@@ -1,0 +1,17 @@
+PB9 - SCL - braun
+PB8 - SDA - rot
+
+
+
+Lidar- VL53LOX
+D:\onedrive_tobias.flaemig_outlook.de\OneDrive\TechProjects\M5Stack\TOF-Abstandssensor
+I2C 	0b0101001x
+	0x52 (8Bit Adr)
+	0x29 (7Bit Adr)	rw
+
+RFID-Leser - SL018 
+http://www.stronglink-rfid.com/download/SL018-User-Manual.pdf
+I2C	0b1010000x
+	0xA0 (8Bit Adr)
+ 	0x50 (7Bit Adr) w (wenn Karte aufliegt, LED gruen)r
+
