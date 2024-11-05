@@ -12,7 +12,7 @@
  ******************************************************************************
  * @attention
  *
- * Copyright (c) 2024 STMicroelectronics.
+ * Copyright (c) 2023 STMicroelectronics.
  * All rights reserved.
  *
  * This software is licensed under terms that can be found in the LICENSE file
@@ -55,7 +55,7 @@ defined in linker script */
   .weak Reset_Handler
   .type Reset_Handler, %function
 Reset_Handler:
-rr  ldr   r0, =_estack
+  ldr   r0, =_estack
   mov   sp, r0          /* set stack pointer */
 /* Call the clock system initialization function.*/
   bl  SystemInit
