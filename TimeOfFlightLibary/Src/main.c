@@ -41,10 +41,44 @@ bool timerTrigger = false;
 
 
 
+ //Hilfreiche Fehlerfinder
+/**
+// Hard Fault Handler with debugging code
+void HardFault_Handler(void) {
+    uint32_t hfsr = SCB->HFSR;
+    uint32_t cfsr = SCB->CFSR;
+    uint32_t bfar = SCB->BFAR;
+    uint32_t mmar = SCB->MMFAR; // Corrected name
+
+    // Place a breakpoint here to inspect these variables or log them if possible
+    (void)hfsr;
+    (void)cfsr;
+    (void)bfar;
+    (void)mmar;
+    while (1); // Infinite loop for debugging
+}
+
+void UsageFault_Handler(void) {
+    // Place a breakpoint here or log fault information
+    while (1); // Infinite loop for debugging
+}
+
+void MemManage_Handler(void) {
+    // Place a breakpoint here for memory management faults
+    while (1);
+}
+
+void BusFault_Handler(void) {
+    // Place a breakpoint here for bus faults
+    while (1);
+}
+*/
+
+//Aktuelles Problem, er steigt hier vor der Main aus und geht in den Fehler Infinite Loop
 
 int main(void) {
-	uint32_t ledTimer = 0UL;
-	uint8_t riseTime = 120;
+	while(1){}
+	uint8_t riseTime = 1;
 	uint8_t i2cAddr = 0x27;
 	uint8_t *readdata = 0xA1;
 	uint8_t *writedata = 0x16;
@@ -55,7 +89,6 @@ int main(void) {
 
 // Initialisierung des Systick-Timers
 	systickInit(SYSTICK_1MS);
-	systickSetMillis(&ledTimer, 1000);
 
 // GPIOB-Bustakt aktivieren wegen der Verwendung von PB8/PB9.
 	gpioInitPort(GPIOB);
@@ -104,12 +137,11 @@ int main(void) {
 
 	//I2C_RETURN_CODE_t i2cSendByte(I2C_TypeDef *i2c, uint8_t saddr, uint8_t data);
 	//i2cSendByte(I2C1, i2cAddr, senddata);
-
+	while (1) {
+	        // Loop to ensure basic startup doesn't trigger a fault
+	    }
 
 
 
 
 }
-
-
-
