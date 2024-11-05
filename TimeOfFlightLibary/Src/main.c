@@ -31,22 +31,27 @@
 #include <mcalSPI.h>
 #include <mcalI2C.h>
 
-int8_t i2cPutByte(I2C_TypeDef *i2c, uint8_t saddr, uint8_t data);
-int8_t i2cGetByte(I2C_TypeDef *i2c, uint8_t saddr,
-uint8_t *data);
 
-#define PCF8574A_ADDR (0x27)	//Im Datenblatt steht eigentlich 0x52 müssen wir mal fragen in Github steht 0x29
+//Im Datenblatt steht eigentlich 0x52 müssen wir mal fragen in Github steht 0x29
+
 #define TRUE 1
 #define FALSE 0
 bool timerTrigger = false;
 
 
 
+
+
 int main(void) {
 	uint32_t ledTimer = 0UL;
-	uint8_t ledPattern = 0xFF;
-	uint8_t ledPos = 0;
-	uint8_t data = 0;
+	uint8_t riseTime = 120;
+	uint8_t i2cAddr = 0x27;
+	uint8_t *readdata = 0xA1;
+	uint8_t *writedata = 0x16;
+
+	uint8_t writeregAddr = 0x52; // WRITE REGISTER
+	uint8_t readregAddr = 0x53; // READ REGISTER
+	uint8_t saddr = 0x27;
 
 // Initialisierung des Systick-Timers
 	systickInit(SYSTICK_1MS);
@@ -63,144 +68,48 @@ int main(void) {
 	gpioSetOutputType(GPIOB, PIN8, OPENDRAIN);
 	gpioSetOutputType(GPIOB, PIN9, OPENDRAIN);
 
-// Wenn Platine keine Pullupwiderstände hat dann hier einfügen (Seite 432 Jesse)
+	//I2C_RETURN_CODE_t i2cSelectI2C(I2C_TypeDef *i2c)
+	i2cSelectI2C(I2C1);
+
+	//I2C_RETURN_CODE_t i2cSetClkSpd(I2C_TypeDef *i2c, I2C_CLOCKSPEED_t spd);
+	i2cSetClkSpd(I2C1, I2C_CLOCK_100);
+
+	//I2C_RETURN_CODE_t i2cSetDutyCycle(I2C_TypeDef *i2c, I2C_DUTY_CYCLE_t duty);
+	i2cSetDutyCycle(I2C1, I2C_DUTY_CYCLE_2);
+
+	//I2C_RETURN_CODE_t i2cSetRiseTime(I2C_TypeDef *i2c, uint8_t riseTime);
+	 i2cSetRiseTime(I2C1, riseTime);
+
+	//i2cInitI2C(I2C_TypeDef *i2c, I2C_DUTY_CYCLE_t duty, uint8_t trise, I2C_CLOCKSPEED_t clock);
+	i2cInitI2C(I2C1, I2C_DUTY_CYCLE_2, riseTime, I2C_CLOCK_100);
+
+	//i2cFindSlaveAddr(I2C_TypeDef *i2c, uint8_t i2cAddr);
+	i2cFindSlaveAddr(I2C1, i2cAddr);
+
+
+	//I2C_RETURN_CODE_t i2cSendByteToSlaveReg(I2C_TypeDef *i2c, uint8_t saddr, uint8_t regAddr, uint8_t data);
+	i2cSendByteToSlaveReg(I2C1, i2cAddr, writeregAddr, *writedata);
+
+
+	//I2C_RETURN_CODE_t i2cReadByteFromSlaveReg(I2C_TypeDef *i2c, uint8_t saddr, uint8_t regAddr, uint8_t *data);
+	//i2cReadByteFromSlaveReg(I2C1, i2cAddr, readregAddr, *readdata);
 
 
 
-	// Initialisierung des I2C-Controllers
-	RCC->APB1ENR |= RCC_APB1ENR_I2C1EN; // I2C1	Bustakt aktivieren
-	I2C1->CR1 &= ~I2C_CR1_PE;
-	I2C1->CR1 = 0x0000; // I2C1: Defaultwert	herstellen
-	I2C1->CR2 = 0x0010; // I2C1: Peripherietakt	einstellen
-	I2C1->CCR = 0x0050; // I2C1: Standard-Modus =	100 kHz		50hex = 80 dez Takteinstellung überprüfen ?
-																// geändert zu 190hex wären 400 dez
-	I2C1->TRISE = 0x0011; // I2C1: Max.	Anstiegszeit der Flanke
-	I2C1->CR1 |= I2C_CR1_PE; // I2C1: aktivieren
 
-/* Hauptprogramm: Endlosschleife */
-		while(1){
-			if(timerTrigger == TRUE){
-				DECREMENT_TIMER(ledTimer);
-				timerTrigger = FALSE;
-				}
 
-			if (isSystickExpired(ledTimer)){
-//Hier springt die schleife rein
+	//I2C_RETURN_CODE_t i2cBurstWrite(I2C_TypeDef *i2c, uint8_t saddr, uint8_t *data, uint8_t numBytes);
+	//i2cBurstWrite(I2C1, saddr, uint8_t *data, uint8_t numBytes);
 
-				//i2cGetByte(I2C1, PCF8574A_ADDR, &data); //	Lesen
 
-				i2cPutByte(I2C1, PCF8574A_ADDR, 0xC0);
-				i2cPutByte(I2C1, PCF8574A_ADDR, 0xC1);
-				i2cPutByte(I2C1, PCF8574A_ADDR, 0xC2);
-			if (ledPos > 0x07){
-				ledPos = 0;
-				ledPattern = 0xFF;
-			}
+	//I2C_RETURN_CODE_t i2cSendByte(I2C_TypeDef *i2c, uint8_t saddr, uint8_t data);
+	//i2cSendByte(I2C1, i2cAddr, senddata);
 
-			systickSetMillis(&ledTimer, 1000);
-		}
-	}
-}
-/**
-* @brief Sendet ein Datenbyte an die I2C-Komponente.
-*
-* @param[in] *i2c : Pointer auf das I2C-Interface
-* @param[in] saddr : I2C-Adresse des Slave
-* @param[in] data : Daten, die gesendet werdensollen.
-*/
 
-int8_t i2cPutByte(I2C_TypeDef *i2c, uint8_t saddr,	uint8_t data){
-static uint32_t dummy = 0UL;
 
-/* Prueft, ob die gewaehlte Komponente 'busy' ist.
-*/
-	while(i2c->SR2 & I2C_SR2_BUSY){
-		;
-	}
 
-	// Generieren und Senden des Startsignals. Warten, bis	108 // das Busy-Bit auf "1" wechselt.
-	i2c->CR1 |= I2C_CR1_START;
-	while(!(i2c->SR1 & I2C_SR1_SB)){
-		;
-	}
 
-	// Senden der Slave-Adresse. VORSICHT: Die Slave-	Adresse
-	// kann bereits um eine Stelle nach links geschoben sein.
-	// Dann reicht es aus, i2c->DR = saddr; zu senden.
-	// i2c->DR = saddr << 1;
-	i2c->DR = saddr;
-
-	// Prueft, ob die Adresse erkannt wurde (ob sie gueltig ist).
-	while(!(i2c->SR1 & I2C_SR1_ADDR)){
-	++dummy;
-	}
-
-	// Lesen von SR1 und SR2: Die Werte werden nicht weiter
-	// benoetigt.
-	i2c->SR1;
-	i2c->SR2;
-
-	// Warten, bis das Transmit-Register leer ist.
-	while(!(i2c->SR1 & I2C_SR1_TXE)){
-		;
-	}
-
-	// Datenbyte senden
-	i2c->DR = data;
-
-	 // Warten, bis der Bit-Transfer abgeschlossen ist.
-	while(!(i2c->SR1 & I2C_SR1_BTF)){
-		;
-	}
-
-	// Stoppsignal generieren und senden
-	i2c->CR1 |= I2C_CR1_STOP;
-	 return 0;
 }
 
-
-/**
- * @brief Lesen eines Bytes. Funktioniert mit der Platine nicht.
- * Funktioniert aber, wenn Sie ein Breadboard verwenden und die
- * LEDs weglassen.
- */
-
- int8_t i2cGetByte(I2C_TypeDef *i2c, uint8_t saddr, uint8_t *data){
-	static uint32_t dummy = 0UL;
-	// Prueft, ob die gewaehlte Komponente 'busy' ist.
-
-	while(i2c->SR2 & I2C_SR2_BUSY){
-		;
-	}
-
-	/* Generiere Startsequenz */
-	i2c->CR1 |= I2C_CR1_START;
-	while(!(i2c->SR1 & I2C_SR1_SB)){
-		;
-	}
-
-	/* Sende Slave-Adresse und warte, bis Adress-Flag
-	gesetzt ist */
-	i2c->DR = saddr | 1; // | 1 erzwingt Lesezugriff
-	while (!(i2c->SR1 & I2C_SR1_ADDR)){
-		;
-	}
-
-	/* Deaktiviere ACK */
-	i2c->CR1 &= ~I2C_CR1_ACK_Msk;
-	i2c->SR2; // Nur Auslesen von SR2, Wert wird nicht
-	// verwendet.
-
-	i2c->CR1 |= I2C_CR1_STOP;
-
-	/* Warte, bis das RXNE-Bit gesetzt ist */
-	while (!(i2c->SR1 & I2C_SR1_RXNE)){
-		;
-	}
-
-	/* Speichere Datenbyte in data */
-	*data = i2c->DR;
-	return 0;
-	}
 
 
