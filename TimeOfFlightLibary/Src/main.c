@@ -35,7 +35,7 @@ int8_t i2cPutByte(I2C_TypeDef *i2c, uint8_t saddr, uint8_t data);
 int8_t i2cGetByte(I2C_TypeDef *i2c, uint8_t saddr,
 uint8_t *data);
 
-#define PCF8574A_ADDR (0x70)
+#define PCF8574A_ADDR (0x27)	//Im Datenblatt steht eigentlich 0x52 müssen wir mal fragen in Github steht 0x29
 #define TRUE 1
 #define FALSE 0
 bool timerTrigger = false;
@@ -65,12 +65,15 @@ int main(void) {
 
 // Wenn Platine keine Pullupwiderstände hat dann hier einfügen (Seite 432 Jesse)
 
+
+
 	// Initialisierung des I2C-Controllers
 	RCC->APB1ENR |= RCC_APB1ENR_I2C1EN; // I2C1	Bustakt aktivieren
 	I2C1->CR1 &= ~I2C_CR1_PE;
 	I2C1->CR1 = 0x0000; // I2C1: Defaultwert	herstellen
 	I2C1->CR2 = 0x0010; // I2C1: Peripherietakt	einstellen
-	I2C1->CCR = 0x0050; // I2C1: Standard-Modus =	100 kHz
+	I2C1->CCR = 0x0050; // I2C1: Standard-Modus =	100 kHz		50hex = 80 dez Takteinstellung überprüfen ?
+																// geändert zu 190hex wären 400 dez
 	I2C1->TRISE = 0x0011; // I2C1: Max.	Anstiegszeit der Flanke
 	I2C1->CR1 |= I2C_CR1_PE; // I2C1: aktivieren
 
@@ -82,10 +85,13 @@ int main(void) {
 				}
 
 			if (isSystickExpired(ledTimer)){
-				i2cGetByte(I2C1, PCF8574A_ADDR, &data); //	Lesen
-				ledPattern &= ~(1 << ledPos++); //Schreiben
-				i2cPutByte(I2C1, PCF8574A_ADDR, ledPattern);
+//Hier springt die schleife rein
 
+				//i2cGetByte(I2C1, PCF8574A_ADDR, &data); //	Lesen
+
+				i2cPutByte(I2C1, PCF8574A_ADDR, 0xC0);
+				i2cPutByte(I2C1, PCF8574A_ADDR, 0xC1);
+				i2cPutByte(I2C1, PCF8574A_ADDR, 0xC2);
 			if (ledPos > 0x07){
 				ledPos = 0;
 				ledPattern = 0xFF;
