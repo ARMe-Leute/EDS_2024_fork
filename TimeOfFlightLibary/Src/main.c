@@ -41,99 +41,52 @@ bool timerTrigger = false;
 
 
 
- //Hilfreiche Fehlerfinder
-/**
-// Hard Fault Handler with debugging code
-void HardFault_Handler(void) {
-    uint32_t hfsr = SCB->HFSR;
-    uint32_t cfsr = SCB->CFSR;
-    uint32_t bfar = SCB->BFAR;
-    uint32_t mmar = SCB->MMFAR; // Corrected name
-
-    // Place a breakpoint here to inspect these variables or log them if possible
-    (void)hfsr;
-    (void)cfsr;
-    (void)bfar;
-    (void)mmar;
-    while (1); // Infinite loop for debugging
-}
-
-void UsageFault_Handler(void) {
-    // Place a breakpoint here or log fault information
-    while (1); // Infinite loop for debugging
-}
-
-void MemManage_Handler(void) {
-    // Place a breakpoint here for memory management faults
-    while (1);
-}
-
-void BusFault_Handler(void) {
-    // Place a breakpoint here for bus faults
-    while (1);
-}
-*/
-
-//Aktuelles Problem, er steigt hier vor der Main aus und geht in den Fehler Infinite Loop
 
 int main(void) {
-	uint8_t riseTime = 1;
-	uint8_t i2cAddr = 0x27;
-	uint8_t *readdata = 0xA1;
-	uint8_t *writedata = 0x16;
+	void i2cActivate()
+	{
+		I2C_TypeDef   *i2c  = I2C1;
+	#ifdef BALA2024
+		I2C_TypeDef   *i2c2  = I2C2;
+	#endif /* BALA2024 */
+		GPIO_TypeDef  *portB = GPIOB;
+	    // GPIOB-Bustakt aktivieren wegen der Verwendung von PB8/PB9 (I2C).
+	    i2cSelectI2C(i2c);                           // I2C1: Bustakt aktivieren
+	    //i2cDisableDevice(i2c);
+	    gpioInitPort(portB);
+	    gpioSelectPinMode(portB, PIN8, ALTFUNC);
+	    gpioSelectAltFunc(portB, PIN8, AF4);         // PB8 : I2C1 SCL
+	    gpioSelectPinMode(portB, PIN9, ALTFUNC);
+	    gpioSelectAltFunc(portB, PIN9, AF4);         // PB9 : I2C1 SDA
 
-	uint8_t writeregAddr = 0x52; // WRITE REGISTER
-	uint8_t readregAddr = 0x53; // READ REGISTER
-	uint8_t saddr = 0x27;
+	    /**
+	     * Verwenden Sie auf keinen Fall die MCU-internen Pull-up-Widerstaende!
+	     * Widerstandswerte: jeweils 4k7 fuer SDA und SCL!
+	     */
+	    gpioSetOutputType(portB, PIN8, OPENDRAIN);   // Immer externe Pull-up-
+	    gpioSetOutputType(portB, PIN9, OPENDRAIN);   // Widerstaende verwenden!!!
+	    // Initialisierung des I2C-Controllers
+	    i2cInitI2C(i2c, I2C_DUTY_CYCLE_2, 17, I2C_CLOCK_50);
+	    i2cEnableDevice(i2c);                        // MCAL I2C1 activ
+	#ifdef BALA2024
 
-// Initialisierung des Systick-Timers
-	systickInit(SYSTICK_1MS);
+	    // GPIOB-Bustakt aktivieren wegen der Verwendung von PB10/PB3 (I2C).
+	    i2cSelectI2C(i2c2);                           // I2C2: Bustakt aktivieren
+	    gpioSelectPinMode(portB, PIN10, ALTFUNC);
+	    gpioSelectAltFunc(portB, PIN10, AF4);         // PB10 : I2C2 SCL
+	    gpioSelectPinMode(portB, PIN3, ALTFUNC);
+	    gpioSelectAltFunc(portB, PIN3, AF9);         // PB3 : 	I2C2 SDA
 
-// GPIOB-Bustakt aktivieren wegen der Verwendung von PB8/PB9.
-	gpioInitPort(GPIOB);
-	gpioSelectPinMode(GPIOB, PIN8, ALTFUNC);
-	gpioSelectAltFunc(GPIOB, PIN8, AF4); // PB8 :	I2C1 SCL
-
-	gpioSelectPinMode(GPIOB, PIN9, ALTFUNC);
-	gpioSelectAltFunc(GPIOB, PIN9, AF4); // PB9 :	I2C1 SDA
-
-	gpioSetOutputType(GPIOB, PIN8, OPENDRAIN);
-	gpioSetOutputType(GPIOB, PIN9, OPENDRAIN);
-
-	//I2C_RETURN_CODE_t i2cSelectI2C(I2C_TypeDef *i2c)
-	i2cSelectI2C(I2C1);
-
-	//I2C_RETURN_CODE_t i2cSetClkSpd(I2C_TypeDef *i2c, I2C_CLOCKSPEED_t spd);
-	i2cSetClkSpd(I2C1, I2C_CLOCK_100);
-
-	//I2C_RETURN_CODE_t i2cSetDutyCycle(I2C_TypeDef *i2c, I2C_DUTY_CYCLE_t duty);
-	i2cSetDutyCycle(I2C1, I2C_DUTY_CYCLE_2);
-
-	//I2C_RETURN_CODE_t i2cSetRiseTime(I2C_TypeDef *i2c, uint8_t riseTime);
-	 i2cSetRiseTime(I2C1, riseTime);
-
-	//i2cInitI2C(I2C_TypeDef *i2c, I2C_DUTY_CYCLE_t duty, uint8_t trise, I2C_CLOCKSPEED_t clock);
-	i2cInitI2C(I2C1, I2C_DUTY_CYCLE_2, riseTime, I2C_CLOCK_100);
-
-	//i2cFindSlaveAddr(I2C_TypeDef *i2c, uint8_t i2cAddr);
-	i2cFindSlaveAddr(I2C1, i2cAddr);
-
-
-	//I2C_RETURN_CODE_t i2cSendByteToSlaveReg(I2C_TypeDef *i2c, uint8_t saddr, uint8_t regAddr, uint8_t data);
-	i2cSendByteToSlaveReg(I2C1, i2cAddr, writeregAddr, *writedata);
-
-
-	//I2C_RETURN_CODE_t i2cReadByteFromSlaveReg(I2C_TypeDef *i2c, uint8_t saddr, uint8_t regAddr, uint8_t *data);
-	//i2cReadByteFromSlaveReg(I2C1, i2cAddr, readregAddr, *readdata);
-
-
-
-	//I2C_RETURN_CODE_t i2cBurstWrite(I2C_TypeDef *i2c, uint8_t saddr, uint8_t *data, uint8_t numBytes);
-	//i2cBurstWrite(I2C1, saddr, uint8_t *data, uint8_t numBytes);
-
-
-	//I2C_RETURN_CODE_t i2cSendByte(I2C_TypeDef *i2c, uint8_t saddr, uint8_t data);
-	//i2cSendByte(I2C1, i2cAddr, senddata);
-
+	    /**
+	     * Verwenden Sie auf keinen Fall die MCU-internen Pull-up-Widerstaende!
+	     * Widerstandswerte: jeweils 4k7 fuer SDA und SCL!
+	     */
+	    gpioSetOutputType(portB, PIN10, OPENDRAIN);   // Immer externe Pull-up-
+	    gpioSetOutputType(portB, PIN3, OPENDRAIN);   // Widerstaende verwenden!!!
+	    // Initialisierung des I2C-Controllers
+	    i2cInitI2C(i2c2, I2C_DUTY_CYCLE_2, 17, I2C_CLOCK_50);
+	    i2cEnableDevice(i2c2);                        // MCAL I2C2 activ
+	#endif /* BALA2024 */
+	}
 
 }
