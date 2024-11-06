@@ -77,7 +77,6 @@ void BusFault_Handler(void) {
 //Aktuelles Problem, er steigt hier vor der Main aus und geht in den Fehler Infinite Loop
 
 int main(void) {
-	while(1){}
 	uint8_t riseTime = 1;
 	uint8_t i2cAddr = 0x27;
 	uint8_t *readdata = 0xA1;
@@ -129,19 +128,12 @@ int main(void) {
 
 
 
-
-
 	//I2C_RETURN_CODE_t i2cBurstWrite(I2C_TypeDef *i2c, uint8_t saddr, uint8_t *data, uint8_t numBytes);
 	//i2cBurstWrite(I2C1, saddr, uint8_t *data, uint8_t numBytes);
 
 
 	//I2C_RETURN_CODE_t i2cSendByte(I2C_TypeDef *i2c, uint8_t saddr, uint8_t data);
 	//i2cSendByte(I2C1, i2cAddr, senddata);
-	while (1) {
-	        // Loop to ensure basic startup doesn't trigger a fault
-	    }
-
-
 
 
 }
