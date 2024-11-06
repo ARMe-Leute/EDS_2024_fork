@@ -4,6 +4,12 @@
 
 language.settings.xml
 
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
 # Prerequisites
 *.d
 
