@@ -39,11 +39,7 @@
 bool timerTrigger = false;
 
 
-
-
-
-int main(void) {
-	void i2cActivate()
+void i2cActivate()
 	{
 		I2C_TypeDef   *i2c  = I2C1;
 	#ifdef BALA2024
@@ -89,4 +85,10 @@ int main(void) {
 	#endif /* BALA2024 */
 	}
 
-}
+
+
+
+int main(void) {
+	i2cActivate();
+	}
+
