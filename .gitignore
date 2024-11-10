@@ -3,6 +3,10 @@
 **/Release
 
 language.settings.xml
+*.ld
+*.launch
+*.s
+**/.settings
 
 ### macOS ###
 # General
