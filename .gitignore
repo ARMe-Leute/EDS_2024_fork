@@ -3,6 +3,10 @@
 **/Release
 
 language.settings.xml
+*.ld
+*.launch
+*.s
+**/.settings
 
 # misra file
 # The rules are under copyright so we don't want to include them.
