@@ -38,7 +38,7 @@ I2C_TypeDef *TOF_i2c;
 static uint8_t TOF_stop_variable = 0;
 
 // flag for continuous_mode on or off
-bool TOF_continuous_mode = true;		// geändert zu true von false
+bool TOF_continuous_mode = false;
 
 //---------------------INTERNAL FUNCTIONS---------------------
 
