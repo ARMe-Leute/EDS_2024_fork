@@ -105,9 +105,9 @@ int main(void)
 	float ZDataList[4] = {0,0,0,0};
 	float XYZ_Mean[3] = {0,0,0};
 	float rotX = 0;
-	float rotY = 0;
-	float oldrotX = 0;
-	float oldrotY = 0;
+	//float rotY = 0;
+	//float oldrotX = 0;
+	//float oldrotY = 0;
 
 	// orientation of the display, used to flip screen
 	ORIENTATION_SCREEN_t orientation = ORIENTATION_1;
@@ -125,6 +125,14 @@ int main(void)
 	// init project
 	initBala();
 
+
+//---------------------------------------------------------------
+	//i2cActivate();
+	//RCC->APB1ENR |= RCC_APB1ENR_I2C1EN;
+	//i2cSelectI2C(i2c); //Bustakt aktivieren
+	//TOF_init(I2C2,0x27); // Hier provisorische TOF init hängt beim ACK vom TOF
+	//TOF_startContinuous(5);
+//---------------------------------------------------------------
 
 
 	// infinity loop to execute software
@@ -284,7 +292,7 @@ int main(void)
 			case SCREEN_PAGE2:
 				visualisationTOF(distance, &olddistance);
 				break;
-			//case SCREEN_PAGE3:
+			case SCREEN_PAGE3:
 				//visualisation3DG(rotX, rotY, &oldrotX, &oldrotY);
 				break;
 			case SCREEN_PAGE4:

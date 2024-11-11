@@ -51,7 +51,7 @@
 #define TOF_RANGE_SEQUENCE_STEP_FINAL_RANGE (0x80)
 
 #define TOF_VL53L0X_EXPECTED_DEVICE_ID (0xEE)
-#define TOF_VL53L0X_DEFAULT_ADDRESS (0x29)
+#define TOF_VL53L0X_DEFAULT_ADDRESS (0x27)//geändert von 0x29
 
 // define out of range
 #define TOF_VL53L0X_OUT_OF_RANGE (8190)
@@ -60,7 +60,7 @@
 typedef enum
 {
 	TOF_ADDR_NONE		= -1,
-	TOF_ADDR_VL53LOX	= 0x29
+	TOF_ADDR_VL53LOX	= 0x27 // geändert von 0x29
 } TOF_ADDR_t;
 
 // enum for calibration phase
