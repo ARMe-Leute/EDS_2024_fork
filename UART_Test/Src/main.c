@@ -25,22 +25,20 @@
 #include <mcalGPIO.h>
 #include <mcalUsart.h>
 
-#define BLUETOOTH_RX
-#define BLUETOOTH_TX
 
-uint8_t *outString =  (uint8_t *) "ABCD";
+uint8_t *outString =  (uint8_t *) "xyz";
 
-void uartTest(void);
 void USART2_IRQHandler(void);
+void delay(uint16_t delay);
 
 int main(void)
 {
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; // GPIOA :Bustakt aktivieren
-	gpioSelectPinMode(GPIOA, PIN2, ALTFUNC); // PA2 :Modus = Alt. Funktion
-	gpioSelectAltFunc(GPIOA, PIN2, AF7); // PA2 :AF7 = USART2 Rx
-	gpioSelectPinMode(GPIOA, PIN3, ALTFUNC); // PA3 :Modus = Alt. Funktion
-	gpioSelectAltFunc(GPIOA, PIN3, AF7); // PA3 :AF7 = USART2 Tx
-	gpioSelectPinMode(GPIOA, PIN5, OUTPUT); // PA5 :GPIO-Output fuer LED
+	gpioSelectPinMode(GPIOA, PIN3, ALTFUNC); // PA2 :Modus = Alt. Funktion
+	gpioSelectAltFunc(GPIOA, PIN3, AF7); // PA2 :AF7 = USART2 Rx
+	gpioSelectPinMode(GPIOA, PIN2, ALTFUNC); // PA3 :Modus = Alt. Funktion
+	gpioSelectAltFunc(GPIOA, PIN2, AF7); // PA3 :AF7 = USART2 Tx
+	gpioSelectPinMode(GPIOA, PIN10, OUTPUT); // PA5 :GPIO-Output fuer LED
 
 	// Hier werden sämtliche Parameter (Baudrate, Wortlaenge, Paritaet und
 	// Anzahl der Stoppbits eingestellt.
@@ -52,7 +50,21 @@ int main(void)
 	NVIC_EnableIRQ(USART2_IRQn);
 	__enable_irq();
 	/* Loop forever */
-	for(;;);
+	for(;;){}
+}
+
+
+void delay(uint16_t delay)
+{
+	uint16_t i = 0;
+
+	for (; delay > 0; --delay)
+	{
+		for (i = 0; i < 1245; ++i)
+		{
+			;
+		}
+	}
 }
 
 void USART2_IRQHandler(void)
@@ -63,33 +75,21 @@ void USART2_IRQHandler(void)
 		received = USART2->DR & 0x01FF;
 		if (received == 'a')
 		{
-			gpioSetPin(GPIOA, PIN5);
+			gpioSetPin(GPIOA, PIN10);
 		}
 		if (received == 'b')
 		{
-			gpioResetPin(GPIOA, PIN5);
+			gpioResetPin(GPIOA, PIN10);
 		}
 		if ((received >= 'A') && (received <= 'Z'))
 		{
-			USART2->DR = received;
+			usartSendByte(USART2, received);
 		}
 		if (received == 'c')
 		{
-			USART2->CR1 |= USART_CR1_TXEIE;
-			USART2->DR = *outString++;  // Liest alle Zeichen des
-			// vordefinierten Strings
+			usartSendString(USART2, outString);
 		}
 	}
 
-	if (USART2->SR & USART_SR_TXE)
-	{
-		if (*outString != '\0')
-		{
-			USART2->DR = *outString++;
-		}
-		else
-		{
-			USART2->CR1 &= ~USART_CR1_TXEIE;
-		}
-	}
+
 }
