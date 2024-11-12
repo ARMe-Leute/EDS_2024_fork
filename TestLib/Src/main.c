@@ -96,7 +96,7 @@ int main(void)
 
 	// variables to store the distance
 	uint16_t distance = 0;
-	uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
+	//uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
 
 
 	// timer variables
@@ -142,6 +142,24 @@ int main(void)
 			exitMenu = EXIT_FROMSUB1;
 		}
 	}
+
+//--------------------LIBTESTS---------------------
+
+if (SetRangingProfile(HIGH_SPEED_MODE_S) == true)
+{
+	TOF_ReadSingleDistance(&distance);
+
+	}
+
+
+
+if(SetRangingProfile(DEFAULT_MODE_D) == true)
+{
+	TOF_ReadSingleDistance(&distance);
+
+}
+
+//------------------LIBTESTS ENDE-------------------
 
 
 

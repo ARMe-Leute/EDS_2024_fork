@@ -37,6 +37,10 @@
 #include "visualisation.h"
 #include "main.h"
 
+
+#define PIGGYBAG
+
+
 // Time timer to check Button input, execute
 // Menu change, calculate 3DG rotation data
 #define timeTimerExec (50)
@@ -58,7 +62,7 @@ bool inited3DG = false;
 bool initedTOF = false;
 
 // current page to be loaded and executed
-SCREEN_PAGES_t page = SCREEN_MAIN;
+SCREEN_PAGES_t page = SCREEN_PAGE3;		//SCREEN_MAIN
 
 // variable to initialize TOF, just an internal flag,
 // not necessary to use TOF library. There it is located here
@@ -92,7 +96,7 @@ int main(void)
 
 	// variables to store the distance
 	uint16_t distance = 0;
-	//uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
+	uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
 
 
 	// timer variables
@@ -108,7 +112,8 @@ int main(void)
 	// init project
 	initBala();
 
-	//visualisationStart();
+	//visualisationClearBody();
+
 
 	i2cScanAndInit(i2c);
 
@@ -118,7 +123,7 @@ int main(void)
 	if(enableTOFSensor != ENABLE_TOF_FALSE && enableTOFSensor == (ENABLE_TOF_SENSOR_t)i2cInitPort)
 	{
 		// do TOF sensor initialization
-		visualisationSensorInit(SENSOR_INIT_RUNNING);
+		//visualisationSensorInit(SENSOR_INIT_RUNNING); // Hier wird das TFT weiß
 
 		i2c_tof = i2c;
 
@@ -128,15 +133,16 @@ int main(void)
 		if(result == true)
 		{
 			// show if init was successful
-			visualisationSensorInit(SENSOR_INIT_DONE);
+			//visualisationSensorInit(SENSOR_INIT_DONE);
 			initedTOF = true;
 
 			// give chance to read success-massage
-			//delayms(500);
+			delayms(500);
 
 			exitMenu = EXIT_FROMSUB1;
 		}
 	}
+
 
 
 
@@ -151,23 +157,19 @@ int main(void)
 		// if timer execute is expired
 		if (isSystickExpired(TimerExec))
 		{
-			//TOF ZEUG ALSO LESEN
+
 			uint8_t runner = 0;
 			for (runner = 0; runner <= 20; runner++) {
-			    TOF_ReadContinuousDistance(&distance);
-			    TOF_ReadSingleDistance(&distance);
-			}
-			TOF_stopContinuous();
+				TOF_ReadSingleDistance(&distance);
 
-			for (runner = 0; runner < 0; runner--) {
-				//Dummy schleife
+				}
 			}
+
 
 			systickSetTicktime(&TimerExec, timeTimerExec);
 		}
 
 	}
-}
 
 /*
  * @function:	 initBala
@@ -192,7 +194,6 @@ void initBala(void)
 	//initialization needed for TFT Display
 	spiInit();
 	tftInitR(INITR_REDTAB);
-
 	// start visualization
 	visualisationStart();
 
