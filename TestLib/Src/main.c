@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  * @file           : main.c
- * @author         : Linus Blanke & Christoph Lederbogen
+ * @author         : Andreas Ladner & Philipp Röhlke
  * @brief		   : This is the executable file for our implementation, which
  * 					 includes the functionality for an 3DG sensor and the TOF
  * 					 sensor in combination with an TFT display and the rotary
@@ -145,7 +145,15 @@ int main(void)
 
 //--------------------LIBTESTS---------------------
 
-if (SetRangingProfile(HIGH_SPEED_MODE_S) == true)
+	uint16_t time = 20; // in der Realität gemessene 17ms
+
+	TOF_ReadSingleDistance(&distance);
+
+
+	TOF_ReadDistanceTimed(time, &distance);
+
+/**
+	if (SetRangingProfile(HIGH_SPEED_MODE_S) == true)
 {
 	TOF_ReadSingleDistance(&distance);
 
@@ -158,7 +166,7 @@ if(SetRangingProfile(DEFAULT_MODE_D) == true)
 	TOF_ReadSingleDistance(&distance);
 
 }
-
+*/
 //------------------LIBTESTS ENDE-------------------
 
 

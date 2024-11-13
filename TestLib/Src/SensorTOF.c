@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  * @file           : SensorTOF.c
- * @author         : Linus Blanke & Christoph Lederbogen
+ * @author         : Andreas Ladner & Philipp Röhlke
  * @brief          : This is the library file to communicate with an TOF sensor.
  * 					 Currently adapted to VL53LOX.
  * 					 It is possible to get the distance in single mode and
@@ -821,6 +821,9 @@ bool TOF_ReadSingleDistance(uint16_t *range)
  */
 bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range)
 {
+
+	delayms(time);
+
 	I2C_RETURN_CODE_t i2c_return;
 
 
@@ -861,7 +864,7 @@ bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range)
 }
 
 
-
+/**
 
 /*
  * @function:	 SetRangingProfile
@@ -872,7 +875,9 @@ bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range)
  *				 Default mode (D); High speed (S); High accuracy (A); Long range (R)
  *
  * @returns:	 bool: true if successful
- */
+
+
+
 bool SetRangingProfile(uint16_t Ranging_Profiles_t){
 
 	// switch case for RangingProfile
@@ -880,28 +885,66 @@ bool SetRangingProfile(uint16_t Ranging_Profiles_t){
 	{
 	case DEFAULT_MODE_D:
 		//HERE EXECUTION PROGRAM FOR PROFILE D
-		return true;
 			break;
 
 
 	case HIGH_SPEED_MODE_S:
 		//HERE EXECUTION PROGRAM FOR PROFILE S
-		return false;
+		if (Status == VL53L0_ERROR_NONE) {
+			Status = VL53L0_SetLimitCheckValue(pMyDevice, VL53L0_CHECKENABLE_SIGNAL_RATE_FINAL_RANGE, (FixPoint1616_t)(0.25*65536));
+		}
+		if (Status == VL53L0_ERROR_NONE) {
+			Status = VL53L0_SetLimitCheckValue(pMyDevice, VL53L0_CHECKENABLE_SIGMA_FINAL_RANGE, (FixPoint1616_t)(32*65536));
+		}
+		if (Status == VL53L0_ERROR_NONE) {
+			Status = VL53L0_SetMeasurementTimingBudgetMicroSeconds(pMyDevice, 20000);
+		}
 			break;
 
 
 	case HIGH_ACCURACY_MODE_A:
 		//HERE EXECUTION PROGRAM FOR PROFILE A
+
+		if (Status == VL53L0_ERROR_NONE) {
+			Status = VL53L0_SetLimitCheckValue(pMyDevice, VL53L0_CHECKENABLE_SIGNAL_RATE_FINAL_RANGE, (FixPoint1616_t)(0.25*65536));
+		}
+		if (Status == VL53L0_ERROR_NONE) {
+			Status = VL53L0_SetLimitCheckValue(pMyDevice, VL53L0_CHECKENABLE_SIGMA_FINAL_RANGE, (FixPoint1616_t)(18*65536));
+		}
+		if (Status == VL53L0_ERROR_NONE) {
+			Status = VL53L0_SetMeasurementTimingBudgetMicroSeconds(pMyDevice, 200000);
+		}
+		return status;
 			break;
 
 
 	case LONG_RANGE_MODE_R:
 		//HERE EXECUTION PROGRAM FOR PROFILE R
+		if (Status == VL53L0_ERROR_NONE) {
+			Status = VL53L0_SetLimitCheckValue(pMyDevice, VL53L0_CHECKENABLE_SIGNAL_RATE_FINAL_RANGE, (FixPoint1616_t)(0.1*65536));
+		}
+		if (Status == VL53L0_ERROR_NONE) {
+			Status = VL53L0_SetLimitCheckValue(pMyDevice,
+			VL53L0_CHECKENABLE_SIGMA_FINAL_RANGE,
+			(FixPoint1616_t)(60*65536));
+		}
+		if (Status == VL53L0_ERROR_NONE) {
+			Status =
+			VL53L0_SetMeasurementTimingBudgetMicroSeconds(pMyDevice, 33000);
+		}
+		if (Status == VL53L0_ERROR_NONE) {
+			Status = VL53L0_SetVcselPulsePeriod(pMyDevice, VL53L0_VCSEL_PERIOD_PRE_RANGE, 18);
+		}
+		if (Status == VL53L0_ERROR_NONE) {
+			Status = VL53L0_SetVcselPulsePeriod(pMyDevice, VL53L0_VCSEL_PERIOD_FINAL_RANGE, 14);
+		}
+
 			break;
 
 	}
 
 }
+*/
+//--------------------------------- VON ANDERER LIB BENOETIGTE FUNKTIONEN ----------------------------
 
-
-
+//VL53L0X_SetLimitCheckValue

@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  * @file           : SensorTOF.h
- * @author         : Linus Blanke & Christoph Lederbogen
+ * @author         : Andreas Ladner & Philipp Röhlke
  * @brief          : This is the library file to communicate with an TOF sensor.
  * 					 Currently adapted to VL53LOX.
  * 					 It is possible to get the distance in single mode and
@@ -85,7 +85,6 @@ typedef enum
 	LONG_RANGE_MODE_R		= 4
 
 } Ranging_Profiles_t;
-
 
 
 
