@@ -26,7 +26,7 @@
 #include <mcalUsart.h>
 
 
-uint8_t *outString =  (uint8_t *) "xyz";
+uint8_t *outString =  (uint8_t *) "AT";
 
 void USART2_IRQHandler(void);
 void delay(uint16_t delay);
@@ -44,13 +44,16 @@ int main(void)
 	// Anzahl der Stoppbits eingestellt.
 	usartSelectUsart(USART2);
 	usartEnableUsart(USART2);
-	usartSetCommParams(USART2, 115200, NO_PARITY, LEN_8BIT, ONE_BIT);
+	usartSetCommParams(USART2, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);
 	usartEnableIrq(USART2, USART_IRQ_RXNEIE);
 
 	NVIC_EnableIRQ(USART2_IRQn);
 	__enable_irq();
 	/* Loop forever */
-	for(;;){}
+	for(;;){
+		usartSendString(USART2, outString);
+		delay(500);
+	}
 }
 
 
