@@ -8,6 +8,10 @@ language.settings.xml
 *.s
 **/.settings
 
+### Doxygen ###
+html
+latex
+
 # misra file
 # The rules are under copyright so we don't want to include them.
 # Please pay for the official Misra documents and don't copy them from here: 
