@@ -19,9 +19,19 @@
 #include <mcalUsart.h>
 
 typedef struct BluetoothModule BluetoothModule_t;
+struct BluetoothModule {
+// Todo: Variablen und Funktionen
+	USART_TypeDef *usart;
+
+};
 
 extern void bluetoothGetStatus();
-extern void bluetoothInit(BluetoothModule_t* BluetoothModule, USART_TypeDef* USART);
+extern void bluetoothInit(BluetoothModule_t *BluetoothModule,
+		USART_TypeDef *USART);
+extern void USART2_IRQHandler(void);
+
+
+extern void delay(uint16_t delay); // For testing purpose
 
 
 #endif /* INC_BLUETOOTH_H_ */

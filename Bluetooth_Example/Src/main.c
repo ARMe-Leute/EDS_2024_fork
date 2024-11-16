@@ -24,30 +24,26 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include <mcalGPIO.h>
 #include <mcalUsart.h>
 
+
+BluetoothModule_t HM17;
+
+
 int main(void)
 {
-
-	BluetoothModule_t* HM17;
-
-	bluetoothInit(HM17, USART2);
+	bluetoothInit(&HM17, USART2);
 
 	usartSetCommParams(USART2, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);  //Muss aus irgend einem Grund drin bleiben
-
-
-
-
-
-
 	bluetoothGetStatus();
-
-
-
     /* Loop forever */
 	for(;;){
-		//bluetoothGetStatus();
+		bluetoothGetStatus();
+		delay(500);
 	}
 }
+
+
