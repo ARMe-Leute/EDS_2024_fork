@@ -4,6 +4,23 @@
 
 language.settings.xml
 
+# misra file
+# The rules are under copyright so we don't want to include them.
+# Please pay for the official Misra documents and don't copy them from here: 
+# https://github.com/fzxhub/cppcheck_plugin/blob/main/misra2012_en.txt
+
+misra_rules.txt
+
+# cppcheck
+**/*cppcheck-build-dir/
+cppcheck-addon-ctu-file-list
+*.a1
+*.ctu-info
+*.s1
+lastResults.xml
+statistics.txt
+*.cppcheck
+
 ### macOS ###
 # General
 .DS_Store
