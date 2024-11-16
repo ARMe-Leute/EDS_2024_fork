@@ -18,9 +18,10 @@
 #include <mcalGPIO.h>
 #include <mcalUsart.h>
 
+typedef struct BluetoothModule BluetoothModule_t;
 
 extern void bluetoothGetStatus();
-extern void bluetoothInit();
+extern void bluetoothInit(BluetoothModule_t* BluetoothModule, USART_TypeDef* USART);
 
 
 #endif /* INC_BLUETOOTH_H_ */
