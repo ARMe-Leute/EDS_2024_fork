@@ -30,11 +30,14 @@
 
 int main(void)
 {
-	bluetoothInit();
+
+	BluetoothModule_t* HM17;
+
+	bluetoothInit(HM17, USART2);
+
+	usartSetCommParams(USART2, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);  //Muss aus irgend einem Grund drin bleiben
 
 
-
-	usartSetCommParams(USART2, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);
 
 
 
