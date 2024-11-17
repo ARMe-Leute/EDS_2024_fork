@@ -18,12 +18,8 @@
 #include <mcalGPIO.h>
 #include <mcalUsart.h>
 
-typedef struct BluetoothModule BluetoothModule_t;
-struct BluetoothModule {
-// Todo: Variablen und Funktionen
-	USART_TypeDef *usart;
 
-};
+
 
 extern void bluetoothGetStatus();
 extern void bluetoothInit(BluetoothModule_t *BluetoothModule,
