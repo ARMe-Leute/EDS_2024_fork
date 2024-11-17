@@ -142,7 +142,7 @@ uint32_t bluetoothBaud2Int(BLUETOOTH_BAUD BAUD) {
 		returnValue = 230400;
 		break;
 	default:
-		returnValue=0;
+		returnValue = 0;
 	}
 
 	return returnValue;
