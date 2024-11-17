@@ -52,9 +52,54 @@ void USART2_IRQHandler(void) {
 void bluetoothGetStatus(/*BluetoothModule_t BluetoothModule*/) {
 
 	usartSendString(USART2, (uint8_t*) "AT");
+	bluetoothReceiveString(USART2, 2, 0);
 
 }
 
+/**
+ * @brief Receive a given amount of characters.
+ *
+ * This is a blocking function, so watch out choosing the timeout.
+ * If the target length is not
+ * achieved after this time, the string will be returned as it is.
+ * If no character got received, NULL will be returned.
+ * Calling this function with no limit and no timeout will return NULL
+ *
+ * Don't forget to free the memory!
+ *
+ * @param length: How many characters should be received,
+ * maximum is 64 Kibibyte
+ * 0 means until timeout
+ * @param timeout: The timeout in ms
+ * maximum is 65.536 s.
+ * 0 means no timeout (Not recommended)
+ *
+ */
+char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
+		uint16_t length, uint16_t timeout) {
+
+	if (length == 0 && timeout == 0) {
+		return NULL;
+	}
+
+	//Todo: Timeout
+
+	if (length == 0) {
+		length -= 1; //Set the length to maximum by subtracting 1 (0-1==65536)
+	}
+	char *String = malloc((length + 1) * sizeof(char));
+	if (String == NULL) {
+		return NULL;
+	}
+
+	uint16_t charCounter = 0;
+	while (charCounter < length) {
+		String[charCounter] = bluetoothReceiveChar(BluetoothModule);
+		charCounter++;
+
+	}
+	return String;
+}
 
 
 uint32_t bluetoothBaud2Int(BLUETOOTH_BAUD BAUD) {
