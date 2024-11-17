@@ -30,4 +30,6 @@ extern void USART2_IRQHandler(void);
 extern void delay(uint16_t delay); // For testing purpose
 
 
+
+extern uint32_t bluetoothBaud2Int(BLUETOOTH_BAUD BAUD);
 #endif /* INC_BLUETOOTH_H_ */
