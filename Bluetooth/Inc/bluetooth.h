@@ -8,7 +8,6 @@
 #ifndef INC_BLUETOOTH_H_
 #define INC_BLUETOOTH_H_
 
-#include <bluetooth.h>
 #include <stm32f401xe.h>
 #include <system_stm32f4xx.h>
 
@@ -18,8 +17,7 @@
 #include <mcalGPIO.h>
 #include <mcalUsart.h>
 
-
-
+#include <bluetooth_typedef.h>
 
 extern void bluetoothGetStatus();
 extern void bluetoothInit(BluetoothModule_t *BluetoothModule,
@@ -28,8 +26,6 @@ extern void USART2_IRQHandler(void);
 char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule);
 
 extern void delay(uint16_t delay); // For testing purpose
-
-
 
 extern uint32_t bluetoothBaud2Int(BLUETOOTH_BAUD BAUD);
 #endif /* INC_BLUETOOTH_H_ */
