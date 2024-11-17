@@ -25,7 +25,7 @@ extern void bluetoothGetStatus();
 extern void bluetoothInit(BluetoothModule_t *BluetoothModule,
 		USART_TypeDef *USART);
 extern void USART2_IRQHandler(void);
-
+char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule);
 
 extern void delay(uint16_t delay); // For testing purpose
 
