@@ -101,6 +101,13 @@ char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
 	return String;
 }
 
+char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule) {
+	while (!(BluetoothModule->usart->SR & USART_SR_RXNE)) {
+		//Todo: Timeout
+	}
+	return (char) (BluetoothModule->usart->DR & 0xFF);
+
+}
 
 uint32_t bluetoothBaud2Int(BLUETOOTH_BAUD BAUD) {
 	uint32_t returnValue = 0;
