@@ -55,14 +55,52 @@ void bluetoothGetStatus(/*BluetoothModule_t BluetoothModule*/) {
 
 }
 
-void delay(uint16_t delay)
-{
+
+
+uint32_t bluetoothBaud2Int(BLUETOOTH_BAUD BAUD) {
+	uint32_t returnValue = 0;
+
+	switch (BAUD) {
+
+	case 0:
+		returnValue = 9600;
+		break;
+	case 1:
+		returnValue = 19200;
+		break;
+	case 2:
+		returnValue = 38400;
+		break;
+	case 3:
+		returnValue = 57600;
+		break;
+	case 4:
+		returnValue = 115200;
+		break;
+	case 5:
+		returnValue = 4800;
+		break;
+	case 6:
+		returnValue = 2400;
+		break;
+	case 7:
+		returnValue = 1200;
+		break;
+	case 8:
+		returnValue = 230400;
+		break;
+	default:
+		returnValue=0;
+	}
+
+	return returnValue;
+}
+
+void delay(uint16_t delay) {
 	uint16_t i = 0;
 
-	for (; delay > 0; --delay)
-	{
-		for (i = 0; i < 1245; ++i)
-		{
+	for (; delay > 0; --delay) {
+		for (i = 0; i < 1245; ++i) {
 			;
 		}
 	}
