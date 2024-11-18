@@ -51,7 +51,7 @@ void USART2_IRQHandler(void) {
 void bluetoothGetStatus(/*BluetoothModule_t BluetoothModule*/) {
 
 	usartSendString(USART2, (uint8_t*) "AT");
-	bluetoothReceiveString(USART2, 2, 0);
+	free(bluetoothReceiveString(USART2, 2, 0));
 
 }
 
