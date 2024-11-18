@@ -91,6 +91,11 @@ char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
 		return NULL;
 	}
 
+	for(uint16_t emptyPosition=0; emptyPosition<length+1; emptyPosition++){
+		String[emptyPosition] = '\0';
+	}
+
+
 	uint16_t charCounter = 0;
 	while (charCounter < length) {
 		String[charCounter] = bluetoothReceiveChar(BluetoothModule);
