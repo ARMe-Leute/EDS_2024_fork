@@ -42,7 +42,7 @@ void bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART) {
 void USART2_IRQHandler(void) {
 	if (USART2->SR & USART_SR_RXNE) {
 		uint16_t received = USART2->DR & 0xFF;
-		 receivedChar = received;
+		receivedChar = received;
 		charReceived = true;
 	}
 
@@ -86,40 +86,40 @@ char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
 	if (length == 0) {
 		length -= 2; //Set the length to maximum by subtracting 1 (0-1==65534)
 	}
-	char* String = malloc((length + 1) * sizeof(char));
+	char *String = malloc((length + 1) * sizeof(char));
 	if (String == NULL) {
 		return NULL;
 	}
 
-	for(uint16_t emptyPosition=0; emptyPosition<length+1; emptyPosition++){
+	for (uint16_t emptyPosition = 0; emptyPosition < length + 1;
+			emptyPosition++) {
 		String[emptyPosition] = '\0';
 	}
-
 
 	uint16_t charCounter = 0;
 	while (charCounter < length) {
 		String[charCounter] = bluetoothReceiveChar(BluetoothModule);
 		charCounter++;
-
 	}
+
 	return String;
 }
 
 char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule) {
 
-/*	uint32_t test = BluetoothModule->usart->SR;
-	while (!(test & USART_SR_RXNE)) {
-		//Todo: Timeout
-		usartSendString(USART2, (uint8_t*) "AT");
-	}
-	return (char) (BluetoothModule->usart->DR & 0xFF);*/
+	/*	uint32_t test = BluetoothModule->usart->SR;
+	 while (!(test & USART_SR_RXNE)) {
+	 //Todo: Timeout
+	 usartSendString(USART2, (uint8_t*) "AT");
+	 }
+	 return (char) (BluetoothModule->usart->DR & 0xFF);*/
 
-	while(charReceived==false){
+	while (charReceived == false) {
 		usartSendString(USART2, (uint8_t*) "AT");
 	}
 	charReceived = false;
 
-	return (char)receivedChar;
+	return (char) receivedChar;
 
 }
 
