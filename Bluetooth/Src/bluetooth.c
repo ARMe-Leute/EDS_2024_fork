@@ -68,10 +68,10 @@ void bluetoothGetStatus(/*BluetoothModule_t BluetoothModule*/) {
  * Don't forget to free the memory!
  *
  * @param length: How many characters should be received,
- * maximum is 64 Kibibyte
+ * maximum is 64 Kibibyte -1 Byte
  * 0 means until timeout
  * @param timeout: The timeout in ms
- * maximum is 65.536 s.
+ * maximum is 65.535 s.
  * 0 means no timeout (Not recommended)
  *
  */
@@ -85,9 +85,9 @@ char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
 	//Todo: Timeout
 
 	if (length == 0) {
-		length -= 1; //Set the length to maximum by subtracting 1 (0-1==65536)
+		length -= 2; //Set the length to maximum by subtracting 1 (0-1==65534)
 	}
-	char *String = malloc((length + 1) * sizeof(char));
+	char* String = malloc((length + 1) * sizeof(char));
 	if (String == NULL) {
 		return NULL;
 	}
