@@ -41,10 +41,9 @@ void bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART) {
 
 void USART2_IRQHandler(void) {
 	if (USART2->SR & USART_SR_RXNE) {
-		uint16_t received = USART2->DR & 0x01FF;
-		if ((received >= 'A') && (received <= 'Z')) {
-			usartSendByte(USART2, received);
-		}
+		uint16_t received = USART2->DR & 0xFF;
+		 receivedChar = received;
+		charReceived = true;
 	}
 
 }
