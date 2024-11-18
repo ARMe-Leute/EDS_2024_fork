@@ -30,4 +30,8 @@ extern char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule);
 extern void delay(uint16_t delay); // For testing purpose
 
 extern uint32_t bluetoothBaud2Int(BLUETOOTH_BAUD BAUD);
+
+extern bool charReceived;
+extern char receivedChar;
+
 #endif /* INC_BLUETOOTH_H_ */

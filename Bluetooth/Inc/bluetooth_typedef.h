@@ -8,6 +8,8 @@
 typedef struct BluetoothModule {
 // Todo: Variablen und Funktionen
 	USART_TypeDef *usart;
+	char receivedChar;
+	bool charReceived;
 
 }BluetoothModule_t;
 
