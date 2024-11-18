@@ -115,7 +115,6 @@ char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule) {
 	 return (char) (BluetoothModule->usart->DR & 0xFF);*/
 
 	while (charReceived == false) {
-		usartSendString(USART2, (uint8_t*) "AT");
 	}
 	charReceived = false;
 
