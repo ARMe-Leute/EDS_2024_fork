@@ -38,6 +38,8 @@ void bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART) {
 	}
 	__enable_irq();
 
+	BluetoothModule->timeout=2*9*1000000/bluetoothBaud2Int(BAUD_9600); // Timeout auf 2 Bytes setzen
+
 }
 
 void USART2_IRQHandler(void) {
