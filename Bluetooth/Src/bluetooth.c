@@ -101,10 +101,20 @@ char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
 }
 
 char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule) {
-	while (!(BluetoothModule->usart->SR & USART_SR_RXNE)) {
+
+/*	uint32_t test = BluetoothModule->usart->SR;
+	while (!(test & USART_SR_RXNE)) {
 		//Todo: Timeout
+		usartSendString(USART2, (uint8_t*) "AT");
 	}
-	return (char) (BluetoothModule->usart->DR & 0xFF);
+	return (char) (BluetoothModule->usart->DR & 0xFF);*/
+
+	while(charReceived==false){
+		usartSendString(USART2, (uint8_t*) "AT");
+	}
+	charReceived = false;
+
+	return (char)receivedChar;
 
 }
 
