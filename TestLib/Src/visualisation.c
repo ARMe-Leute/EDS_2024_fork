@@ -54,14 +54,17 @@ void visualisationStart(void)
 	visualisationHeader();
 
 	// welcome massage
-	tftPrint("Projekt ARM",0,30,0);
-	tftPrint("Linus, Christoph",0,50,0);
+	tftPrint("----------------",0,10,0);
+	tftPrint("TimeofFlight Sensor",0,30,0);
+	tftPrint("Philipp & Andreas",0,50,0);
+	tftPrint("----------------",0,70,0);
+
 
 	// wait, that it can be read
-	delayms(1000);
+	delayms(20000);
 
 	// start menu scan i2c
-	visualisationMenu(SCREEN_PAGE3, false, false);
+	//visualisationMenu(SCREEN_PAGE3, false, false);
 }
 
 /*
@@ -71,7 +74,7 @@ void visualisationStart(void)
  */
 void visualisationHeader(void)
 {
-	tftPrint("Herzlich willkommen",0,0,0);
+	tftPrint("ARM-TMT22GR2",0,0,0);
 }
 
 /*

@@ -96,7 +96,7 @@ int main(void)
 
 	// variables to store the distance
 	uint16_t distance = 0;
-	//uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
+	uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
 
 
 	// timer variables
@@ -112,7 +112,7 @@ int main(void)
 	// init project
 	initBala();
 
-	//visualisationClearBody();
+	visualisationClearBody();
 
 
 	i2cScanAndInit(i2c);
@@ -145,12 +145,12 @@ int main(void)
 
 //--------------------LIBTESTS---------------------
 
-	uint16_t time = 20; // in der Realität gemessene 17ms
+	//uint16_t time = 20; // in der Realität gemessene 17ms
 
-	TOF_ReadSingleDistance(&distance);
+	//TOF_ReadSingleDistance(&distance);
+	//visualisationClearBody();
 
-
-	TOF_ReadDistanceTimed(time, &distance);
+	//TOF_ReadDistanceTimed(time, &distance);
 
 /**
 	if (SetRangingProfile(HIGH_SPEED_MODE_S) == true)
@@ -180,15 +180,13 @@ if(SetRangingProfile(DEFAULT_MODE_D) == true)
 			systickUpdateTimerList((uint32_t *) timerList, arraySize);
 		}
 
+
 		// if timer execute is expired
 		if (isSystickExpired(TimerExec))
 		{
+			visualisationTOF(distance, &olddistance);
+			TOF_ReadSingleDistance(&distance);
 
-			uint8_t runner = 0;
-			for (runner = 0; runner <= 20; runner++) {
-				TOF_ReadSingleDistance(&distance);
-
-				}
 			}
 
 
@@ -224,7 +222,7 @@ void initBala(void)
 	visualisationStart();
 
 	//start page 1: i2c sensor connect
-	page = SCREEN_PAGE1;
+	//page = SCREEN_PAGE1;
 }
 
 
