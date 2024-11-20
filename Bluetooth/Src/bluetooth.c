@@ -45,8 +45,10 @@ void bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART) {
 void USART2_IRQHandler(void) {
 	if (USART2->SR & USART_SR_RXNE) {
 		uint16_t received = USART2->DR & 0xFF;
-		receivedChar = received;
-		charReceived = true;
+
+		Usart2receivedChar = received;
+		Usart2charReceived = true;
+
 	}
 
 }
@@ -110,12 +112,15 @@ char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
 
 char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule) {
 
-	while (charReceived == false) {
+	if (BluetoothModule->usart == USART2) {
+		while (Usart2charReceived == false) {
+		}
+		Usart2charReceived = false;
+
+		return (char) Usart2receivedChar;
+	} else {
+		//Todo: other USART ports
 	}
-	charReceived = false;
-
-	return (char) receivedChar;
-
 }
 
 uint32_t bluetoothBaud2Int(BLUETOOTH_BAUD BAUD) {

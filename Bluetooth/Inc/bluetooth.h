@@ -31,7 +31,7 @@ extern void delay(uint16_t delay); // For testing purpose
 
 extern uint32_t bluetoothBaud2Int(BLUETOOTH_BAUD BAUD);
 
-extern bool charReceived;
-extern char receivedChar;
+extern bool Usart2charReceived;
+extern char Usart2receivedChar;
 
 #endif /* INC_BLUETOOTH_H_ */

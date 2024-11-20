@@ -32,14 +32,14 @@
 
 BluetoothModule_t HM17;
 
-char receivedChar;
-bool charReceived;
+char Usart2receivedChar;
+bool Usart2charReceived;
 
 
 int main(void)
 {
 	bluetoothInit(&HM17, USART2);
-	charReceived == false;
+	Usart2charReceived == false;
 
 	usartSetCommParams(USART2, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);  //Muss aus irgend einem Grund drin bleiben
 	bluetoothGetStatus();
