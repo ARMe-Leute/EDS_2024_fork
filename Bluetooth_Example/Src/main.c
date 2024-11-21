@@ -16,8 +16,6 @@
  ******************************************************************************
  */
 
-
-
 #include <bluetooth.h>
 #include <stm32f401xe.h>
 #include <system_stm32f4xx.h>
@@ -47,13 +45,15 @@ int main(void) {
 	bluetoothInit(&HM17, USART2, &HM17_Timer);
 	Usart2charReceived == false;
 
-	usartSetCommParams(USART2, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);  //Muss aus irgend einem Grund drin bleiben
+	usartSetCommParams(USART2, 9600, NO_PARITY, LEN_8BIT, ONE_BIT); //Muss aus irgend einem Grund drin bleiben
+
+	delay(500);
 	bluetoothGetStatus();
-    /* Loop forever */
-	for(;;){
-		bluetoothGetStatus();
-		delay(500);
+
+	/* Loop forever */
+	for (;;) {
+		//	bluetoothGetStatus();
+
 	}
 }
-
 
