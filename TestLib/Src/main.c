@@ -152,8 +152,8 @@ int main(void)
 
 	//TOF_ReadDistanceTimed(time, &distance);
 
-/**
-	if (SetRangingProfile(HIGH_SPEED_MODE_S) == true)
+
+if (SetRangingProfile(HIGH_SPEED_MODE_S) == true)
 {
 	TOF_ReadSingleDistance(&distance);
 
@@ -166,7 +166,7 @@ if(SetRangingProfile(DEFAULT_MODE_D) == true)
 	TOF_ReadSingleDistance(&distance);
 
 }
-*/
+
 //------------------LIBTESTS ENDE-------------------
 
 

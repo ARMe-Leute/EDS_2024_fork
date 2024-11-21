@@ -154,6 +154,7 @@ bool TOF_stopContinuous();
  */
 bool TOF_ReadContinuousDistance(uint16_t *range);
 
+
 /*
  * @function:	 TOF_ReadSingleDistance
  *
@@ -164,8 +165,6 @@ bool TOF_ReadContinuousDistance(uint16_t *range);
  * @returns:	 bool: true if successful
  */
 bool TOF_ReadSingleDistance(uint16_t *range);
-
-
 
 
 /*

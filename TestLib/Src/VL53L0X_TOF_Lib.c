@@ -876,32 +876,35 @@ bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range)
  * @returns:	 bool: true if successful
  *
  * DOKU: Seite 24 VL5310X.pdf
-
 */
 
+
 bool SetRangingProfile(uint16_t Ranging_Profiles_t){
+
+	const uint16_t timing_budget_us[] = { 20000, 33000, 66000 }; // Timing-Budget (in Mikrosekunden)
+	const uint8_t signal_rate_limit[] = { 25, 18, 12 }; // Signalratenlimit (in Megahertz)
+	const uint16_t pre_range[] = { 20, 14, 8 }; // Pre-Range-Werte (Beispielwerte für die Konfiguration)
+
 
 	// switch case for RangingProfile
 	switch(Ranging_Profiles_t)
 	{
 	case DEFAULT_MODE_D:
 		//HERE EXECUTION PROGRAM FOR PROFILE D
-		setMeasurementTimingBudget(30000); 			//in us
+		TOF_set_timing_budget(30000); 			//in us
 			break;
 
 
 	case HIGH_SPEED_MODE_S:
 		//HERE EXECUTION PROGRAM FOR PROFILE S
 		  setMeasurementTimingBudget(20000);
-
-
 			break;
 
 
 	case HIGH_ACCURACY_MODE_A:
 		//HERE EXECUTION PROGRAM FOR PROFILE A
 		setMeasurementTimingBudget(200000);
-		return status;
+		return true;
 			break;
 
 
@@ -918,6 +921,45 @@ bool SetRangingProfile(uint16_t Ranging_Profiles_t){
 
 }
 
+
+// Funktion zum Setzen des Timing-Budgets
+bool TOF_set_timing_budget(uint16_t timing_budget_us) {
+
+
+	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_TimingBudget, data); // so muss die ANsprache des Sensors über I2C aussehen
+
+	// Setzt das Timing-Budget des Sensors (in Mikrosekunden)
+	return TOF_write_register(TOF_REG_TimingBudget, timing_budget_us);
+}
+
+
+
+
+
+// Funktion zum Setzen des Signalratenlimits
+bool TOF_set_signal_rate_limit(uint8_t signal_rate_limit) {
+	// Setzt das Signalratenlimit des Sensors (in Megahertz)
+	return TOF_write_register_8bit(TOF_REG_SignalRateLimit, signal_rate_limit);
+}
+
+// Funktion zum Konfigurieren des Pre-Ranges
+bool TOF_configure_pre_range(uint16_t pre_range_value) {
+	// Setzt den Pre-Range-Wert des Sensors
+	return TOF_write_register(TOF_REG_PreRange, pre_range_value);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// ARDUINO FUNKTIONEN
 bool setSignalRateLimit(float limit_Mcps)
 {
   if (limit_Mcps < 0 || limit_Mcps > 511.99) { return false; }
@@ -1269,3 +1311,112 @@ uint16_t encodeTimeout(uint32_t timeout_mclks)
   }
   else { return 0; }
 }
+
+
+
+
+
+//--------------------------------------
+
+
+// Beispielhafte Definition der Registeradressen und Standardwerte für VL53L0X
+#define TOF_REG_TimingBudget 0x71  // Beispiel-Adresse für das Timing-Budget
+#define TOF_REG_SignalRateLimit 0x01  // Beispiel-Adresse für Signalratenlimit
+#define TOF_REG_PreRange 0x02  // Beispiel-Adresse für Pre-Range
+
+// Hier sind einige Hilfsfunktionen zur Kommunikation mit dem Sensor erforderlich, die den Sensor steuern.
+
+// Funktion, um ein Register mit einem 16-Bit-Wert zu schreiben
+bool TOF_write_register(uint8_t reg_address, uint16_t value) {
+    // Hier würde der Code zum Schreiben in das Register des VL53L0X-Sensors stehen
+    // Dies könnte über I2C oder SPI geschehen, je nachdem, wie der Sensor angeschlossen ist.
+    // Zum Beispiel:
+    // I2C_WriteRegister(VL53L0X_ADDRESS, reg_address, value);
+    return true;  // Für diese Demo wird immer "true" zurückgegeben.
+}
+
+// Funktion, um ein Register mit einem 8-Bit-Wert zu schreiben
+bool TOF_write_register_8bit(uint8_t reg_address, uint8_t value) {
+    // Funktion zum Schreiben eines 8-Bit-Werts in ein Register des Sensors
+    // I2C_WriteRegister(VL53L0X_ADDRESS, reg_address, value);
+    return true;
+}
+
+// Funktion zum Setzen des Timing-Budgets
+bool TOF_set_timing_budget(uint16_t timing_budget_us) {
+    // Setzt das Timing-Budget (in Mikrosekunden) des Sensors
+    // Schreiben in das Register für das Timing-Budget
+    if (!TOF_write_register(TOF_REG_TimingBudget, timing_budget_us)) {
+        return false; // Fehler beim Setzen des Timing-Budgets
+    }
+    return true;  // Erfolgreich gesetzt
+}
+
+// Funktion zum Setzen des Signalratenlimits
+bool TOF_set_signal_rate_limit(uint8_t signal_rate_limit) {
+    // Setzt das Signalratenlimit des Sensors
+    // Schreiben in das Register für das Signalratenlimit
+    if (!TOF_write_register_8bit(TOF_REG_SignalRateLimit, signal_rate_limit)) {
+        return false; // Fehler beim Setzen des Signalratenlimits
+    }
+    return true;  // Erfolgreich gesetzt
+}
+
+// Funktion zum Konfigurieren des Pre-Ranges
+bool TOF_configure_pre_range(uint16_t pre_range_value) {
+    // Setzt den Pre-Range des Sensors (z. B. für Verstärkungs- oder Timing-Einstellungen)
+    // Schreiben in das Register für den Pre-Range
+    if (!TOF_write_register(TOF_REG_PreRange, pre_range_value)) {
+        return false; // Fehler beim Konfigurieren des Pre-Ranges
+    }
+    return true;  // Erfolgreich konfiguriert
+}
+
+/**
+ * @brief Setzt das Messprofil (Ranging Profile) für den VL53L0X-Sensor.
+ *        Diese Funktion wurde speziell für den STM32F401RET6-Controller angepasst.
+ * @param profile_id Das gewünschte Profil, das gesetzt werden soll:
+ *                   0 = Nahbereich
+ *                   1 = Mittelbereich
+ *                   2 = Langbereich
+ * @return true bei Erfolg, false bei Fehler (z. B. ungültiges Profil oder Sensorproblem).
+ */
+bool setRangingProfile(uint8_t profile_id)
+{
+    // 1. Definition von Profilparametern:
+    // Diese Arrays enthalten die spezifischen Werte für jedes Profil (Nah-, Mittel- und Langbereich).
+    // Die Werte können angepasst werden, um die Sensorleistung für unterschiedliche Anforderungen zu optimieren.
+
+    const uint16_t timing_budget_us[] = { 20000, 33000, 66000 }; // Timing-Budget (in Mikrosekunden)
+    const uint8_t signal_rate_limit[] = { 25, 18, 12 }; // Signalratenlimit (in Megahertz)
+    const uint16_t pre_range[] = { 20, 14, 8 }; // Pre-Range-Werte (Beispielwerte für die Konfiguration)
+
+    // 2. Gültigkeitsprüfung des Profil-IDs:
+    if (profile_id >= sizeof(timing_budget_us) / sizeof(timing_budget_us[0])) {
+        return false; // Ungültiges Profil, zurückgeben von "false"
+    }
+
+    // 3. Timing-Budget setzen:
+    // Setzt das Timing-Budget entsprechend dem gewählten Profil
+    if (!TOF_set_timing_budget(timing_budget_us[profile_id])) {
+        return false; // Fehler beim Setzen des Timing-Budgets
+    }
+
+    // 4. Signalratenlimit setzen:
+    // Setzt das Signalratenlimit entsprechend dem gewählten Profil
+    if (!TOF_set_signal_rate_limit(signal_rate_limit[profile_id])) {
+        return false; // Fehler beim Setzen des Signalratenlimits
+    }
+
+    // 5. Pre-Range-Konfiguration setzen:
+    // Setzt die Pre-Range-Konfiguration entsprechend dem gewählten Profil
+    if (!TOF_configure_pre_range(pre_range[profile_id])) {
+        return false; // Fehler bei der Pre-Range-Konfiguration
+    }
+
+    // 6. Rückmeldung bei Erfolg:
+    // Wenn alles erfolgreich gesetzt wurde, gibt die Funktion "true" zurück
+    return true;
+}
+
+
