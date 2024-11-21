@@ -111,7 +111,7 @@ BluetoothMessageReply_t bluetoothParseReply(char *inputString) {
  * If no character got received, NULL will be returned.
  * Calling this function with no limit and no timeout will return NULL
  *
- * Don't forget to free the memory!
+ * @warning Don't forget to free the memory!
  *
  * @param length: How many characters should be received,
  * maximum is 64 Kibibyte -1 Byte
@@ -133,7 +133,7 @@ char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
 	//Todo: Timeout
 
 	if (length == 0) {
-		length -= 2; //Set the length to maximum by subtracting 1 (0-1==65534)
+		length -= 2; //Set the length to maximum by subtracting -2 (0-1==65534)
 	}
 	char *String = malloc((length + 1) * sizeof(char));
 	if (String == NULL) {
@@ -142,7 +142,7 @@ char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
 
 	for (uint16_t emptyPosition = 0; emptyPosition < length + 1;
 			emptyPosition++) {
-		String[emptyPosition] = '\0';
+		String[emptyPosition] = '\0'; //Set the String char at array position emptyPosition to \0
 	}
 
 	uint16_t charCounter = 0;
@@ -190,6 +190,7 @@ char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule) {
 		return 0;
 	}
 }
+
 
 uint32_t bluetoothBaud2Int(BLUETOOTH_BAUD BAUD) {
 	uint32_t returnValue = 0;
