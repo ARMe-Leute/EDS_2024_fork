@@ -26,6 +26,11 @@ typedef enum
 	BAUD_230400
 } BLUETOOTH_BAUD;
 
+typedef enum{
+	BLUETOOTH_ERROR=0,
+	BLUETOOTH_OK
+}BLUETOOTH_MessageStatus;
+
 
 
 
