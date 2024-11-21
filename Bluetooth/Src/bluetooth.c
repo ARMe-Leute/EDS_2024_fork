@@ -38,6 +38,9 @@ void bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART) {
 	}
 	__enable_irq();
 
+	gpioSelectPort(GPIOA);
+	gpioSelectPinMode(GPIOA, PIN10, OUTPUT);
+
 }
 
 void USART2_IRQHandler(void) {
@@ -54,7 +57,11 @@ void USART2_IRQHandler(void) {
 void bluetoothGetStatus(/*BluetoothModule_t BluetoothModule*/) {
 
 	usartSendString(USART2, (char*) "AT");
-	free(bluetoothReceiveString(USART2, 2, 0));
+	char*test= bluetoothReceiveString(USART2, 2, 0);
+	if (strncmp(test, "OK", 2) == 0){
+		gpioSetPin(GPIOA, PIN10);
+	}
+	free(test);
 
 }
 
