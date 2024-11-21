@@ -140,7 +140,7 @@ char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule) {
 			}
 			// If timeout expired, return
 			if (isSystickExpired(*BluetoothModule->timeoutTimer)) {
-				return NULL;
+				return 0;
 			}
 		}
 		Usart2charReceived = false;
@@ -148,7 +148,7 @@ char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule) {
 		return (char) Usart2receivedChar;
 	} else {
 		/// @todo Implement other Usart channels
-		return NULL;
+		return 0;
 	}
 }
 
