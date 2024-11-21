@@ -181,6 +181,23 @@ bool SetRangingProfile(uint16_t Rangingprofile);
 
 
 
+//--------------- IF GENUG ZEIT ---------------
+
+/*
+ * @function:	 TOF_CalibrateReference
+ *
+ * @brief: 		 Calibrates the TOF Sensor
+ *
+ * @parameters:	 none
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_CalibrateReference();
+
+
+
+
+
 
 
 
