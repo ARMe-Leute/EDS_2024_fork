@@ -32,6 +32,7 @@
 
 BluetoothModule_t HM17;
 
+// global variables for receiving usart2 chars
 char Usart2receivedChar;
 bool Usart2charReceived;
 
