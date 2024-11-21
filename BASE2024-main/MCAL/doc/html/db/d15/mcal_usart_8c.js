@@ -1,0 +1,27 @@
+var mcal_usart_8c =
+[
+    [ "USART_TX_EMPTY", "d9/d3f/group__usart1.html#ga9aae106668b28990ea368dccdbeaba3d", null ],
+    [ "USART_WAIT", "d9/d3f/group__usart1.html#ga45989d33a17d5210b0bc4e2e364a2467", null ],
+    [ "usartDeselectUsart", "da/d22/group__usart2.html#ga5dcd9bf01a632bea5e0bc3bd4600c664", null ],
+    [ "usartDisableIrq", "da/daf/group__usart3.html#ga31f0f6eb447a073e6df2c99f085ecfa1", null ],
+    [ "usartDisableUsart", "da/d22/group__usart2.html#ga2a854bfe2766450b107bf52546da1b89", null ],
+    [ "usartEnableIrq", "da/daf/group__usart3.html#ga52a0617ca5383e11cf755d93bfaa36db", null ],
+    [ "usartEnableIrqList", "da/daf/group__usart3.html#ga50dc7539f62d8321405c89d0493d2f84", null ],
+    [ "usartEnableReceiver", "da/d22/group__usart2.html#gae504233ebcb3b473f0057e9dbc8d5435", null ],
+    [ "usartEnableTransmitter", "da/d22/group__usart2.html#ga312472ca74206a6190a069b9f7364112", null ],
+    [ "usartEnableUsart", "da/d22/group__usart2.html#ga4381ef71193be34a4d0ee5df7f7335a4", null ],
+    [ "usartInitBuffer", "db/d15/mcal_usart_8c.html#aa2b77232454763382dee9fa6811211bd", null ],
+    [ "usartResetIrqFlag", "da/daf/group__usart3.html#ga8bd86515e435ce6068f4f6a56d0a4951", null ],
+    [ "usartSelectUsart", "da/d22/group__usart2.html#ga96fdf6e5b8c01072a5182591ff63e5ae", null ],
+    [ "usartSendString", "da/d22/group__usart2.html#ga1c1e926fda7ce2f558e81f29bb7ff7eb", null ],
+    [ "usartSetBaudrate", "da/d22/group__usart2.html#gab77eba2544f5a330153282fc742de2b9", null ],
+    [ "usartSetCommParams", "da/d22/group__usart2.html#ga92b8aa89c8351551088a4164148ba6ce", null ],
+    [ "usartSetDmaRxMode", "da/daf/group__usart3.html#gaec8fa95004df14fbeec46ad60b945be1", null ],
+    [ "usartSetDmaTxMode", "da/daf/group__usart3.html#ga772261fdc218818a0e33c7c721f87fcf", null ],
+    [ "usartSetFlowCtrlMode", "db/d15/mcal_usart_8c.html#abcd73fa1872d40ca482ec2c68683cf17", null ],
+    [ "usartSetNumStopBits", "da/d22/group__usart2.html#ga4d8535517a0b6b155c0f0984c39a7c5c", null ],
+    [ "usartSetOversampling", "da/d22/group__usart2.html#gaeec0a79388ce67151e81cea632901d9c", null ],
+    [ "usartSetParity", "da/d22/group__usart2.html#gaf15e445ff73b82124cb502d07ab245ef", null ],
+    [ "usartSetWordlength", "da/d22/group__usart2.html#ga1a83276baae2db3a24c77fea4f650909", null ],
+    [ "usartStartUsart", "db/d43/group__usart0.html#ga733d7c8af37b96c7b6598e127d2ddb34", null ]
+];

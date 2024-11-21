@@ -1,0 +1,25 @@
+var mcal_i2_c_8c =
+[
+    [ "I2C_ADDRESS_COMPLETED", "d0/d3c/group__iic1.html#ga1c76ada6a4bf8be57764b7e043b77d11", null ],
+    [ "I2C_BYTE_TRANSFER_FINISHED", "d0/d3c/group__iic1.html#gabff37892cd8e53cd3578c8d02eaca070", null ],
+    [ "I2C_CHECK_RXBUF_NOT_EMPTY", "d0/d3c/group__iic1.html#ga959ff02dfa22669d8eafa24b9696cddc", null ],
+    [ "I2C_CHECK_TXBUF_EMPTY", "d0/d3c/group__iic1.html#ga52bb03c11d04d0edd80a72f2c6be45a0", null ],
+    [ "I2C_DUMMY_READ_SR1", "d0/d3c/group__iic1.html#gafd40ffe3e3d0ac19a2501fce683c7e81", null ],
+    [ "I2C_DUMMY_READ_SR2", "d0/d3c/group__iic1.html#ga4f6afccde434365d4245f63f2bad1dbe", null ],
+    [ "I2C_RESET_ACK", "d0/d3c/group__iic1.html#gad20937b34c34a5e7258d43531a137153", null ],
+    [ "I2C_RESET_POS", "d0/d3c/group__iic1.html#ga1da27d0400a8537838ca0e44582273d2", null ],
+    [ "I2C_SET_ACK", "d0/d3c/group__iic1.html#ga73c292d670d1be9ee3e52d86890dd191", null ],
+    [ "I2C_SET_POS", "d0/d3c/group__iic1.html#ga4365eb60231dc371fbebe43a99e51a44", null ],
+    [ "I2C_START_COMPLETED", "d0/d3c/group__iic1.html#ga79114709825d781a2b3cf333af15d114", null ],
+    [ "I2C_STOPP_COMPLETED", "d0/d3c/group__iic1.html#ga35df78be4d8f4c132d72edb618891484", null ],
+    [ "I2C_WAIT_BUSY", "d0/d3c/group__iic1.html#ga2404b7508036ccd1297cbde45285bc59", null ],
+    [ "i2cBurstRead", "da/df4/group__iic3.html#gaf5027c01b1ce74bea83a064578087526", null ],
+    [ "i2cBurstWrite", "da/df4/group__iic3.html#ga937787da163c8e375b10a7ddd3540068", null ],
+    [ "i2cDeselectI2C", "d1/dbb/group__iic2.html#ga36e239110b0a600ad7b6fae25e1e22be", null ],
+    [ "i2cInit", "d7/d25/group__iic0.html#ga2c83c540a32523ab69127c1f753cc39d", null ],
+    [ "i2cReadByte", "d1/dbb/group__iic2.html#ga5a5c2a5b3725f1ff8ec0fa17a3e497f3", null ],
+    [ "i2cReadByteFromSlaveReg", "da/df4/group__iic3.html#ga657d9fd5e4b0a73fb2899b9ef80c7ca7", null ],
+    [ "i2cSelectI2C", "d1/dbb/group__iic2.html#gaff4d57080f4fcebe3ee2ba5c45320476", null ],
+    [ "i2cSendByte", "d1/dbb/group__iic2.html#ga2d9d09074f3f7125d0489bbb81744a53", null ],
+    [ "i2cSendByteToSlaveReg", "da/df4/group__iic3.html#gac824904399f47691e1e23784a54e9fa8", null ]
+];

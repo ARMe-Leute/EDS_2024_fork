@@ -1,0 +1,8 @@
+History
+=======
+
+Version    Description
+-----------------------------------------------------------------------------------------
+0.2        This release.
+0.1        Outdated release. This release is not longer supported. However, it is still
+           available since it was used in my STM32F446 book published by mitp in Germany.
