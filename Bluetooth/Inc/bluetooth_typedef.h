@@ -10,7 +10,8 @@ typedef struct BluetoothModule {
 	USART_TypeDef *usart;
 	char receivedChar;
 	bool charReceived;
-	uint16_t timeout
+	uint16_t timeout;
+	uint32_t *timeoutTimer;
 
 }BluetoothModule_t;
 
