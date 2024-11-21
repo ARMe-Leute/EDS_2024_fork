@@ -31,6 +31,11 @@ typedef enum{
 	BLUETOOTH_OK
 }BLUETOOTH_MessageStatus;
 
+typedef struct BluetoothMessageReply{
+	BLUETOOTH_MessageStatus status;
+	char* reply;
+}BluetoothMessageReply_t;
+
 
 
 
