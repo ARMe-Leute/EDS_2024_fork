@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <mcalGPIO.h>
 #include <mcalUsart.h>
@@ -69,6 +70,37 @@ void bluetoothGetStatus(/*BluetoothModule_t BluetoothModule*/) {
 	free(test);
 
 }
+
+/**
+ * @brief
+ *
+ * @warning This may return BLUETOOTH_OK with a null pointer.
+ * This is expected if there is no further reply (i.e. AT is answered only with OK).
+ * If you expect an answer, you have to check for a null pointer.
+ *
+ * @param inputString
+ * @return
+ */
+BluetoothMessageReply_t bluetoothParseReply(char *inputString) {
+
+	BluetoothMessageReply_t reply;
+	if (strncmp(inputString, "OK", 2) == 0) {
+		reply.status = BLUETOOTH_OK;
+		reply.reply=NULL;
+		if (strlen(inputString) == 2) { // We only have OK
+			reply.reply = NULL;
+			return reply;
+		} else {
+			reply.reply = strdup(inputString + 3);
+
+		}
+
+	} else {
+
+	}
+
+}
+
 
 /**
  * @brief Receive a given amount of characters.
