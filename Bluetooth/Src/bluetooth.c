@@ -80,6 +80,8 @@ void bluetoothGetStatus(/*BluetoothModule_t BluetoothModule*/) {
  * @param timeout: The timeout in ms
  * maximum is 65.535 s.
  * 0 means no timeout (Not recommended)
+ * @return String: Returns pointer to the received string with
+ * NULL-Terminator at the end
  *
  */
 char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
@@ -145,7 +147,8 @@ char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule) {
 
 		return (char) Usart2receivedChar;
 	} else {
-		//Todo: other USART ports
+		/// @todo Implement other Usart channels
+		return NULL;
 	}
 }
 
