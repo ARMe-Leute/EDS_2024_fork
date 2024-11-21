@@ -28,17 +28,23 @@
 
 #include <mcalGPIO.h>
 #include <mcalUsart.h>
-
+#include <mcalSystick.h>
 
 BluetoothModule_t HM17;
 
 char Usart2receivedChar;
 bool Usart2charReceived;
 
+uint32_t HM17_Timer = 0UL;
+uint32_t *timerList[] = { &HM17_Timer };
+uint8_t timerSize = sizeof(timerList) / sizeof(timerList[0]);
+bool timerTrigger;
 
-int main(void)
-{
-	bluetoothInit(&HM17, USART2);
+int main(void) {
+
+	systickInit(SYSTICK_1US);
+
+	bluetoothInit(&HM17, USART2, &HM17_Timer);
 	Usart2charReceived == false;
 
 	usartSetCommParams(USART2, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);  //Muss aus irgend einem Grund drin bleiben

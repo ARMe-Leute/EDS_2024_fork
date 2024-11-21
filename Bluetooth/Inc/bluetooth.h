@@ -21,7 +21,7 @@
 
 extern void bluetoothGetStatus();
 extern void bluetoothInit(BluetoothModule_t *BluetoothModule,
-		USART_TypeDef *USART);
+		USART_TypeDef *USART, uint32_t *timeoutTimer);
 extern void USART2_IRQHandler(void);
 extern char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
 		uint16_t length, uint16_t timeout);
@@ -33,5 +33,8 @@ extern uint32_t bluetoothBaud2Int(BLUETOOTH_BAUD BAUD);
 
 extern bool Usart2charReceived;
 extern char Usart2receivedChar;
+
+extern uint32_t *timerList[];
+extern uint8_t timerSize;
 
 #endif /* INC_BLUETOOTH_H_ */
