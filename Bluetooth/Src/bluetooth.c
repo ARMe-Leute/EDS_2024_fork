@@ -106,8 +106,23 @@ char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
 
 	uint16_t charCounter = 0;
 	while (charCounter < length) {
+
+		systickSetTicktime(BluetoothModule->timeoutTimer,
+				BluetoothModule->timeout);
+
 		String[charCounter] = bluetoothReceiveChar(BluetoothModule);
 		charCounter++;
+
+		/**
+		 * Update the timer List and return the string if the timeout expired
+		 */
+		if (timerTrigger == true) {
+			systickUpdateTimerList((uint32_t*) timerList, timerSize);
+		}
+		if (isSystickExpired(*BluetoothModule->timeoutTimer)) {
+			return String;
+		}
+
 	}
 
 	return String;
@@ -116,7 +131,15 @@ char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
 char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule) {
 
 	if (BluetoothModule->usart == USART2) {
+		// Update  the timers
 		while (Usart2charReceived == false) {
+			if (timerTrigger == true) {
+				systickUpdateTimerList((uint32_t*) timerList, timerSize);
+			}
+			// If timeout expired, return
+			if (isSystickExpired(*BluetoothModule->timeoutTimer)) {
+				return NULL;
+			}
 		}
 		Usart2charReceived = false;
 
