@@ -3,6 +3,8 @@
 	<name>GyroSensorTest</name>
 	<comment></comment>
 	<projects>
+		<project>CMSIS</project>
+		<project>MCAL</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -89,6 +89,7 @@ void i2cActivate()
 
 int main(void)
 {
+	i2cActivate();
     /* Loop forever */
 	for(;;);
 }
