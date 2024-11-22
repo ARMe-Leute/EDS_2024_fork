@@ -62,6 +62,46 @@
 
 #define TOF_VL53L0X_OUT_OF_RANGE (8190)						/* define out of range */
 
+//------ Adressen für Ranging Profiles
+
+#define TOF_REG_TimingBudget 0x71  // Adresse für das Timing-Budget
+#define TOF_REG_SignalRateLimit 0x44  //"FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT"
+#define TOF_REG_PreRange 0x51			//"PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI"
+
+
+
+
+#define MSRC_CONFIG_TIMEOUT_MACROP         0x46
+#define PRE_RANGE_CONFIG_VCSEL_PERIOD      0x50
+#define FINAL_RANGE_CONFIG_VCSEL_PERIOD    0x70
+#define PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x51
+#define FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x71
+
+#define TOF_REG_SYSTEM_SEQUENCE_CONFIG 0x01
+
+#define TOF_REG_SIGNAL_RATE_LIMIT 0x44 // Beispieladresse für das Signalratenlimit
+#define TOF_I2C_ADDRESS 0x29 // Beispieladresse des Sensors, bitte anpassen
+
+
+// Beispielhafte Registeradressen für VCSEL und Timeout-Werte
+#define TOF_REG_PreRange 0x51
+#define TOF_REG_FinalRange 0x61
+#define TOF_REG_VCSEL_PERIOD 0x70
+#define TOF_REG_PHASE_CAL_LIM 0x0F
+#define TOF_REG_TIMEOUT_MACROP_HI 0x0A
+#define TOF_REG_VALID_PHASE_HIGH 0x22
+#define TOF_REG_VALID_PHASE_LOW 0x23
+#define TOF_REG_MSRC_TIMEOUT_MACROP 0x12
+#define TOF_REG_TIMEOUT_MACROP 0x10
+
+
+
+
+
+
+
+
+
 
 
 #else
@@ -71,6 +111,23 @@ Placeholder for other adapted Sensor Register Adresses
 
  */
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // enum with implemented Sensors and addresses (currently only VL53LOX)
@@ -196,6 +253,27 @@ bool SetRangingProfile(uint16_t Rangingprofile);
 
 
 
+
+
+
+
+bool TOF_set_timing_budget(uint16_t timing_budget_us);
+
+bool setSignalRateLimit(float limit_Mcps);
+
+bool setVcselPulsePeriod(vcselPeriodType type, uint8_t period_pclks);
+
+bool encodeVcselPeriod(uint8_t period_pclks, uint8_t* encoded_period);
+
+bool getSequenceStepEnables(SequenceStepEnables *enables);
+
+bool getSequenceStepTimeouts(SequenceStepEnables const *enables, SequenceStepTimeouts *timeouts);
+
+bool timeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks, uint32_t* mclks);
+
+bool calcMacroPeriod(uint8_t vcsel_period_pclks, uint32_t* macro_period_ns);
+
+bool encodeTimeout(uint32_t timeout_mclks, uint16_t* encoded_timeout);
 
 
 
