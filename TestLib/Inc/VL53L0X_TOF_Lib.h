@@ -83,26 +83,20 @@
 #define TOF_I2C_ADDRESS 0x29 // Beispieladresse des Sensors, bitte anpassen
 
 
+
+// I2C Constants (These should be defined as per your project setup)
+#define TOF_REG_SIGNAL_RATE_LIMIT 0x44
+#define TOF_REG_VALID_PHASE_HIGH 0x35
+#define TOF_REG_VALID_PHASE_LOW 0x33
+#define TOF_REG_PreRange 0x56
+#define TOF_REG_FinalRange 0x58
+#define TOF_REG_TimingBudget 0x50
 // Beispielhafte Registeradressen für VCSEL und Timeout-Werte
-#define TOF_REG_PreRange 0x51
-#define TOF_REG_FinalRange 0x61
 #define TOF_REG_VCSEL_PERIOD 0x70
 #define TOF_REG_PHASE_CAL_LIM 0x0F
 #define TOF_REG_TIMEOUT_MACROP_HI 0x0A
-#define TOF_REG_VALID_PHASE_HIGH 0x22
-#define TOF_REG_VALID_PHASE_LOW 0x23
 #define TOF_REG_MSRC_TIMEOUT_MACROP 0x12
 #define TOF_REG_TIMEOUT_MACROP 0x10
-
-
-
-
-
-
-
-
-
-
 
 #else
 /**
@@ -112,20 +106,11 @@ Placeholder for other adapted Sensor Register Adresses
  */
 #endif
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Function Declarations
+typedef enum {
+    VcselPeriodPreRange = 18,  // Example value
+    VcselPeriodFinalRange = 14  // Example value
+} vcselPeriodType_t;
 
 
 
@@ -251,34 +236,16 @@ bool SetRangingProfile(uint16_t Rangingprofile);
 
 
 
-
-
-
-
-
-
+// Function Definitions
 bool TOF_set_timing_budget(uint16_t timing_budget_us);
 
-bool setSignalRateLimit(float limit_Mcps);
+//bool setVcselPulsePeriod(vcselPeriodType type_t, uint8_t period_pclks);
 
-bool setVcselPulsePeriod(vcselPeriodType type, uint8_t period_pclks);
+bool timeoutMicrosecondsToMclks(uint32_t timeout_us, uint8_t vcsel_period_pclks, uint32_t* timeout_mclks);
 
-bool encodeVcselPeriod(uint8_t period_pclks, uint8_t* encoded_period);
-
-bool getSequenceStepEnables(SequenceStepEnables *enables);
-
-bool getSequenceStepTimeouts(SequenceStepEnables const *enables, SequenceStepTimeouts *timeouts);
-
-bool timeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks, uint32_t* mclks);
-
-bool calcMacroPeriod(uint8_t vcsel_period_pclks, uint32_t* macro_period_ns);
+uint16_t decodeTimeout(uint16_t encoded_timeout);
 
 bool encodeTimeout(uint32_t timeout_mclks, uint16_t* encoded_timeout);
-
-
-
-
-
 
 
 #endif /* SENSORTOF_H */		//End Include-Guard

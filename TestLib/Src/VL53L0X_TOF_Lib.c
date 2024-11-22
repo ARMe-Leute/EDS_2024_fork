@@ -40,6 +40,11 @@ static uint8_t TOF_stop_variable = 0;
 // flag for continuous_mode on or off
 bool TOF_continuous_mode = false;
 
+
+
+
+
+
 //---------------------INTERNAL FUNCTIONS---------------------
 
 /*
@@ -865,6 +870,8 @@ bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range)
 
 
 
+
+
 /*
  * @function:	 SetRangingProfile
  *
@@ -879,360 +886,153 @@ bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range)
 */
 
 
-bool SetRangingProfile(uint16_t Ranging_Profiles_t){
+bool SetRangingProfile(uint16_t Ranging_Profiles_t) {
+    bool ERROR_HANDLER_PROFILE = false;
 
-	// switch case for RangingProfile
-	switch(Ranging_Profiles_t)
-	{
-	case DEFAULT_MODE_D:
-		if(!TOF_set_timing_budget(30000)){
-			return false;
-		}
-			break;
+    // Switch-case logic for RangingProfiles
+    switch (Ranging_Profiles_t) {
+        case DEFAULT_MODE_D:
+            //ERROR_HANDLER_PROFILE = TOF_set_timing_budget(30000);
+            break;
+        case HIGH_SPEED_MODE_S:
+            //ERROR_HANDLER_PROFILE = TOF_set_timing_budget(20000);
+            break;
+        case HIGH_ACCURACY_MODE_A:
+            //ERROR_HANDLER_PROFILE = TOF_set_timing_budget(200000);
+            break;
+        case LONG_RANGE_MODE_R:
+            //ERROR_HANDLER_PROFILE = setSignalRateLimit(0.1);
+            //ERROR_HANDLER_PROFILE = setVcselPulsePeriod(VcselPeriodPreRange, 18);
+            //ERROR_HANDLER_PROFILE = setVcselPulsePeriod(VcselPeriodFinalRange, 14);
+            break;
+    }
 
-
-	case HIGH_SPEED_MODE_S:
-		if(!TOF_set_timing_budget(20000)){
-					return false;
-				}
-			break;
-
-
-	case HIGH_ACCURACY_MODE_A:
-		if(!TOF_set_timing_budget(200000)){
-					return false;
-				}
-			break;
-
-
-	case LONG_RANGE_MODE_R:
-		if(!setSignalRateLimit(0.1)){
-			return false;
-		}
-
-		if(!setVcselPulsePeriod(VcselPeriodPreRange, 18)){
-					return false;
-				}
-
-		if(!setVcselPulsePeriod(VcselPeriodFinalRange, 14)){
-					return false;
-				}
-			break;
-
-	}
+    return ERROR_HANDLER_PROFILE;
 }
 
+
+// Function Definitions
 
 bool TOF_set_timing_budget(uint16_t timing_budget_us) {
+    uint16_t StartOverhead = 1910;
+    uint16_t EndOverhead = 960;
+    uint16_t used_budget_us = StartOverhead + EndOverhead;
 
-	uint16_t StartOverhead     = 1910;
-	uint16_t EndOverhead        = 960;
-	uint16_t MsrcOverhead       = 660;
-	uint16_t TccOverhead        = 590;
-	uint16_t DssOverhead        = 690;
-	uint16_t PreRangeOverhead   = 660;
-	uint16_t FinalRangeOverhead = 550;
+    uint8_t sequence_config;
+    if (!i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSTEM_SEQUENCE_CONFIG, &sequence_config)) {
+        return false;  // Failure reading sequence configuration
+    }
 
-	uint32_t used_budget_us = StartOverhead + EndOverhead;
+    bool enables_pre_range = (sequence_config >> 6) & 0x1;
+    bool enables_final_range = (sequence_config >> 7) & 0x1;
 
-	getSequenceStepEnables(&enables);
-	getSequenceStepTimeouts(&enables, &timeouts);
+    if (enables_final_range) {
+        used_budget_us += 550;
+        if (used_budget_us > timing_budget_us) {
+            return false;
+        }
 
-	if (enables.tcc){
-	used_budget_us += (timeouts.msrc_dss_tcc_us + TccOverhead);
-	}
+        uint32_t final_range_timeout_us = timing_budget_us - used_budget_us;
+        uint32_t final_range_timeout_mclks;
+        if (!timeoutMicrosecondsToMclks(final_range_timeout_us, 16, &final_range_timeout_mclks)) {
+            return false;
+        }
 
-	if (enables.dss){
-	used_budget_us += 2 * (timeouts.msrc_dss_tcc_us + DssOverhead);
-	}
+        if (enables_pre_range) {
+            uint32_t pre_range_mclks = decodeTimeout(660);
+            final_range_timeout_mclks += pre_range_mclks;
+        }
 
-	else if (enables.msrc){
-	used_budget_us += (timeouts.msrc_dss_tcc_us + MsrcOverhead);
-	}
+        uint16_t encoded_timeout;
+        if (!encodeTimeout(final_range_timeout_mclks, &encoded_timeout)) {
+            return false;
+        }
+        if (!i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_TimingBudget, encoded_timeout)) {
+            return false;
+        }
+    }
 
-	if (enables.pre_range){
-	used_budget_us += (timeouts.pre_range_us + PreRangeOverhead);
-	}
-
-	if (enables.final_range){
-	used_budget_us += FinalRangeOverhead;
-
-	if (used_budget_us > budget_us){
-	  // "Requested timeout too big."
-	  return false;
-	}
-
-	uint32_t final_range_timeout_us = budget_us - used_budget_us;
-
-	uint32_t final_range_timeout_mclks =
-	  timeoutMicrosecondsToMclks(final_range_timeout_us,
-								 timeouts.final_range_vcsel_period_pclks);
-
-	if (enables.pre_range)
-	{
-	  final_range_timeout_mclks += timeouts.pre_range_mclks;
-	}
-
-	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_TimingBudget, encodeTimeout(final_range_timeout_mclks)); // so muss die ANsprache des Sensors über I2C aussehen
-
-	// set_sequence_step_timeout() end
-
-	measurement_timing_budget_us = budget_us; // store for internal reuse
-	}
-	return true;
+    return true;
 }
-
 
 bool setSignalRateLimit(float limit_Mcps) {
-    // Sicherstellen, dass der Wert im gültigen Bereich liegt
     if (limit_Mcps < 0 || limit_Mcps > 511.99) {
-        return false;  // Ungültiger Wert
+        return false;  // Invalid value
     }
 
-    // Q9.7 Fixed-Point Format: 9 Ganzzahlbits und 7 Fraktionsbits
-    uint16_t value = (uint16_t)(limit_Mcps * (1 << 7));  // Multiplizieren mit 128 (1 << 7)
-    return i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SIGNAL_RATE_LIMIT, signal_rate_limit);  // Den Wert ins Register schreiben
+    uint16_t value = (uint16_t)(limit_Mcps * (1 << 7));  // Multiply by 128
+    uint8_t msb = (value >> 8) & 0xFF;
+    uint8_t lsb = value & 0xFF;
+
+    // Write the MSB and LSB separately
+    if (!i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SIGNAL_RATE_LIMIT, msb) ||
+        !i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SIGNAL_RATE_LIMIT + 1, lsb)) {
+        return false;  // I²C write failure
+    }
+
+    return true;  // Success
 }
 
+/*
+bool setVcselPulsePeriod(vcselPeriodType type_t, uint8_t period_pclks) {
+    uint8_t vcsel_period_reg = period_pclks - 1;
 
-bool setVcselPulsePeriod(vcselPeriodType type, uint8_t period_pclks) {
-    uint8_t vcsel_period_reg = encodeVcselPeriod(period_pclks);
-
-    SequenceStepEnables enables;
-    SequenceStepTimeouts timeouts;
-
-    // Hole die Konfiguration für die Sequenz und Timeouts
-    if (!getSequenceStepEnables(&enables) || !getSequenceStepTimeouts(&enables, &timeouts)) {
-        return false;
-    }
-
-    // Anwendungslogik für die VCSEL-Periode
     if (type == VcselPeriodPreRange) {
-        // Setze spezifische Phase-Check-Grenzen für Pre-Range
         switch (period_pclks) {
-            case 12:
-                writeReg(TOF_REG_VALID_PHASE_HIGH, 0x18);
-                break;
-            case 14:
-                writeReg(TOF_REG_VALID_PHASE_HIGH, 0x30);
-                break;
-            case 16:
-                writeReg(TOF_REG_VALID_PHASE_HIGH, 0x40);
-                break;
-            case 18:
-                writeReg(TOF_REG_VALID_PHASE_HIGH, 0x50);
-                break;
-            default:
-                return false; // Ungültige Periode
+            case 12: i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_VALID_PHASE_HIGH, 0x18); break;
+            case 14: i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_VALID_PHASE_HIGH, 0x30); break;
+            case 16: i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_VALID_PHASE_HIGH, 0x40); break;
+            case 18: i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_VALID_PHASE_HIGH, 0x50); break;
+            default: return false;  // Invalid period
         }
-        writeReg(TOF_REG_VALID_PHASE_LOW, 0x08);
-
-        // Wende die neue VCSEL-Periode an
-        writeReg(TOF_REG_PreRange, vcsel_period_reg);
-
-        // Berechne und wende die neuen Timeouts an
-        uint16_t new_pre_range_timeout_mclks = timeoutMicrosecondsToMclks(timeouts.pre_range_us, period_pclks);
-        writeReg16Bit(TOF_REG_TIMEOUT_MACROP_HI, encodeTimeout(new_pre_range_timeout_mclks));
-
-        uint16_t new_msrc_timeout_mclks = timeoutMicrosecondsToMclks(timeouts.msrc_dss_tcc_us, period_pclks);
-        writeReg(TOF_REG_MSRC_TIMEOUT_MACROP, (new_msrc_timeout_mclks > 256) ? 255 : (new_msrc_timeout_mclks - 1));
-    }
-    else if (type == VcselPeriodFinalRange) {
-        // Setze spezifische Phase-Check-Grenzen für Final-Range
+        i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_VALID_PHASE_LOW, 0x08);
+        i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_PreRange, vcsel_period_reg);
+    } else if (type == VcselPeriodFinalRange) {
         switch (period_pclks) {
-            case 8:
-                writeReg(TOF_REG_VALID_PHASE_HIGH, 0x10);
-                writeReg(TOF_REG_VALID_PHASE_LOW,  0x08);
-                break;
-            case 10:
-                writeReg(TOF_REG_VALID_PHASE_HIGH, 0x28);
-                writeReg(TOF_REG_VALID_PHASE_LOW,  0x08);
-                break;
-            case 12:
-                writeReg(TOF_REG_VALID_PHASE_HIGH, 0x38);
-                writeReg(TOF_REG_VALID_PHASE_LOW,  0x08);
-                break;
-            case 14:
-                writeReg(TOF_REG_VALID_PHASE_HIGH, 0x48);
-                writeReg(TOF_REG_VALID_PHASE_LOW,  0x08);
-                break;
-            default:
-                return false; // Ungültige Periode
+            case 8: i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_VALID_PHASE_HIGH, 0x10); break;
+            case 10: i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_VALID_PHASE_HIGH, 0x28); break;
+            case 12: i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_VALID_PHASE_HIGH, 0x38); break;
+            case 14: i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_VALID_PHASE_HIGH, 0x48); break;
+            default: return false;  // Invalid period
         }
-
-        // Wende die neue VCSEL-Periode für den Final-Range an
-        writeReg(TOF_REG_FinalRange, vcsel_period_reg);
-
-        // Berechne und wende die neuen Timeouts an
-        uint16_t new_final_range_timeout_mclks = timeoutMicrosecondsToMclks(timeouts.final_range_us, period_pclks);
-        if (enables.pre_range) {
-            new_final_range_timeout_mclks += timeouts.pre_range_mclks;
-        }
-        writeReg16Bit(TOF_REG_TIMEOUT_MACROP_HI, encodeTimeout(new_final_range_timeout_mclks));
-    }
-    else {
-        return false; // Ungültiger Typ
+        i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_FinalRange, vcsel_period_reg);
+    } else {
+        return false;  // Unknown VCSEL period type
     }
 
     return true;
 }
 
+*/
 
-bool encodeVcselPeriod(uint8_t period_pclks, uint8_t* encoded_period) {
-    // Überprüfen, ob der übergebene Wert im gültigen Bereich liegt (angenommen 1-255)
-    if (period_pclks < 1 || period_pclks > 255) {
-        return false;  // Ungültiger Wert für period_pclks
-    }
-
-    // Umwandlung des VCSEL-Pulszeitraums in ein Registerformat
-    *encoded_period = period_pclks - 1;
-    return true;  // Erfolgreiche Umwandlung
-}
-
-
-bool getSequenceStepEnables(SequenceStepEnables *enables) {
-    uint8_t sequence_config;
-    if (!i2cBurstRegRead(TOF_i2c, TOF_address_used, TOF_REG_SYSTEM_SEQUENCE_CONFIG, &sequence_config)) {
-        return false;
-    }
-
-    enables->tcc = (sequence_config >> 4) & 0x1;
-    enables->dss = (sequence_config >> 3) & 0x1;
-    enables->msrc = (sequence_config >> 2) & 0x1;
-    enables->pre_range = (sequence_config >> 6) & 0x1;
-    enables->final_range = (sequence_config >> 7) & 0x1;
-
-    return true;
-
-	i2c_return = i2cBurstRegRead(TOF_i2c, TOF_address_used, TOF_REG_SYSTEM_SEQUENCE_CONFIG, &data, 1);
-	uint8_t sequence_config = *data;
-}
-
-
-bool getSequenceStepTimeouts(SequenceStepEnables const *enables, SequenceStepTimeouts *timeouts) {
-    // Pre-Range VCSEL Period
-    uint8_t pre_range_vcsel_period_raw;
-    if (!TOF_read_register_8bit(PRE_RANGE_CONFIG_VCSEL_PERIOD, &pre_range_vcsel_period_raw)) {
-        return false;
-    }
-    timeouts->pre_range_vcsel_period_pclks = decodeVcselPeriod(pre_range_vcsel_period_raw);
-
-    // MSRC/DSS/TCC Timeout
-    uint8_t msrc_config_timeout;
-    if (!TOF_read_register_8bit(MSRC_CONFIG_TIMEOUT_MACROP, &msrc_config_timeout)) {
-        return false;
-    }
-    timeouts->msrc_dss_tcc_mclks = msrc_config_timeout + 1;
-    timeouts->msrc_dss_tcc_us = timeoutMclksToMicroseconds(
-        timeouts->msrc_dss_tcc_mclks, timeouts->pre_range_vcsel_period_pclks
-    );
-
-    // Pre-Range Timeout
-    uint16_t pre_range_timeout_mclks;
-    if (!TOF_read_register_16bit(PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI, &pre_range_timeout_mclks)) {
-        return false;
-    }
-    timeouts->pre_range_mclks = decodeTimeout(pre_range_timeout_mclks);
-    timeouts->pre_range_us = timeoutMclksToMicroseconds(
-        timeouts->pre_range_mclks, timeouts->pre_range_vcsel_period_pclks
-    );
-
-    // Final Range VCSEL Period
-    uint8_t final_range_vcsel_period_raw;
-    if (!TOF_read_register_8bit(FINAL_RANGE_CONFIG_VCSEL_PERIOD, &final_range_vcsel_period_raw)) {
-        return false;
-    }
-    timeouts->final_range_vcsel_period_pclks = decodeVcselPeriod(final_range_vcsel_period_raw);
-
-    // Final Range Timeout
-    uint16_t final_range_timeout_mclks;
-    if (!TOF_read_register_16bit(FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, &final_range_timeout_mclks)) {
-        return false;
-    }
-    timeouts->final_range_mclks = decodeTimeout(final_range_timeout_mclks);
-
-    // Berücksichtigung von Pre-Range
-    if (enables->pre_range) {
-        timeouts->final_range_mclks -= timeouts->pre_range_mclks;
-    }
-    timeouts->final_range_us = timeoutMclksToMicroseconds(
-        timeouts->final_range_mclks, timeouts->final_range_vcsel_period_pclks
-    );
-
+bool timeoutMicrosecondsToMclks(uint32_t timeout_us, uint8_t vcsel_period_pclks, uint32_t* timeout_mclks) {
+    uint32_t macro_period_ns = (2304 * vcsel_period_pclks) / 1000;
+    *timeout_mclks = (timeout_us * 1000) / macro_period_ns;
     return true;
 }
 
-
-
-bool timeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks, uint32_t* mclks)
-{
-    // Prüfen, ob der Zeitzählerwert im akzeptablen Bereich liegt
-    if (timeout_period_us == 0 || vcsel_period_pclks == 0)
-    {
-        return false;  // Ungültige Eingabewerte
-    }
-
-    // Berechne die Makro-Periode anhand der VCSEL-Periode
-    uint32_t macro_period_ns = calcMacroPeriod(vcsel_period_pclks);
-
-    // Wenn die Makro-Periode ungültig ist (0), gebe false zurück
-    if (macro_period_ns == 0)
-    {
-        return false;
-    }
-
-    // Umrechnung von Mikrosekunden in Makro-Taktzyklen (MClks)
-    *mclks = ((timeout_period_us * 1000) + (macro_period_ns / 2)) / macro_period_ns;
-
-    return true;  // Erfolgreiche Berechnung
+uint16_t decodeTimeout(uint16_t encoded_timeout) {
+    uint16_t ls_byte = encoded_timeout & 0xFF;
+    uint16_t ms_byte = (encoded_timeout >> 8) & 0xFF;
+    return ((1 << ms_byte) * (ls_byte + 1));
 }
 
-
-bool calcMacroPeriod(uint8_t vcsel_period_pclks, uint32_t* macro_period_ns)
-{
-    // Prüfen, ob die VCSEL-Periode gültig ist
-    if (vcsel_period_pclks == 0)
-    {
-        return false;  // Ungültige Eingabe
-    }
-
-    // Beispielhafte Berechnung der Makro-Periode basierend auf der VCSEL-Periode
-    *macro_period_ns = 1000 * vcsel_period_pclks;  // Beispiel: 1000 ns pro PCLK
-
-    return true;  // Erfolgreiche Berechnung
-}
-
-
-bool encodeTimeout(uint32_t timeout_mclks, uint16_t* encoded_timeout)
-{
-    // Format: "(LSByte * 2^MSByte) + 1"
-
-    uint32_t ls_byte = 0;
-    uint16_t ms_byte = 0;
-
-    // Wenn timeout_mclks > 0, berechne die Kodierung
-    if (timeout_mclks > 0)
-    {
-        // Subtrahiere 1 von timeout_mclks, um auf das richtige Format zu kommen
-        ls_byte = timeout_mclks - 1;
-
-        // Bestimme die Anzahl der Verschiebungen, um die Zahl im erlaubten Bereich zu halten
-        while ((ls_byte & 0xFFFFFF00) > 0)
-        {
-            ls_byte >>= 1;
-            ms_byte++;
-        }
-
-        // Kombiniere das Ergebnis und gebe es über den Pointer zurück
-        *encoded_timeout = (ms_byte << 8) | (ls_byte & 0xFF);
-
-        return true;  // Erfolgreiche Berechnung
-    }
-    else
-    {
-        // Bei ungültigem Timeout-Wert (0), setze den codierten Timeout-Wert auf 0 und gib false zurück
+bool encodeTimeout(uint32_t timeout_mclks, uint16_t* encoded_timeout) {
+    if (timeout_mclks == 0) {
         *encoded_timeout = 0;
-        return false;  // Fehler: Timeout-Wert gleich 0
+        return false;
     }
+
+    uint16_t ls_byte = (timeout_mclks - 1) & 0xFF;
+    uint8_t ms_byte = 0;
+
+    while ((timeout_mclks - 1) > 255) {
+        timeout_mclks >>= 1;
+        ms_byte++;
+    }
+
+    *encoded_timeout = (ms_byte << 8) | ls_byte;
+    return true;
 }
+
 
