@@ -88,6 +88,13 @@ typedef enum
 
 
 
+typedef enum
+{
+	MODE1  		= 1,
+	MODE2		= 2,
+	MODE3  	= 3
+
+} vcselPeriodType_t;
 
 
 
@@ -153,6 +160,22 @@ bool TOF_ReadSingleDistance(uint16_t *range);
 
 
 //--------------- ADDITIONAL EXTERNAL FUNCTIONS---------------
+
+/*
+ * @function:	 TOF_SetAddress
+ *
+ * @brief: 		 get distance in single mode with preset time delay
+ *
+ * @parameters:	 uint16_t *range :	variable with measurement
+ * 				 uint16_t time :	variable with time preset
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_SetAddress( uint8_t newAddr);
+
+
+
+
 
 /*
  * @function:	 TOF_ReadDistanceTimed

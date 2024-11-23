@@ -809,6 +809,34 @@ bool TOF_ReadSingleDistance(uint16_t *range)
 
 //--------------- ADDITIONAL EXTERNAL FUNCTIONS---------------
 
+
+/*
+ * @function:	 TOF_SetAddress
+ *
+ * @brief: 		 get distance in single mode with preset time delay
+ *
+ * @parameters:	 uint16_t *range :	variable with measurement
+ * 				 uint16_t time :	variable with time preset
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_SetAddress(uint8_t new_Addr) {
+    I2C_RETURN_CODE_t i2c_return;
+    uint8_t newaddr = new_Addr;
+
+    // Send the new address to the device
+    i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x8A, newaddr & 0x7F);
+
+    if (i2c_return != I2C_OK) {
+        return false; // Return false if the operation fails
+    }
+    TOF_address_used = newaddr;
+    return true; // Ensure the function always returns a value
+}
+
+
+
+
 /*
  * @function:	 TOF_ReadDistanceTimed
  *
@@ -864,7 +892,108 @@ bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range)
 }
 
 
-/**
+
+
+/*
+ * @function:	 TOF_SetTimingBudget
+ *
+ * @brief: 		 get distance in single mode with preset time delay
+ *
+ * @parameters:	 uint16_t *range :	variable with measurement
+ * 				 uint16_t time :	variable with time preset
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_SetTimingBudget( uint16_t time, uint16_t *range){	//timingBUdget in ms
+	//not implemented yet
+}
+
+
+/*
+ * @function:	 TOF_getSignalRateLimit
+ *
+ * @brief: 		 get distance in single mode with preset time delay
+ *
+ * @parameters:	 uint16_t *range :	variable with measurement
+ * 				 uint16_t time :	variable with time preset
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_getSignalRateLimit(float *signalRateLimit) {
+    uint8_t data= 0;
+    I2C_RETURN_CODE_t i2c_return;
+    // Read 2 bytes from the 0x44 register
+    i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, 0x44, &data);
+    if (i2c_return != I2C_OK) {
+        return false; // Return false if the I2C read fails
+    }
+
+    // Calculate the signal rate limit
+    *signalRateLimit = (float)data / (1 << 7);
+
+    return true; // Return true on success
+}
+
+
+/*
+ * @function:	 TOF_SetSignalRateLimit
+ *
+ * @brief: 		 get distance in single mode with preset time delay
+ *
+ * @parameters:	 uint16_t *range :	variable with measurement
+ * 				 uint16_t time :	variable with time preset
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_SetSignalRateLimit(float *signalRateLimit) {
+	I2C_RETURN_CODE_t i2c_return;
+
+	float limitMCPS = *signalRateLimit;
+	  if (limitMCPS < 0 || limitMCPS > 511.99) {
+		  return false;
+	  }
+
+	  // Q9.7 fixed point format (9 integer bits, 7 fractional bits)
+	  i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x44, limitMCPS * (1 << 7));
+	  if (i2c_return != I2C_OK) {
+	          return false; // Return false if the I2C read fails
+	      }
+	  return true;
+
+}
+
+
+
+/*
+ * @function:	 TOF_SetVcselPulsePeriod
+ *
+ * @brief: 		 sets the RangingProfile
+ *
+ * @parameters:	 uint16_t Rangingprofile :	variable with Rangingprofile
+ *				 Default mode (D); High speed (S); High accuracy (A); Long range (R)
+ *
+ * @returns:	 bool: true if successful
+
+*/
+bool TOF_SetVcselPulsePeriod(vcselPeriodType_t, uint8_t period_pclks){
+	{
+	  uint8_t vcsel_period_reg = ((period_pclks) >> 1) - 1;
+
+	  //getSequenceStepEnables(&enables);
+	  uint8_t sequence_config = readReg(SYSTEM_SEQUENCE_CONFIG);
+
+	  enables->tcc          = (sequence_config >> 4) & 0x1;
+	  enables->dss          = (sequence_config >> 3) & 0x1;
+	  enables->msrc         = (sequence_config >> 2) & 0x1;
+	  enables->pre_range    = (sequence_config >> 6) & 0x1;
+	  enables->final_range  = (sequence_config >> 7) & 0x1;
+
+	  //getSequenceStepTimeouts(&enables, &timeouts);
+
+
+}
+
+
 
 /*
  * @function:	 SetRangingProfile
@@ -876,75 +1005,35 @@ bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range)
  *
  * @returns:	 bool: true if successful
 
-
-
-bool SetRangingProfile(uint16_t Ranging_Profiles_t){
-
-	// switch case for RangingProfile
-	switch(Ranging_Profiles_t)
-	{
-	case DEFAULT_MODE_D:
-		//HERE EXECUTION PROGRAM FOR PROFILE D
-			break;
-
-
-	case HIGH_SPEED_MODE_S:
-		//HERE EXECUTION PROGRAM FOR PROFILE S
-		if (Status == VL53L0_ERROR_NONE) {
-			Status = VL53L0_SetLimitCheckValue(pMyDevice, VL53L0_CHECKENABLE_SIGNAL_RATE_FINAL_RANGE, (FixPoint1616_t)(0.25*65536));
-		}
-		if (Status == VL53L0_ERROR_NONE) {
-			Status = VL53L0_SetLimitCheckValue(pMyDevice, VL53L0_CHECKENABLE_SIGMA_FINAL_RANGE, (FixPoint1616_t)(32*65536));
-		}
-		if (Status == VL53L0_ERROR_NONE) {
-			Status = VL53L0_SetMeasurementTimingBudgetMicroSeconds(pMyDevice, 20000);
-		}
-			break;
-
-
-	case HIGH_ACCURACY_MODE_A:
-		//HERE EXECUTION PROGRAM FOR PROFILE A
-
-		if (Status == VL53L0_ERROR_NONE) {
-			Status = VL53L0_SetLimitCheckValue(pMyDevice, VL53L0_CHECKENABLE_SIGNAL_RATE_FINAL_RANGE, (FixPoint1616_t)(0.25*65536));
-		}
-		if (Status == VL53L0_ERROR_NONE) {
-			Status = VL53L0_SetLimitCheckValue(pMyDevice, VL53L0_CHECKENABLE_SIGMA_FINAL_RANGE, (FixPoint1616_t)(18*65536));
-		}
-		if (Status == VL53L0_ERROR_NONE) {
-			Status = VL53L0_SetMeasurementTimingBudgetMicroSeconds(pMyDevice, 200000);
-		}
-		return status;
-			break;
-
-
-	case LONG_RANGE_MODE_R:
-		//HERE EXECUTION PROGRAM FOR PROFILE R
-		if (Status == VL53L0_ERROR_NONE) {
-			Status = VL53L0_SetLimitCheckValue(pMyDevice, VL53L0_CHECKENABLE_SIGNAL_RATE_FINAL_RANGE, (FixPoint1616_t)(0.1*65536));
-		}
-		if (Status == VL53L0_ERROR_NONE) {
-			Status = VL53L0_SetLimitCheckValue(pMyDevice,
-			VL53L0_CHECKENABLE_SIGMA_FINAL_RANGE,
-			(FixPoint1616_t)(60*65536));
-		}
-		if (Status == VL53L0_ERROR_NONE) {
-			Status =
-			VL53L0_SetMeasurementTimingBudgetMicroSeconds(pMyDevice, 33000);
-		}
-		if (Status == VL53L0_ERROR_NONE) {
-			Status = VL53L0_SetVcselPulsePeriod(pMyDevice, VL53L0_VCSEL_PERIOD_PRE_RANGE, 18);
-		}
-		if (Status == VL53L0_ERROR_NONE) {
-			Status = VL53L0_SetVcselPulsePeriod(pMyDevice, VL53L0_VCSEL_PERIOD_FINAL_RANGE, 14);
-		}
-
-			break;
-
-	}
-
-}
 */
-//--------------------------------- VON ANDERER LIB BENOETIGTE FUNKTIONEN ----------------------------
+bool SetRangingProfile(uint16_t Ranging_Profiles_t) {
+    // Switch case for RangingProfile
+    switch (Ranging_Profiles_t) {
+    case DEFAULT_MODE_D:
+        // TOF_SetTimingBudget(30);
+        break;
 
-//VL53L0X_SetLimitCheckValue
+    case HIGH_SPEED_MODE_S:
+        // TOF_SetTimingBudget(20);
+        break;
+
+    case HIGH_ACCURACY_MODE_A:
+        // TOF_SetTimingBudget(200);
+        break;
+
+    case LONG_RANGE_MODE_R:
+    	TOF_SetSignalRateLimit(10);		//Wert sollte für diesen Modus 0.1 sein
+        // setVcselPulsePeriod(VcselPeriodPreRange, 18);
+        // setVcselPulsePeriod(VcselPeriodFinalRange, 14);
+        break;
+
+    default:
+        // Handle an invalid profile case
+        return false;
+    }
+
+    return true; // Return true for valid profiles
+}
+
+
+
