@@ -58,11 +58,14 @@ void USART2_IRQHandler(void) {
 void bluetoothGetStatus(BluetoothModule_t *BluetoothModule) {
 
 	usartSendString(USART2, (char*) "AT");
-	char*test= bluetoothReceiveString(BluetoothModule, 2, 0);
-	if (strncmp(test, "OK", 2) == 0){
-		gpioSetPin(GPIOA, PIN10);
+	char *test = bluetoothReceiveString(BluetoothModule, 2, 0);
+	BluetoothMessageReply_t reply = bluetoothParseReply(test);
+
+	if (reply.status == BLUETOOTH_OK) {
+		gpioTogglePin(GPIOA, PIN10);
 	}
 	free(test);
+	free(reply.reply);
 
 }
 
