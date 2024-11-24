@@ -43,10 +43,10 @@ int main(void)
 	Usart2charReceived = false;
 
 	usartSetCommParams(USART2, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);  //Muss aus irgend einem Grund drin bleiben
-	bluetoothGetStatus();
+	bluetoothGetStatus(&HM17);
     /* Loop forever */
 	for(;;){
-		bluetoothGetStatus();
+		bluetoothGetStatus(&HM17);
 		delay(500);
 	}
 }

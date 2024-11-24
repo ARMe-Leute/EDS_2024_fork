@@ -19,7 +19,7 @@
 
 #include <bluetooth_typedef.h>
 
-extern void bluetoothGetStatus();
+extern void bluetoothGetStatus(BluetoothModule_t *BluetoothModule);
 extern void bluetoothInit(BluetoothModule_t *BluetoothModule,
 		USART_TypeDef *USART);
 extern void USART2_IRQHandler(void);
