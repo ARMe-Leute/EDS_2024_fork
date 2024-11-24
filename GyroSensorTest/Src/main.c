@@ -30,6 +30,7 @@
 #include <mcalI2C.h>
 // #include <ST7735.h> //DEL
 #include "GyroSensor.h"
+#include "RotaryPushButton.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
@@ -39,6 +40,7 @@
  * Defines
  */
 #define MPU6050_i2cAdress i2cAddr_MPU6050 << 1 // 7 Bit Adresse
+#define currentSensor 'SENSOR_MPU6050'
 
 /*
  * Methods
@@ -65,7 +67,7 @@ void i2cActivate()
     gpioSetOutputType(portB, PIN9, OPENDRAIN);   // Widerstaende verwenden!!!
     // Initialisierung des I2C-Controllers
     i2cInitI2C(i2c, I2C_DUTY_CYCLE_2, 17, I2C_CLOCK_50);
-    i2cEnableDevice(i2c);                        // MCAL I2C1 activ
+    i2cEnableDevice(i2c);   // MCAL I2C1 activ
 #ifdef BALA2024
 
     // GPIOB-Bustakt aktivieren wegen der Verwendung von PB10/PB3 (I2C).
@@ -87,9 +89,43 @@ void i2cActivate()
 #endif /* BALA2024 */
 }
 
+static bool checkI2CCommunication(void)
+{
+    int8_t sensorStatus = sensor_init(I2C1, 1);
+    if (sensorStatus == 0)
+    {
+        return true; /* Kommunikation erfolgreich */
+    }
+    return false; /* Fehler bei der Kommunikation */
+}
+
 int main(void)
 {
-	i2cActivate();
-    /* Loop forever */
-	for(;;);
+	initRotaryPushButton();
+	 bool communicationOk;
+
+	    /* I²C initialisieren */
+	    i2cActivate();
+
+	    /* Kommunikation mit dem Sensor prüfen */
+	    communicationOk = checkI2CCommunication();
+
+	    if (communicationOk)
+	    {
+	    	setRotaryColor(LED_GREEN);
+	        /* Erfolgreiche Kommunikation */
+	        for (;;)
+	        {
+	            /* Blinkt z. B. eine LED oder setzt Debug-Ausgabe */
+	        }
+	    }
+	    else
+	    {
+	    	setRotaryColor(LED_RED);
+	        /* Fehlgeschlagene Kommunikation */
+	        for (;;)
+	        {
+	            /* Fehlerbehandlung, z. B. LED blinkt langsamer */
+	        }
+	    }
 }
