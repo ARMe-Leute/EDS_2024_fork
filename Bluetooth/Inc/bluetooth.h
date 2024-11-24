@@ -26,6 +26,7 @@ extern void USART2_IRQHandler(void);
 extern char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
 		uint16_t length, uint16_t timeout);
 extern char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule);
+extern BluetoothMessageReply_t bluetoothParseReply(char *inputString);
 
 extern void delay(uint16_t delay); // For testing purpose
 
