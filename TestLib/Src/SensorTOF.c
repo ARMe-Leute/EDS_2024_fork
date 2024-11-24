@@ -475,29 +475,6 @@ bool TOF_perform_single_ref_calibration(TOF_calibration_type_t calib_type)
     return true;
 }
 
-/*
- * @function:	 TOF_perform_ref_calibration
- *
- * @brief: 		 perform reference calibration
- *
- * @returns:	 bool: true if successful
- */
-bool TOF_perform_ref_calibration()
-{
-	if (!TOF_perform_single_ref_calibration(TOF_CALIBRATION_TYPE_VHV)) {
-		return false;
-	}
-	if (!TOF_perform_single_ref_calibration(TOF_CALIBRATION_TYPE_PHASE)) {
-		return false;
-	}
-	/* Restore sequence steps enabled */
-	if (!TOF_set_sequence_steps_enabled(TOF_RANGE_SEQUENCE_STEP_DSS +
-			TOF_RANGE_SEQUENCE_STEP_PRE_RANGE +
-			TOF_RANGE_SEQUENCE_STEP_FINAL_RANGE)) {
-		return false;
-	}
-	return true;
-}
 
 /*
  * @function:	 TOF_init_device
@@ -533,9 +510,9 @@ bool TOF_init_device()
 		return false;
 	}
 
-    if (!TOF_perform_ref_calibration()) {
-        return false;
-    }
+    //if (!TOF_perform_ref_calibration()) {
+    //    return false;
+    //}
 
 	return true;
 }
@@ -834,9 +811,6 @@ bool TOF_SetAddress(uint8_t new_Addr) {
     return true; // Ensure the function always returns a value
 }
 
-
-
-
 /*
  * @function:	 TOF_ReadDistanceTimed
  *
@@ -891,22 +865,261 @@ bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range)
 	return true;
 }
 
+/*
+ * @function:	 SetRangingProfile
+ *
+ * @brief: 		 sets the RangingProfile
+ *
+ * @parameters:	 uint16_t Rangingprofile :	variable with Rangingprofile
+ *				 Default mode (D); High speed (S); High accuracy (A); Long range (R)
+ *
+ * @returns:	 bool: true if successful
+*/
+bool SetRangingProfile(uint16_t Ranging_Profiles_t) {
+    // Switch case for RangingProfile
+    switch (Ranging_Profiles_t) {
+    case DEFAULT_MODE_D:
+    	//if(!setMeasurementTimingBudget(30000)){return false;}
+
+        break;
+
+    case HIGH_SPEED_MODE_S:
+        //setMeasurementTimingBudget(20);
+        break;
+
+    case HIGH_ACCURACY_MODE_A:
+        //setMeasurementTimingBudget(200);
+        break;
+
+    case LONG_RANGE_MODE_R:
+    	//setSignalRateLimit(10);		//Wert sollte für diesen Modus 0.1 sein
+        //setVcselPulsePeriod(VcselPeriodPreRange, 18);
+        //setVcselPulsePeriod(VcselPeriodFinalRange, 14);
+        break;
+
+    default:
+        // Handle an invalid profile case
+        return false;
+    }
+
+    return true; // Return true for valid profiles
+}
+
+
+
+
+
+#define PRE_RANGE_CONFIG_VALID_PHASE_HIGH 0x57
+#define PRE_RANGE_CONFIG_VALID_PHASE_LOW 0x56
+#define PRE_RANGE_CONFIG_VCSEL_PERIOD 0x50
+#define PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x51
+#define FINAL_RANGE_CONFIG_VALID_PHASE_HIGH 0x48
+#define FINAL_RANGE_CONFIG_VALID_PHASE_LOW 0x47
+#define MSRC_CONFIG_TIMEOUT_MACROP 0x46
+#define GLOBAL_CONFIG_VCSEL_WIDTH 0x32
+#define FINAL_RANGE_CONFIG_VCSEL_PERIOD 0x70
+#define FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x71
+#define SYSTEM_SEQUENCE_CONFIG 0x01
+#define encodeVcselPeriod(period_pclks) (((period_pclks) >> 1) - 1)
+
+bool setVcselPulsePeriod(vcselPeriodType type, uint8_t period_pclks)
+	{
+	    uint8_t vcsel_period_reg = encodeVcselPeriod(period_pclks);
+	    I2C_RETURN_CODE_t i2c_return;
+
+	    SequenceStepEnables enables;
+	    SequenceStepTimeouts timeouts;
+
+	    // Get the current sequence step enables and timeouts from the sensor
+	    getSequenceStepEnables(&enables);
+	    getSequenceStepTimeouts(&enables, &timeouts);
+
+	    // Apply specific settings for the requested VCSEL period
+	    if (type == VcselPeriodPreRange)
+	    {
+	        // Set phase check limits based on the requested period
+	        switch (period_pclks)
+	        {
+	            case 12:
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x18);
+	            	if (i2c_return != I2C_OK) {
+	            			return false;
+	            		}
+	                break;
+	            case 14:
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x30);
+	            	if (i2c_return != I2C_OK) {
+	            			return false;
+	            		}
+	                break;
+	            case 16:
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x40);
+	            	if (i2c_return != I2C_OK) {
+	            			return false;
+	            		}
+	                break;
+	            case 18:
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x50);
+	            	if (i2c_return != I2C_OK) {
+	            			return false;
+	            		}
+	                break;
+	            default:
+	                return false;  // Invalid VCSEL period for pre-range
+	        }
+	        i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
+
+	        // Apply new VCSEL period for pre-range
+	        i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_VCSEL_PERIOD, vcsel_period_reg);
+
+	        // Update timeouts for pre-range
+	        uint16_t new_pre_range_timeout_mclks = timeoutMicrosecondsToMclks(timeouts.pre_range_us, period_pclks);
+	        new_pre_range_timeout_mclks = encodeTimeOut(new_pre_range_timeout_mclks);
+	        i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI, new_pre_range_timeout_mclks);
+
+	        // Update MSRC timeout
+	        uint16_t new_msrc_timeout_mclks = timeoutMicrosecondsToMclks(timeouts.msrc_dss_tcc_us, period_pclks);
+	        i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, MSRC_CONFIG_TIMEOUT_MACROP, (new_msrc_timeout_mclks > 256) ? 255 : (new_msrc_timeout_mclks - 1));
+	    }
+	    else if (type == VcselPeriodFinalRange)
+	    {
+	        // Set phase check limits for final-range VCSEL period
+	        switch (period_pclks)
+	        {
+	            case 8:
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, 0x10);
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, GLOBAL_CONFIG_VCSEL_WIDTH, 0x02);
+	            	if (i2c_return != I2C_OK) {
+						return false;
+	            	}
+	            	break;
+	            case 10:
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, 0x28);
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, GLOBAL_CONFIG_VCSEL_WIDTH, 0x03);
+	            	if (i2c_return != I2C_OK) {
+						return false;
+					}
+	            	break;
+	            case 12:
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, 0x38);
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, GLOBAL_CONFIG_VCSEL_WIDTH, 0x03);
+	            	if (i2c_return != I2C_OK) {
+						return false;
+					}
+	            	break;
+	            case 14:
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, 0x48);
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
+	            	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, GLOBAL_CONFIG_VCSEL_WIDTH, 0x03);
+	            	if (i2c_return != I2C_OK) {
+						return false;
+					}
+	            	break;
+	            default:
+	                return false;  // Invalid VCSEL period for final-range
+	        }
+
+	        // Apply new VCSEL period for final-range
+	        i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_VCSEL_PERIOD, vcsel_period_reg);
+	        if (i2c_return != I2C_OK) {
+				return false;
+			}
+	        // Update timeouts for final-range
+	        uint16_t new_final_range_timeout_mclks = timeoutMicrosecondsToMclks(timeouts.final_range_us, period_pclks);
+	        if (enables.pre_range)
+	        {
+	            new_final_range_timeout_mclks += timeouts.pre_range_mclks;
+	        }
+	        new_final_range_timeout_mclks = encodeTimeOut(new_final_range_timeout_mclks);
+	        i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, new_final_range_timeout_mclks);
+	        if (i2c_return != I2C_OK) {
+				return false;
+			}
+	    }
+	    else
+	    {
+	        return false;  // Invalid type
+	    }
+
+	    // Re-apply the timing budget
+	    //setMeasurementTimingBudget(measurement_timing_budget_us);
+
+	    // Perform phase calibration if needed
+
+	    uint8_t sequence_config;
+	    i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, SYSTEM_SEQUENCE_CONFIG, &sequence_config);
+	        if (i2c_return != I2C_OK) {
+	            return false; // Return false if the I2C read fails
+	        }
+	    i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, SYSTEM_SEQUENCE_CONFIG, 0x02);
+	    if (i2c_return != I2C_OK) {
+			return false;
+		}
+	    TOF_perform_single_ref_calibration(TOF_CALIBRATION_TYPE_VHV);
+	    i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, SYSTEM_SEQUENCE_CONFIG, sequence_config);
+	    if (i2c_return != I2C_OK) {
+			return false;
+		}
+	    return true;
+}
+
 
 
 
 /*
- * @function:	 TOF_SetTimingBudget
- *
- * @brief: 		 get distance in single mode with preset time delay
- *
- * @parameters:	 uint16_t *range :	variable with measurement
- * 				 uint16_t time :	variable with time preset
- *
- * @returns:	 bool: true if successful
- */
-bool TOF_SetTimingBudget( uint16_t time, uint16_t *range){	//timingBUdget in ms
-	//not implemented yet
+* @function:	 encodeTimeOut
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+uint16_t encodeTimeOut(uint16_t final_range_timeout_mclks) {
+
+	uint32_t ls_byte = 0;
+	uint16_t ms_byte = 0;
+
+	if (final_range_timeout_mclks > 0){
+	ls_byte = final_range_timeout_mclks - 1;
+
+		while ((ls_byte & 0xFFFFFF00) > 0){
+	      ls_byte >>= 1;
+	      ms_byte++;
+	    }
+
+	    return (ms_byte << 8) | (ls_byte & 0xFF);
+	  }
+	  else { return 0; }
 }
+
+/*
+* @function:	 decodeTimeOut
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+uint16_t decodeTimeout(uint16_t reg_val)
+{
+    // Formula: (LSByte * 2^MSByte) + 1
+    // reg_val is a 16-bit value; the MSByte (Most Significant Byte) is the upper 8 bits
+    // and the LSByte (Least Significant Byte) is the lower 8 bits.
+
+    uint8_t msb = (reg_val >> 8) & 0xFF;  // Extract the most significant byte
+    uint8_t lsb = reg_val & 0xFF;         // Extract the least significant byte
+
+    // Calculate the timeout as per the formula
+    uint16_t timeout = (lsb << msb) + 1;
+
+    return timeout;
 
 
 /*
@@ -934,9 +1147,8 @@ bool TOF_getSignalRateLimit(float *signalRateLimit) {
     return true; // Return true on success
 }
 
-
 /*
- * @function:	 TOF_SetSignalRateLimit
+ * @function:	 setSignalRateLimit
  *
  * @brief: 		 get distance in single mode with preset time delay
  *
@@ -945,7 +1157,7 @@ bool TOF_getSignalRateLimit(float *signalRateLimit) {
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_SetSignalRateLimit(float *signalRateLimit) {
+bool setSignalRateLimit(float *signalRateLimit) {
 	I2C_RETURN_CODE_t i2c_return;
 
 	float limitMCPS = *signalRateLimit;
@@ -964,75 +1176,278 @@ bool TOF_SetSignalRateLimit(float *signalRateLimit) {
 
 
 
+
 /*
- * @function:	 TOF_SetVcselPulsePeriod
- *
- * @brief: 		 sets the RangingProfile
- *
- * @parameters:	 uint16_t Rangingprofile :	variable with Rangingprofile
- *				 Default mode (D); High speed (S); High accuracy (A); Long range (R)
- *
- * @returns:	 bool: true if successful
-
+* @function:	 getSequenceStepEnables
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
 */
-bool TOF_SetVcselPulsePeriod(vcselPeriodType_t, uint8_t period_pclks){
+#define SYSTEM_SEQUENCE_CONFIG 0x01
+
+bool getSequenceStepEnables(SequenceStepEnables *enables)
+{
+    I2C_RETURN_CODE_t i2c_return;
+    uint8_t sequence_config;
+
+    // Read the byte from the SYSTEM_SEQUENCE_CONFIG register
+    i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, SYSTEM_SEQUENCE_CONFIG, &sequence_config);
+
+    // Check if the I2C read was successful
+    if (i2c_return != I2C_OK)
+    {
+        return false;  // Return false if there was an error
+    }
+
+    // Extract bit values using shifts and masks
+    enables->tcc         = (sequence_config >> 4) & 0x1;  // Extract the TCC bit
+    enables->dss         = (sequence_config >> 3) & 0x1;  // Extract the DSS bit
+    enables->msrc        = (sequence_config >> 2) & 0x1;  // Extract the MSRC bit
+    enables->pre_range   = (sequence_config >> 6) & 0x1;  // Extract the PRE_RANGE bit
+    enables->final_range = (sequence_config >> 7) & 0x1;  // Extract the FINAL_RANGE bit
+
+    return true;  // Return true if everything succeeded
+}
+
+
+/*
+* @function:	 getSequenceStepTimeouts
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+
+#define MSRC_CONFIG_TIMEOUT_MACROP 0x46
+#define PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x51
+#define FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x71
+enum vcselPeriodType { VcselPeriodPreRange, VcselPeriodFinalRange };
+
+bool getSequenceStepTimeouts(SequenceStepEnables *enables, SequenceStepTimeouts *timeouts)
+{
+	I2C_RETURN_CODE_t i2c_return;
+
+    timeouts->pre_range_vcsel_period_pclks = getVcselPulsePeriod(VcselPeriodPreRange);
+
+    i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, MSRC_CONFIG_TIMEOUT_MACROP, &timeouts->msrc_dss_tcc_mclks);
+	if (i2c_return != I2C_OK)
 	{
-	  uint8_t vcsel_period_reg = ((period_pclks) >> 1) - 1;
+		return false;
+	}
+    timeouts->msrc_dss_tcc_mclks += 1;
+    timeouts->msrc_dss_tcc_us = timeoutMclksToMicroseconds(timeouts->msrc_dss_tcc_mclks, timeouts->pre_range_vcsel_period_pclks);
 
-	  //getSequenceStepEnables(&enables);
-	  uint8_t sequence_config = readReg(SYSTEM_SEQUENCE_CONFIG);
+    i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI, &timeouts->pre_range_mclks);
+    if (i2c_return != I2C_OK)
+    	{
+    		return false;
+    	}
+    timeouts->pre_range_mclks = decodeTimeout(timeouts->pre_range_mclks);
+    timeouts->pre_range_us = timeoutMclksToMicroseconds(timeouts->pre_range_mclks, timeouts->pre_range_vcsel_period_pclks);
 
-	  enables->tcc          = (sequence_config >> 4) & 0x1;
-	  enables->dss          = (sequence_config >> 3) & 0x1;
-	  enables->msrc         = (sequence_config >> 2) & 0x1;
-	  enables->pre_range    = (sequence_config >> 6) & 0x1;
-	  enables->final_range  = (sequence_config >> 7) & 0x1;
-
-	  //getSequenceStepTimeouts(&enables, &timeouts);
+    timeouts->final_range_vcsel_period_pclks = getVcselPulsePeriod(VcselPeriodFinalRange);
 
 
+    i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, &timeouts->pre_range_mclks);
+    if (i2c_return != I2C_OK)
+    	{
+    		return false;
+    	}
+    timeouts->final_range_mclks = decodeTimeout(timeouts->final_range_mclks);
+
+    if (enables->pre_range)
+    {
+        timeouts->final_range_mclks -= timeouts->pre_range_mclks;
+    }
+
+    timeouts->final_range_us = timeoutMclksToMicroseconds(timeouts->final_range_mclks, timeouts->final_range_vcsel_period_pclks);
+}
+
+/*
+* @function:	 timeoutMclksToMicroseconds
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+#define calcMacroPeriod(vcsel_period_pclks) ((((uint32_t)2304 * (vcsel_period_pclks) * 1655) + 500) / 1000)
+uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks)
+{
+    // Calculate the macro period in nanoseconds
+    uint32_t macro_period_ns = calcMacroPeriod(vcsel_period_pclks);
+
+    // Convert the timeout period in MCLKs to microseconds
+    return ((timeout_period_mclks * macro_period_ns) + 500) / 1000;
+}
+
+
+/*
+* @function:	 getVcselPulsePeriod
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+
+#define decodeVcselPeriod(reg_val)      (((reg_val) + 1) << 1)
+#define PRE_RANGE_CONFIG_VCSEL_PERIOD 0x50
+#define FINAL_RANGE_CONFIG_VCSEL_PERIOD 0x70
+
+uint8_t getVcselPulsePeriod(vcselPeriodType type)
+{
+
+	I2C_RETURN_CODE_t i2c_return;
+
+    uint8_t vcsel_period = 255;  // Default to 255 (error case)
+
+    if (type == VcselPeriodPreRange)
+    {
+        // Read the pre-range VCSEL period register and decode
+        i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_VCSEL_PERIOD, &vcsel_period);
+    	if (i2c_return != I2C_OK){
+    		return false;
+    	}
+        vcsel_period = decodeVcselPeriod(vcsel_period);
+    }
+    else if (type == VcselPeriodFinalRange)
+    {
+        // Read the final range VCSEL period register and decode
+        i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_VCSEL_PERIOD, &vcsel_period);
+    	if (i2c_return != I2C_OK){
+    		return false;
+    	}
+    	vcsel_period = decodeVcselPeriod(vcsel_period);
+    }
+
+    return vcsel_period;
 }
 
 
 
+
+
+
 /*
- * @function:	 SetRangingProfile
- *
- * @brief: 		 sets the RangingProfile
- *
- * @parameters:	 uint16_t Rangingprofile :	variable with Rangingprofile
- *				 Default mode (D); High speed (S); High accuracy (A); Long range (R)
- *
- * @returns:	 bool: true if successful
-
+* @function:	 setMeasurementTimingBudget
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
 */
-bool SetRangingProfile(uint16_t Ranging_Profiles_t) {
-    // Switch case for RangingProfile
-    switch (Ranging_Profiles_t) {
-    case DEFAULT_MODE_D:
-        // TOF_SetTimingBudget(30);
-        break;
+bool setMeasurementTimingBudget(uint32_t budget_us)
+{
+	I2C_RETURN_CODE_t i2c_return;
 
-    case HIGH_SPEED_MODE_S:
-        // TOF_SetTimingBudget(20);
-        break;
+    SequenceStepEnables enables;
+    SequenceStepTimeouts timeouts;
 
-    case HIGH_ACCURACY_MODE_A:
-        // TOF_SetTimingBudget(200);
-        break;
+    uint16_t StartOverhead     = 1910;
+    uint16_t EndOverhead       = 960;
+    uint16_t MsrcOverhead      = 660;
+    uint16_t TccOverhead       = 590;
+    uint16_t DssOverhead       = 690;
+    uint16_t PreRangeOverhead  = 660;
+    uint16_t FinalRangeOverhead = 550;
 
-    case LONG_RANGE_MODE_R:
-    	TOF_SetSignalRateLimit(10);		//Wert sollte für diesen Modus 0.1 sein
-        // setVcselPulsePeriod(VcselPeriodPreRange, 18);
-        // setVcselPulsePeriod(VcselPeriodFinalRange, 14);
-        break;
+    uint32_t used_budget_us = StartOverhead + EndOverhead;
 
-    default:
-        // Handle an invalid profile case
-        return false;
+    // Get sequence step enables and timeouts
+    getSequenceStepEnables(&enables);
+    getSequenceStepTimeouts(&enables, &timeouts);
+
+    if (enables.tcc)
+    {
+        used_budget_us += (timeouts.msrc_dss_tcc_us + TccOverhead);
     }
 
-    return true; // Return true for valid profiles
+    if (enables.dss)
+    {
+        used_budget_us += 2 * (timeouts.msrc_dss_tcc_us + DssOverhead);
+    }
+    else if (enables.msrc)
+    {
+        used_budget_us += (timeouts.msrc_dss_tcc_us + MsrcOverhead);
+    }
+
+    if (enables.pre_range)
+    {
+        used_budget_us += (timeouts.pre_range_us + PreRangeOverhead);
+    }
+
+    if (enables.final_range)
+    {
+        used_budget_us += FinalRangeOverhead;
+
+        if (used_budget_us > budget_us)
+        {
+            // Requested timeout too big
+            return false;
+        }
+
+        uint32_t final_range_timeout_us = budget_us - used_budget_us;
+
+        // Convert the final range timeout to MCLks
+        uint32_t final_range_timeout_mclks =
+        timeoutMicrosecondsToMclks(final_range_timeout_us, timeouts.final_range_vcsel_period_pclks);
+
+        if (enables.pre_range)
+        {
+            final_range_timeout_mclks += timeouts.pre_range_mclks;
+        }
+
+        // Write the final range timeout to the register
+
+        final_range_timeout_mclks = encodeTimeOut(final_range_timeout_mclks);
+        i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, final_range_timeout_mclks);
+        if (i2c_return != I2C_OK){
+            		return false;
+            	}
+        // Store the timing budget for internal reuse
+        uint32_t measurement_timing_budget_us = budget_us;
+    }
+
+    return true;
+}
+
+
+
+
+/*
+* @function:	 timeoutMicrosecondsToMclks
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+uint32_t timeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks)
+{
+    // Calculate the macro period in nanoseconds
+    uint32_t macro_period_ns = calcMacroPeriod(vcsel_period_pclks);
+
+    // Convert timeout from microseconds to MCLKs
+    // The formula uses rounding by adding (macro_period_ns / 2) before dividing
+    uint32_t return_value = (((timeout_period_us * 1000) + (macro_period_ns / 2)) / macro_period_ns);
+    return return_value;
+}
 }
 
 

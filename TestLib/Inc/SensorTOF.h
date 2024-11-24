@@ -72,7 +72,10 @@ typedef enum
 
 
 
-
+typedef enum {
+    VcselPeriodPreRange = 0,
+    VcselPeriodFinalRange
+} vcselPeriodType;
 
 
 //-------------------- ADDITIONAL SETUP ---------------------
@@ -97,6 +100,25 @@ typedef enum
 } vcselPeriodType_t;
 
 
+typedef struct
+{
+    uint8_t pre_range_vcsel_period_pclks;
+    uint16_t msrc_dss_tcc_mclks;
+    uint32_t msrc_dss_tcc_us;
+    uint16_t pre_range_mclks;
+    uint32_t pre_range_us;
+    uint8_t final_range_vcsel_period_pclks;
+    uint16_t final_range_mclks;
+    uint32_t final_range_us;
+} SequenceStepTimeouts;
+
+typedef struct {
+    uint8_t tcc;          // TCC step enabled (1 if enabled, 0 if disabled)
+    uint8_t dss;          // DSS step enabled (1 if enabled, 0 if disabled)
+    uint8_t msrc;         // MSRC step enabled (1 if enabled, 0 if disabled)
+    uint8_t pre_range;    // Pre-range step enabled (1 if enabled, 0 if disabled)
+    uint8_t final_range;  // Final range step enabled (1 if enabled, 0 if disabled)
+} SequenceStepEnables;
 
 
 
@@ -204,22 +226,165 @@ bool SetRangingProfile(uint16_t Rangingprofile);
 
 
 
-//--------------- IF GENUG ZEIT ---------------
+//--------------- NEUE ---------------
+
 
 /*
- * @function:	 TOF_CalibrateReference
+ * @function:	 TOF_SetTimingBudget
  *
- * @brief: 		 Calibrates the TOF Sensor
+ * @brief: 		 get distance in single mode with preset time delay
  *
- * @parameters:	 none
+ * @parameters:	 uint16_t *range :	variable with measurement
+ * 				 uint16_t time :	variable with time preset
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_CalibrateReference();
+bool TOF_SetTimingBudget();
+
+/*
+ * @function:	 TOF_SetVcselPulsePeriod
+ *
+ * @brief: 		 get distance in single mode with preset time delay
+ *
+ * @parameters:	 uint16_t *range :	variable with measurement
+ * 				 uint16_t time :	variable with time preset
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_SetVcselPulsePeriod();
 
 
+/*
+* @function:	 encodeTimeOut
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+uint16_t encodeTimeOut(uint16_t final_range_timeout_mclks);
 
+/*
+* @function:	 decodeTimeOut
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+uint16_t decodeTimeout(uint16_t reg_val);
 
+/*
+ * @function:	 TOF_getSignalRateLimit
+ *
+ * @brief: 		 get distance in single mode with preset time delay
+ *
+ * @parameters:	 uint16_t *range :	variable with measurement
+ * 				 uint16_t time :	variable with time preset
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_getSignalRateLimit(float *signalRateLimit);
+
+/*
+ * @function:	 TOF_SetSignalRateLimit
+ *
+ * @brief: 		 get distance in single mode with preset time delay
+ *
+ * @parameters:	 uint16_t *range :	variable with measurement
+ * 				 uint16_t time :	variable with time preset
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_SetSignalRateLimit(float *signalRateLimit);
+
+/*
+* @function:	 getSequenceStepEnables
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+bool getSequenceStepEnables(SequenceStepEnables *enables);
+
+/*
+* @function:	 getSequenceStepTimeouts
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+bool getSequenceStepTimeouts(SequenceStepEnables *enables, SequenceStepTimeouts *timeouts);
+
+/*
+* @function:	 timeoutMclksToMicroseconds
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks);
+
+/*
+* @function:	 getVcselPulsePeriod
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+uint8_t getVcselPulsePeriod(vcselPeriodType type);
+
+/*
+* @function:	 setMeasurementTimingBudget
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+bool setMeasurementTimingBudget(uint32_t budget_us);
+
+/*
+* @function:	 timeoutMicrosecondsToMclks
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+uint32_t timeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks);
+
+/*
+* @function:	 calcMacroPeriod
+*
+* @brief: 		 get distance in single mode with preset time delay
+*
+* @parameters:	 uint16_t *range :	variable with measurement
+* 				 uint16_t time :	variable with time preset
+*
+* @returns:	 bool: true if successful
+*/
+uint32_t calcMacroPeriod(uint8_t vcsel_period_pclks);
 
 
 
