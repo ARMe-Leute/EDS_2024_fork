@@ -62,11 +62,24 @@ void bluetoothGetStatus(BluetoothModule_t *BluetoothModule) {
 	BluetoothMessageReply_t reply = bluetoothParseReply(test);
 
 	if (reply.status == BLUETOOTH_OK) {
-		gpioTogglePin(GPIOA, PIN10);
+	//	gpioTogglePin(GPIOA, PIN10);
 	}
 	free(test);
 	free(reply.reply);
 
+}
+
+BluetoothMessageReply_t bluetoothGetAddress(BluetoothModule_t *BluetoothModule) {
+
+	BluetoothMessageReply_t returnValue;
+	usartSendString(USART2, (char*) "AT+ADDR?");
+	char *addressReply = bluetoothReceiveString(BluetoothModule, 19, 0);
+	BluetoothMessageReply_t parsedReply = bluetoothParseReply(addressReply);
+
+	returnValue.status = parsedReply.status;
+	returnValue.reply = parsedReply.reply + 4;
+
+	return returnValue;
 }
 
 /**
