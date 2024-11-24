@@ -151,16 +151,16 @@ char* bluetoothReceiveString(BluetoothModule_t *BluetoothModule,
 
 char bluetoothReceiveChar(BluetoothModule_t *BluetoothModule) {
 
-	if (BluetoothModule->usart == USART2) {
+	//if (BluetoothModule->usart == USART2) {
 		while (Usart2charReceived == false) {
 		}
 		Usart2charReceived = false;
 
 		return (char) Usart2receivedChar;
-	} else {
+//	} else {
 		/// @todo Implement other Usart channels
-		return NULL;
-	}
+//		return NULL;
+//	}
 }
 
 
