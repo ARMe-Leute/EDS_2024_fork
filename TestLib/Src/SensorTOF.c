@@ -813,10 +813,9 @@ bool TOF_ReadSingleDistance(uint16_t *range)
 /*
  * @function:	 TOF_SetAddress
  *
- * @brief: 		 get distance in single mode with preset time delay
+ * @brief: 		 set new TOF address
  *
- * @parameters:	 uint16_t *range :	variable with measurement
- * 				 uint16_t time :	variable with time preset
+ * @parameters:	 uint16_t new address :	variable with measurement
  *
  * @returns:	 bool: true if successful
  */
@@ -929,12 +928,12 @@ bool SetRangingProfile(uint16_t Ranging_Profiles_t) {
 }
 
 /*
- * @function:	 SetRangingProfile
+ * @function:	 setVcselPulsePeriod
  *
- * @brief: 		 sets the RangingProfile
+ * @brief: 		 sets the pulse period
  *
- * @parameters:	 uint16_t Rangingprofile :	variable with Rangingprofile
- *				 Default mode (D); High speed (S); High accuracy (A); Long range (R)
+ * @parameters:	 	vcselPeriodType type : typedef
+ * 					uint8_t period_pclks : defines limits based on the requested period
  *
  * @returns:	 bool: true if successful
 */
@@ -1085,12 +1084,11 @@ bool setVcselPulsePeriod(vcselPeriodType type, uint8_t period_pclks)
 /*
 * @function:	 encodeTimeOut
 *
-* @brief: 		 get distance in single mode with preset time delay
+* @brief: 		 sets the final range timeout
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 uint16_t final_range_timeout_mclks : defines encode timeout for final range
 *
-* @returns:	 bool: true if successful
+* @returns:	 uint16_t : ms_byte / ls_byte
 */
 uint16_t encodeTimeOut(uint16_t final_range_timeout_mclks) {
 
@@ -1114,12 +1112,11 @@ uint16_t encodeTimeOut(uint16_t final_range_timeout_mclks) {
 /*
 * @function:	 decodeTimeOut
 *
-* @brief: 		 get distance in single mode with preset time delay
+* @brief: 		 calculates decode time out
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 uint16_t reg_val : 16-bit value for timeout value
 *
-* @returns:	 bool: true if successful
+* @returns:	 uint16_t timeout
 */
 uint16_t decodeTimeout(uint16_t reg_val)
 {
@@ -1140,10 +1137,9 @@ uint16_t decodeTimeout(uint16_t reg_val)
 /*
  * @function:	 setSignalRateLimit
  *
- * @brief: 		 get distance in single mode with preset time delay
+ * @brief: 		 sets the signal rate limit
  *
- * @parameters:	 uint16_t *range :	variable with measurement
- * 				 uint16_t time :	variable with time preset
+ * @parameters:	 float signalRateLimit : signal rate limit (e.g. based on the ranging profile)
  *
  * @returns:	 bool: true if successful
  */
@@ -1168,10 +1164,9 @@ bool setSignalRateLimit(float *signalRateLimit) {
 /*
 * @function:	 getSequenceStepEnables
 *
-* @brief: 		 get distance in single mode with preset time delay
+* @brief: 		checks if the I2C read was succesful
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 SequenceStepEnables
 *
 * @returns:	 bool: true if successful
 */
@@ -1203,10 +1198,10 @@ bool getSequenceStepEnables(SequenceStepEnables *enables)
 /*
 * @function:	 getSequenceStepTimeouts
 *
-* @brief: 		 get distance in single mode with preset time delay
+* @brief: 		 sets the sequence step timeouts
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 SequenceStepEnables
+* 				 SequenceStepTimeouts
 *
 * @returns:	 bool: true if successful
 */
@@ -1263,10 +1258,10 @@ bool getSequenceStepTimeouts(SequenceStepEnables *enables, SequenceStepTimeouts 
 *
 * @brief: 		 get distance in single mode with preset time delay
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 uint16_t timeout_period_mclks : timeout period in microseconds
+* 				 uint8_t vcsel_period_pclks : Vertical cavity surface emitting laser period
 *
-* @returns:	 bool: true if successful
+* @returns:	 uint32_t : returns timeout_period_mclks * macro_period_ns
 */
 #define calcMacroPeriod(vcsel_period_pclks) (((uint32_t)(2304) * (vcsel_period_pclks) * 1655 + 500) / 1000)
 uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks)
@@ -1283,12 +1278,11 @@ uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel
 /*
 * @function:	 getVcselPulsePeriod
 *
-* @brief: 		 get distance in single mode with preset time delay
+* @brief: 		 reads the current pulse period type
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 enum : vcselPeriodType
 *
-* @returns:	 bool: true if successful
+* @returns:	 uint8_t : vcsel_period
 */
 #define decodeVcselPeriod(reg_val)      (((reg_val) + 1) << 1)
 uint8_t getVcselPulsePeriod(vcselPeriodType type)
@@ -1324,10 +1318,9 @@ uint8_t getVcselPulsePeriod(vcselPeriodType type)
 /*
 * @function:	 setMeasurementTimingBudget
 *
-* @brief: 		 get distance in single mode with preset time delay
+* @brief: 		 calculates timing budget
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 uint32_t budget_us : current timing budget
 *
 * @returns:	 bool: true if successful
 */
@@ -1410,12 +1403,12 @@ bool setMeasurementTimingBudget(uint32_t budget_us)
 /*
 * @function:	 timeoutMicrosecondsToMclks
 *
-* @brief: 		 get distance in single mode with preset time delay
+* @brief: 		 calculates the macro period in microseconds
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 uint32_t timeout_period_us : timeout period in mycroseconds
+* 				 uint8_t vcsel_period_pclks : Vertical cavity surface emitting laser period
 *
-* @returns:	 bool: true if successful
+* @returns:	 uint32_t : return value
 */
 uint32_t timeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks)
 {
