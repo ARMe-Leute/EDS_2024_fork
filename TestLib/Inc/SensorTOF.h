@@ -51,10 +51,31 @@
 #define TOF_RANGE_SEQUENCE_STEP_FINAL_RANGE (0x80)
 
 #define TOF_VL53L0X_EXPECTED_DEVICE_ID (0xEE)
-#define TOF_VL53L0X_DEFAULT_ADDRESS (0x29)//sollte das nicht 0x27 sein ????
+#define TOF_VL53L0X_DEFAULT_ADDRESS (0x29)
 
 // define out of range
 #define TOF_VL53L0X_OUT_OF_RANGE (8190)
+
+//defines for SetRangingProfile
+#define MSRC_CONFIG_TIMEOUT_MACROP 0x46
+#define PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x51
+#define FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x71
+#define SYSTEM_SEQUENCE_CONFIG 0x01
+#define PRE_RANGE_CONFIG_VALID_PHASE_HIGH 0x57
+#define PRE_RANGE_CONFIG_VALID_PHASE_LOW 0x56
+#define PRE_RANGE_CONFIG_VCSEL_PERIOD 0x50
+#define PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x51
+#define FINAL_RANGE_CONFIG_VALID_PHASE_HIGH 0x48
+#define FINAL_RANGE_CONFIG_VALID_PHASE_LOW 0x47
+#define MSRC_CONFIG_TIMEOUT_MACROP 0x46
+#define GLOBAL_CONFIG_VCSEL_WIDTH 0x32
+#define FINAL_RANGE_CONFIG_VCSEL_PERIOD 0x70
+#define FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x71
+#define SYSTEM_SEQUENCE_CONFIG 0x01
+#define encodeVcselPeriod(period_pclks) (((period_pclks) >> 1) - 1)
+#define PRE_RANGE_CONFIG_VCSEL_PERIOD 0x50
+#define FINAL_RANGE_CONFIG_VCSEL_PERIOD 0x70
+
 
 // enum with implemented Sensors and addresses (currently only VL53LOX)
 typedef enum
@@ -72,12 +93,6 @@ typedef enum
 
 
 
-typedef enum {
-    VcselPeriodPreRange = 0,
-    VcselPeriodFinalRange
-} vcselPeriodType;
-
-
 //-------------------- ADDITIONAL SETUP ---------------------
 //enum for RangingProfiles
 typedef enum
@@ -89,6 +104,12 @@ typedef enum
 
 } Ranging_Profiles_t;
 
+
+
+typedef enum {
+    VcselPeriodPreRange = 0,
+    VcselPeriodFinalRange =1
+} vcselPeriodType;
 
 
 typedef enum
@@ -251,7 +272,7 @@ bool TOF_SetTimingBudget();
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_SetVcselPulsePeriod();
+bool setVcselPulsePeriod(vcselPeriodType type, uint8_t period_pclks);
 
 
 /*
@@ -279,18 +300,6 @@ uint16_t encodeTimeOut(uint16_t final_range_timeout_mclks);
 uint16_t decodeTimeout(uint16_t reg_val);
 
 /*
- * @function:	 TOF_getSignalRateLimit
- *
- * @brief: 		 get distance in single mode with preset time delay
- *
- * @parameters:	 uint16_t *range :	variable with measurement
- * 				 uint16_t time :	variable with time preset
- *
- * @returns:	 bool: true if successful
- */
-bool TOF_getSignalRateLimit(float *signalRateLimit);
-
-/*
  * @function:	 TOF_SetSignalRateLimit
  *
  * @brief: 		 get distance in single mode with preset time delay
@@ -300,7 +309,7 @@ bool TOF_getSignalRateLimit(float *signalRateLimit);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_SetSignalRateLimit(float *signalRateLimit);
+bool setSignalRateLimit(float *signalRateLimit);
 
 /*
 * @function:	 getSequenceStepEnables

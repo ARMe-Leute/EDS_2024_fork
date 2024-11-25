@@ -475,6 +475,29 @@ bool TOF_perform_single_ref_calibration(TOF_calibration_type_t calib_type)
     return true;
 }
 
+/*
+ * @function:	 TOF_perform_ref_calibration
+ *
+ * @brief: 		 perform reference calibration
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_perform_ref_calibration()
+{
+	if (!TOF_perform_single_ref_calibration(TOF_CALIBRATION_TYPE_VHV)) {
+		return false;
+	}
+	if (!TOF_perform_single_ref_calibration(TOF_CALIBRATION_TYPE_PHASE)) {
+		return false;
+	}
+	/* Restore sequence steps enabled */
+	if (!TOF_set_sequence_steps_enabled(TOF_RANGE_SEQUENCE_STEP_DSS +
+			TOF_RANGE_SEQUENCE_STEP_PRE_RANGE +
+			TOF_RANGE_SEQUENCE_STEP_FINAL_RANGE)) {
+		return false;
+	}
+	return true;
+}
 
 /*
  * @function:	 TOF_init_device
@@ -510,9 +533,9 @@ bool TOF_init_device()
 		return false;
 	}
 
-    //if (!TOF_perform_ref_calibration()) {
-    //    return false;
-    //}
+    if (!TOF_perform_ref_calibration()) {
+        return false;
+    }
 
 	return true;
 }
@@ -879,22 +902,22 @@ bool SetRangingProfile(uint16_t Ranging_Profiles_t) {
     // Switch case for RangingProfile
     switch (Ranging_Profiles_t) {
     case DEFAULT_MODE_D:
-    	//if(!setMeasurementTimingBudget(30000)){return false;}
+    	if(!setMeasurementTimingBudget(30)){return false;}
 
         break;
 
     case HIGH_SPEED_MODE_S:
-        //setMeasurementTimingBudget(20);
+        setMeasurementTimingBudget(20000);
         break;
 
     case HIGH_ACCURACY_MODE_A:
-        //setMeasurementTimingBudget(200);
+        setMeasurementTimingBudget(200000);
         break;
 
     case LONG_RANGE_MODE_R:
-    	//setSignalRateLimit(10);		//Wert sollte für diesen Modus 0.1 sein
-        //setVcselPulsePeriod(VcselPeriodPreRange, 18);
-        //setVcselPulsePeriod(VcselPeriodFinalRange, 14);
+    	//if(!setSignalRateLimit(0.1)){return false;}
+    	if(!setVcselPulsePeriod(VcselPeriodPreRange, 18)){return false;}
+        if(!setVcselPulsePeriod(VcselPeriodFinalRange, 14)){return false;}
         break;
 
     default:
@@ -905,23 +928,16 @@ bool SetRangingProfile(uint16_t Ranging_Profiles_t) {
     return true; // Return true for valid profiles
 }
 
-
-
-
-
-#define PRE_RANGE_CONFIG_VALID_PHASE_HIGH 0x57
-#define PRE_RANGE_CONFIG_VALID_PHASE_LOW 0x56
-#define PRE_RANGE_CONFIG_VCSEL_PERIOD 0x50
-#define PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x51
-#define FINAL_RANGE_CONFIG_VALID_PHASE_HIGH 0x48
-#define FINAL_RANGE_CONFIG_VALID_PHASE_LOW 0x47
-#define MSRC_CONFIG_TIMEOUT_MACROP 0x46
-#define GLOBAL_CONFIG_VCSEL_WIDTH 0x32
-#define FINAL_RANGE_CONFIG_VCSEL_PERIOD 0x70
-#define FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x71
-#define SYSTEM_SEQUENCE_CONFIG 0x01
-#define encodeVcselPeriod(period_pclks) (((period_pclks) >> 1) - 1)
-
+/*
+ * @function:	 SetRangingProfile
+ *
+ * @brief: 		 sets the RangingProfile
+ *
+ * @parameters:	 uint16_t Rangingprofile :	variable with Rangingprofile
+ *				 Default mode (D); High speed (S); High accuracy (A); Long range (R)
+ *
+ * @returns:	 bool: true if successful
+*/
 bool setVcselPulsePeriod(vcselPeriodType type, uint8_t period_pclks)
 	{
 	    uint8_t vcsel_period_reg = encodeVcselPeriod(period_pclks);
@@ -1066,9 +1082,6 @@ bool setVcselPulsePeriod(vcselPeriodType type, uint8_t period_pclks)
 	    return true;
 }
 
-
-
-
 /*
 * @function:	 encodeTimeOut
 *
@@ -1097,6 +1110,7 @@ uint16_t encodeTimeOut(uint16_t final_range_timeout_mclks) {
 	  else { return 0; }
 }
 
+
 /*
 * @function:	 decodeTimeOut
 *
@@ -1120,32 +1134,8 @@ uint16_t decodeTimeout(uint16_t reg_val)
     uint16_t timeout = (lsb << msb) + 1;
 
     return timeout;
-
-
-/*
- * @function:	 TOF_getSignalRateLimit
- *
- * @brief: 		 get distance in single mode with preset time delay
- *
- * @parameters:	 uint16_t *range :	variable with measurement
- * 				 uint16_t time :	variable with time preset
- *
- * @returns:	 bool: true if successful
- */
-bool TOF_getSignalRateLimit(float *signalRateLimit) {
-    uint8_t data= 0;
-    I2C_RETURN_CODE_t i2c_return;
-    // Read 2 bytes from the 0x44 register
-    i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, 0x44, &data);
-    if (i2c_return != I2C_OK) {
-        return false; // Return false if the I2C read fails
-    }
-
-    // Calculate the signal rate limit
-    *signalRateLimit = (float)data / (1 << 7);
-
-    return true; // Return true on success
 }
+
 
 /*
  * @function:	 setSignalRateLimit
@@ -1175,8 +1165,6 @@ bool setSignalRateLimit(float *signalRateLimit) {
 }
 
 
-
-
 /*
 * @function:	 getSequenceStepEnables
 *
@@ -1187,8 +1175,6 @@ bool setSignalRateLimit(float *signalRateLimit) {
 *
 * @returns:	 bool: true if successful
 */
-#define SYSTEM_SEQUENCE_CONFIG 0x01
-
 bool getSequenceStepEnables(SequenceStepEnables *enables)
 {
     I2C_RETURN_CODE_t i2c_return;
@@ -1224,19 +1210,16 @@ bool getSequenceStepEnables(SequenceStepEnables *enables)
 *
 * @returns:	 bool: true if successful
 */
-
-#define MSRC_CONFIG_TIMEOUT_MACROP 0x46
-#define PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x51
-#define FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x71
-enum vcselPeriodType { VcselPeriodPreRange, VcselPeriodFinalRange };
-
 bool getSequenceStepTimeouts(SequenceStepEnables *enables, SequenceStepTimeouts *timeouts)
 {
+	uint8_t data;
 	I2C_RETURN_CODE_t i2c_return;
 
     timeouts->pre_range_vcsel_period_pclks = getVcselPulsePeriod(VcselPeriodPreRange);
 
-    i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, MSRC_CONFIG_TIMEOUT_MACROP, &timeouts->msrc_dss_tcc_mclks);
+    i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, MSRC_CONFIG_TIMEOUT_MACROP, &data);
+    timeouts->msrc_dss_tcc_mclks = data;
+
 	if (i2c_return != I2C_OK)
 	{
 		return false;
@@ -1244,7 +1227,8 @@ bool getSequenceStepTimeouts(SequenceStepEnables *enables, SequenceStepTimeouts 
     timeouts->msrc_dss_tcc_mclks += 1;
     timeouts->msrc_dss_tcc_us = timeoutMclksToMicroseconds(timeouts->msrc_dss_tcc_mclks, timeouts->pre_range_vcsel_period_pclks);
 
-    i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI, &timeouts->pre_range_mclks);
+    i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI, &data);
+    timeouts->pre_range_mclks = data;
     if (i2c_return != I2C_OK)
     	{
     		return false;
@@ -1255,7 +1239,8 @@ bool getSequenceStepTimeouts(SequenceStepEnables *enables, SequenceStepTimeouts 
     timeouts->final_range_vcsel_period_pclks = getVcselPulsePeriod(VcselPeriodFinalRange);
 
 
-    i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, &timeouts->pre_range_mclks);
+    i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, &data);
+    timeouts->pre_range_mclks = data;
     if (i2c_return != I2C_OK)
     	{
     		return false;
@@ -1268,7 +1253,10 @@ bool getSequenceStepTimeouts(SequenceStepEnables *enables, SequenceStepTimeouts 
     }
 
     timeouts->final_range_us = timeoutMclksToMicroseconds(timeouts->final_range_mclks, timeouts->final_range_vcsel_period_pclks);
+
+    return true;
 }
+
 
 /*
 * @function:	 timeoutMclksToMicroseconds
@@ -1280,14 +1268,15 @@ bool getSequenceStepTimeouts(SequenceStepEnables *enables, SequenceStepTimeouts 
 *
 * @returns:	 bool: true if successful
 */
-#define calcMacroPeriod(vcsel_period_pclks) ((((uint32_t)2304 * (vcsel_period_pclks) * 1655) + 500) / 1000)
+#define calcMacroPeriod(vcsel_period_pclks) (((uint32_t)(2304) * (vcsel_period_pclks) * 1655 + 500) / 1000)
 uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks)
 {
     // Calculate the macro period in nanoseconds
     uint32_t macro_period_ns = calcMacroPeriod(vcsel_period_pclks);
 
     // Convert the timeout period in MCLKs to microseconds
-    return ((timeout_period_mclks * macro_period_ns) + 500) / 1000;
+
+    return (uint32_t)((timeout_period_mclks * macro_period_ns) + 500) / 1000;
 }
 
 
@@ -1301,11 +1290,7 @@ uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel
 *
 * @returns:	 bool: true if successful
 */
-
 #define decodeVcselPeriod(reg_val)      (((reg_val) + 1) << 1)
-#define PRE_RANGE_CONFIG_VCSEL_PERIOD 0x50
-#define FINAL_RANGE_CONFIG_VCSEL_PERIOD 0x70
-
 uint8_t getVcselPulsePeriod(vcselPeriodType type)
 {
 
@@ -1334,10 +1319,6 @@ uint8_t getVcselPulsePeriod(vcselPeriodType type)
 
     return vcsel_period;
 }
-
-
-
-
 
 
 /*
@@ -1419,13 +1400,11 @@ bool setMeasurementTimingBudget(uint32_t budget_us)
             		return false;
             	}
         // Store the timing budget for internal reuse
-        uint32_t measurement_timing_budget_us = budget_us;
+        //uint32_t measurement_timing_budget_us = budget_us;
     }
 
     return true;
 }
-
-
 
 
 /*
@@ -1448,7 +1427,10 @@ uint32_t timeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_pe
     uint32_t return_value = (((timeout_period_us * 1000) + (macro_period_ns / 2)) / macro_period_ns);
     return return_value;
 }
-}
+
+
+
+
 
 
 
