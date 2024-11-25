@@ -90,11 +90,18 @@ bool timerTrigger = false;
  * @brief: 		 executable function, timing control and trigger
  * 				 point for all functionality
  */
-
-
-
 int main(void)
 {
+
+	// TOF-Instanz deklarieren
+	TOFSensor_t TOF_Sensor_1;
+	// Initialisieren des TOF-Sensors
+	initializeTOFSensor(&TOF_Sensor_1, 0x29, 0x01, 0x03, 5000); // Beispiel: Sensoradresse 0x29, I2C-Adresse 0x01, Messmodus 0x03, Maximaler Messbereich 5000mm
+
+
+
+
+
 
 	// variables to store the distance
 	uint16_t distance = 0;

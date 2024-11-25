@@ -134,16 +134,30 @@ typedef struct {
 } SequenceStepEnables;
 
 
-typedef struct {
-    TOF_ADDR_t TOF_address_used;  // I2C-Adresse des Sensors
-    I2C_TypeDef* I2C_instance;   // Zeiger auf I2C-Hardware-Instanz
-    uint16_t distance;           // Letzter gemessener Abstand (in mm)
-    uint16_t Ranging_Profiles_t;
-
-} TOFSensNum_t;
 
 
 
+
+//-------------------- Predeclare PID Control Type ------------------------------
+// Strukturdefinition für den TOF-Sensor
+typedef struct TOFSensor TOFSensor_t;
+
+struct TOFSensor {
+    uint16_t sensorAddress;        // Die Adresse des Sensors (z.B. 0x29)
+    uint16_t i2cAddress;           // Die I2C-Adresse des Sensors
+    uint16_t measurementMode;      // Der Modus des Sensors für die Reichweitenmessung
+    uint16_t distanceFromTOF;      // Die aktuelle Distanzmessung (distanz vom TOF)
+    uint16_t maxRange;             // Der maximal messbare Bereich
+
+    void (*initialize)(TOFSensor_t*, uint16_t, uint16_t, uint16_t, uint16_t);  // Initialisieren des TOF-Sensors
+    void (*configure)(TOFSensor_t*, uint16_t, uint16_t, uint16_t);              // Konfigurieren des TOF-Sensors
+    uint16_t (*getMeasurement)(TOFSensor_t*);                                  // Abrufen des aktuellen Messwerts
+};
+
+// Funktionsprototypen
+extern void initializeTOFSensor(TOFSensor_t* sensor, uint16_t sensorAddress, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange);
+extern void configureTOFSensor(TOFSensor_t* sensor, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange);
+extern uint16_t getTOFMeasurement(TOFSensor_t* sensor);
 //---------------------EXTERNAL FUNCTIONS---------------------
 
 

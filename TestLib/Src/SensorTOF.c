@@ -40,6 +40,11 @@ static uint8_t TOF_stop_variable = 0;
 // flag for continuous_mode on or off
 bool TOF_continuous_mode = false;
 
+//math defines
+
+#define calcMacroPeriod(vcsel_period_pclks) (((uint32_t)(2304) * (vcsel_period_pclks) * 1655 + 500) / 1000)
+#define decodeVcselPeriod(reg_val)      (((reg_val) + 1) << 1)
+
 //---------------------INTERNAL FUNCTIONS---------------------
 
 /*
@@ -596,6 +601,39 @@ bool TOF_getMeasurement(uint16_t *range)
 	return true;
 }
 
+//--------------------- SENSOR ------------------------
+
+// Funktion zur Initialisierung des TOF-Sensors
+void initializeTOFSensor(TOFSensor_t* sensor, uint16_t sensorAddress, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange) {
+    sensor->sensorAddress = sensorAddress;        // Setzt die Sensoradresse
+    sensor->i2cAddress = i2cAddress;              // Setzt die I2C-Adresse
+    sensor->measurementMode = measurementMode;    // Setzt den Messmodus
+    sensor->maxRange = maxRange;                  // Setzt den maximalen Messbereich
+    sensor->distanceFromTOF = 0;                   // Initialisiert die Distanz mit Null
+}
+
+// Funktion zum Konfigurieren des TOF-Sensors
+void configureTOFSensor(TOFSensor_t* sensor, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange) {
+    sensor->i2cAddress = i2cAddress;             // Setzt die I2C-Adresse
+    sensor->measurementMode = measurementMode;   // Setzt den Messmodus
+    sensor->maxRange = maxRange;                 // Setzt den maximalen Messbereich
+}
+
+// Funktion zum Abrufen des Messwerts (Distanz)
+uint16_t getTOFMeasurement(TOFSensor_t* sensor) {
+    // Hier könnte der eigentliche Messwert vom TOF-Sensor abgerufen werden
+    // Zum Beispiel könnte ein I2C-Befehl zum Sensor geschickt werden.
+    // Für dieses Beispiel wird ein fiktiver Wert zurückgegeben.
+
+    sensor->distanceFromTOF = 1500;  // Beispielwert (Distanz = 1500mm)
+    return sensor->distanceFromTOF;  // Rückgabe des aktuellen Messwerts
+}
+
+
+
+
+
+
 //---------------------EXTERNAL FUNCTIONS---------------------
 
 
@@ -763,12 +801,8 @@ bool TOF_ReadSingleDistance(uint16_t *range)
 }
 
 
-
-
-
-
-
 //--------------- ADDITIONAL EXTERNAL FUNCTIONS---------------
+
 
 bool TOF_SetAddress(uint8_t new_Addr) {
     I2C_RETURN_CODE_t i2c_return;
@@ -834,22 +868,22 @@ bool SetRangingProfile(uint16_t Ranging_Profiles_t) {
     // Switch case for RangingProfile
     switch (Ranging_Profiles_t) {
     case DEFAULT_MODE_D:
-    	if(!setMeasurementTimingBudget(30)){return false;}
+    	//if(!setMeasurementTimingBudget(30)){return false;}
 
         break;
 
     case HIGH_SPEED_MODE_S:
-        setMeasurementTimingBudget(20000);
+        //setMeasurementTimingBudget(20000);
         break;
 
     case HIGH_ACCURACY_MODE_A:
-        setMeasurementTimingBudget(200000);
+        //setMeasurementTimingBudget(200000);
         break;
 
     case LONG_RANGE_MODE_R:
-    	if(!setSignalRateLimit(0.1)){return false;}
-    	if(!setVcselPulsePeriod(VcselPeriodPreRange, 18)){return false;}
-        if(!setVcselPulsePeriod(VcselPeriodFinalRange, 14)){return false;}
+    	//if(!setSignalRateLimit(0.1)){return false;}
+    	//if(!setVcselPulsePeriod(VcselPeriodPreRange, 18)){return false;}
+        //if(!setVcselPulsePeriod(VcselPeriodFinalRange, 14)){return false;}
         break;
 
     default:
@@ -1132,7 +1166,6 @@ bool getSequenceStepTimeouts(SequenceStepEnables *enables, SequenceStepTimeouts 
 }
 
 
-#define calcMacroPeriod(vcsel_period_pclks) (((uint32_t)(2304) * (vcsel_period_pclks) * 1655 + 500) / 1000)
 uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks)
 {
     // Calculate the macro period in nanoseconds
@@ -1144,7 +1177,6 @@ uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel
 }
 
 
-#define decodeVcselPeriod(reg_val)      (((reg_val) + 1) << 1)
 uint8_t getVcselPulsePeriod(vcselPeriodType type)
 {
 
