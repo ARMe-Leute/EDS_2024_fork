@@ -21,7 +21,7 @@
 
 void getAngleFromAcc(int16_t *xyz, float *AlphaBeta);
 void getAccData(I2C_TypeDef *i2c, int16_t *xyz);
-void getFiltertAccData(int16_t *XYZ, float *XYZFiltert, float kFilt);
+void getFiltertAccData(int16_t *XYZ, float *XYZFiltert, float kFilt); // Del
 extern int8_t sensor_init(I2C_TypeDef *i2c, int8_t restart);
 extern int8_t i2cBMA020_init(I2C_TypeDef *i2c, int8_t restart);
 extern int16_t i2cBMA020XYZ(I2C_TypeDef *i2c, int16_t *xyz);
@@ -34,9 +34,6 @@ extern void i2cMPU6050LpFilt(I2C_TypeDef *i2c, uint8_t DLPF_CFG);
 extern int8_t i2cLIS3DH_init(I2C_TypeDef *i2c, int8_t restart);
 extern int8_t i2cLIS3DH_Temp(I2C_TypeDef *i2c);
 extern int16_t i2cLIS3DH_XYZ(I2C_TypeDef *i2c, int16_t *xyz);
-
-
-
 
 typedef enum {
     SENSOR_NONE,
