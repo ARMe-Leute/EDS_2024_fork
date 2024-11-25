@@ -42,7 +42,6 @@ int main(void)
 	bluetoothInit(&HM17, USART2);
 	Usart2charReceived = false;
 
-	usartSetCommParams(USART2, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);  //Muss aus irgend einem Grund drin bleiben
 	delay(500);
 	bluetoothGetStatus(&HM17);
 	bluetoothGetAddress(&HM17);
