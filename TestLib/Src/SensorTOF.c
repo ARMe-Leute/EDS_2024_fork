@@ -7,7 +7,7 @@
  * 					 It is possible to get the distance in single mode and
  * 					 continuous mode. The configuration is implemented with the
  * 					 right register controls.
- * @date		   : April 16, 2024
+ * @date		   : December 2025
  ******************************************************************************
  */
 
@@ -597,16 +597,8 @@ bool TOF_getMeasurement(uint16_t *range)
 }
 
 //---------------------EXTERNAL FUNCTIONS---------------------
-/*
- * @function:	 TOF_init
- *
- * @brief: 		 init TOF sensor
- *
- * @parameters:	 I2C_TypeDef *i2c:	i2c used
- * 				 TOF_ADDR_t addr:	TOF address used
- *
- * @returns:	 bool: true if successful
- */
+
+
 bool TOF_init(I2C_TypeDef *i2c, TOF_ADDR_t addr)
 {
 	TOF_address_used = addr;
@@ -628,16 +620,7 @@ bool TOF_init(I2C_TypeDef *i2c, TOF_ADDR_t addr)
 	return true;
 }
 
-/*
- * @function:	 TOF_startContinuous
- *
- * @brief: 		 Start continuous ranging measurements
- * 				 get measurement with function TOF_ReadContinuousDistance()
- *
- * @parameters:	 uint32_t period_ms: 	period of measurement in ms
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_startContinuous(uint32_t period_ms)
 {
 	I2C_RETURN_CODE_t i2c_return;
@@ -698,13 +681,7 @@ bool TOF_startContinuous(uint32_t period_ms)
 	return true;
 }
 
-/*
- * @function:	 TOF_stopContinuous
- *
- * @brief: 		 stops continuous measurment
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_stopContinuous()
 {
 	if(!TOF_continuous_mode)
@@ -725,15 +702,7 @@ bool TOF_stopContinuous()
 	return true;
 }
 
-/*
- * @function:	 TOF_ReadContinuousDistance
- *
- * @brief: 		 get distance in continuous mode
- *
- * @parameters:	 uint16_t *range:	variable with measurement
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_ReadContinuousDistance(uint16_t *range)
 {
 	if(!TOF_continuous_mode)
@@ -749,15 +718,7 @@ bool TOF_ReadContinuousDistance(uint16_t *range)
 	return true;
 }
 
-/*
- * @function:	 TOF_ReadSingleDistance
- *
- * @brief: 		 get distance in single mode
- *
- * @parameters:	 uint16_t *range:	variable with measurement
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_ReadSingleDistance(uint16_t *range)
 {
 	I2C_RETURN_CODE_t i2c_return;
@@ -809,16 +770,6 @@ bool TOF_ReadSingleDistance(uint16_t *range)
 
 //--------------- ADDITIONAL EXTERNAL FUNCTIONS---------------
 
-
-/*
- * @function:	 TOF_SetAddress
- *
- * @brief: 		 set new TOF address
- *
- * @parameters:	 uint16_t new address :	variable with measurement
- *
- * @returns:	 bool: true if successful
- */
 bool TOF_SetAddress(uint8_t new_Addr) {
     I2C_RETURN_CODE_t i2c_return;
     uint8_t newaddr = new_Addr;
@@ -833,16 +784,7 @@ bool TOF_SetAddress(uint8_t new_Addr) {
     return true; // Ensure the function always returns a value
 }
 
-/*
- * @function:	 TOF_ReadDistanceTimed
- *
- * @brief: 		 get distance in single mode with preset time delay
- *
- * @parameters:	 uint16_t *range :	variable with measurement
- * 				 uint16_t time :	variable with time preset
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range)
 {
 
@@ -887,16 +829,7 @@ bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range)
 	return true;
 }
 
-/*
- * @function:	 SetRangingProfile
- *
- * @brief: 		 sets the RangingProfile
- *
- * @parameters:	 uint16_t Rangingprofile :	variable with Rangingprofile
- *				 Default mode (D); High speed (S); High accuracy (A); Long range (R)
- *
- * @returns:	 bool: true if successful
-*/
+
 bool SetRangingProfile(uint16_t Ranging_Profiles_t) {
     // Switch case for RangingProfile
     switch (Ranging_Profiles_t) {
@@ -927,16 +860,7 @@ bool SetRangingProfile(uint16_t Ranging_Profiles_t) {
     return true; // Return true for valid profiles
 }
 
-/*
- * @function:	 setVcselPulsePeriod
- *
- * @brief: 		 sets the pulse period
- *
- * @parameters:	 	vcselPeriodType type : typedef
- * 					uint8_t period_pclks : defines limits based on the requested period
- *
- * @returns:	 bool: true if successful
-*/
+
 bool setVcselPulsePeriod(vcselPeriodType type, uint8_t period_pclks)
 	{
 	    uint8_t vcsel_period_reg = encodeVcselPeriod(period_pclks);
@@ -1081,15 +1005,7 @@ bool setVcselPulsePeriod(vcselPeriodType type, uint8_t period_pclks)
 	    return true;
 }
 
-/*
-* @function:	 encodeTimeOut
-*
-* @brief: 		 sets the final range timeout
-*
-* @parameters:	 uint16_t final_range_timeout_mclks : defines encode timeout for final range
-*
-* @returns:	 uint16_t : ms_byte / ls_byte
-*/
+
 uint16_t encodeTimeOut(uint16_t final_range_timeout_mclks) {
 
 	uint32_t ls_byte = 0;
@@ -1109,15 +1025,6 @@ uint16_t encodeTimeOut(uint16_t final_range_timeout_mclks) {
 }
 
 
-/*
-* @function:	 decodeTimeOut
-*
-* @brief: 		 calculates decode time out
-*
-* @parameters:	 uint16_t reg_val : 16-bit value for timeout value
-*
-* @returns:	 uint16_t timeout
-*/
 uint16_t decodeTimeout(uint16_t reg_val)
 {
     // Formula: (LSByte * 2^MSByte) + 1
@@ -1134,15 +1041,6 @@ uint16_t decodeTimeout(uint16_t reg_val)
 }
 
 
-/*
- * @function:	 setSignalRateLimit
- *
- * @brief: 		 sets the signal rate limit
- *
- * @parameters:	 float signalRateLimit : signal rate limit (e.g. based on the ranging profile)
- *
- * @returns:	 bool: true if successful
- */
 bool setSignalRateLimit(float signalRateLimit) {
 	I2C_RETURN_CODE_t i2c_return;
 
@@ -1161,15 +1059,6 @@ bool setSignalRateLimit(float signalRateLimit) {
 }
 
 
-/*
-* @function:	 getSequenceStepEnables
-*
-* @brief: 		checks if the I2C read was succesful
-*
-* @parameters:	 SequenceStepEnables
-*
-* @returns:	 bool: true if successful
-*/
 bool getSequenceStepEnables(SequenceStepEnables *enables)
 {
     I2C_RETURN_CODE_t i2c_return;
@@ -1195,16 +1084,6 @@ bool getSequenceStepEnables(SequenceStepEnables *enables)
 }
 
 
-/*
-* @function:	 getSequenceStepTimeouts
-*
-* @brief: 		 sets the sequence step timeouts
-*
-* @parameters:	 SequenceStepEnables
-* 				 SequenceStepTimeouts
-*
-* @returns:	 bool: true if successful
-*/
 bool getSequenceStepTimeouts(SequenceStepEnables *enables, SequenceStepTimeouts *timeouts)
 {
 	uint8_t data;
@@ -1253,16 +1132,6 @@ bool getSequenceStepTimeouts(SequenceStepEnables *enables, SequenceStepTimeouts 
 }
 
 
-/*
-* @function:	 timeoutMclksToMicroseconds
-*
-* @brief: 		 get distance in single mode with preset time delay
-*
-* @parameters:	 uint16_t timeout_period_mclks : timeout period in microseconds
-* 				 uint8_t vcsel_period_pclks : Vertical cavity surface emitting laser period
-*
-* @returns:	 uint32_t : returns timeout_period_mclks * macro_period_ns
-*/
 #define calcMacroPeriod(vcsel_period_pclks) (((uint32_t)(2304) * (vcsel_period_pclks) * 1655 + 500) / 1000)
 uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks)
 {
@@ -1275,15 +1144,6 @@ uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel
 }
 
 
-/*
-* @function:	 getVcselPulsePeriod
-*
-* @brief: 		 reads the current pulse period type
-*
-* @parameters:	 enum : vcselPeriodType
-*
-* @returns:	 uint8_t : vcsel_period
-*/
 #define decodeVcselPeriod(reg_val)      (((reg_val) + 1) << 1)
 uint8_t getVcselPulsePeriod(vcselPeriodType type)
 {
@@ -1315,15 +1175,6 @@ uint8_t getVcselPulsePeriod(vcselPeriodType type)
 }
 
 
-/*
-* @function:	 setMeasurementTimingBudget
-*
-* @brief: 		 calculates timing budget
-*
-* @parameters:	 uint32_t budget_us : current timing budget
-*
-* @returns:	 bool: true if successful
-*/
 bool setMeasurementTimingBudget(uint32_t budget_us)
 {
 	I2C_RETURN_CODE_t i2c_return;
@@ -1400,16 +1251,6 @@ bool setMeasurementTimingBudget(uint32_t budget_us)
 }
 
 
-/*
-* @function:	 timeoutMicrosecondsToMclks
-*
-* @brief: 		 calculates the macro period in microseconds
-*
-* @parameters:	 uint32_t timeout_period_us : timeout period in mycroseconds
-* 				 uint8_t vcsel_period_pclks : Vertical cavity surface emitting laser period
-*
-* @returns:	 uint32_t : return value
-*/
 uint32_t timeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks)
 {
     // Calculate the macro period in nanoseconds

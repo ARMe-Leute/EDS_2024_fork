@@ -7,7 +7,7 @@
  * 					 It is possible to get the distance in single mode and
  * 					 continuous mode. The configuration is implemented with the
  * 					 right register controls.
- * @date		   : April 16, 2024
+ * @date		   : December 2025
  ******************************************************************************
  */
 
@@ -91,7 +91,6 @@ typedef enum
 } TOF_calibration_type_t;
 
 
-
 //-------------------- ADDITIONAL SETUP ---------------------
 //enum for RangingProfiles
 typedef enum
@@ -135,8 +134,6 @@ typedef struct {
 } SequenceStepEnables;
 
 
-
-
 typedef struct {
     TOF_ADDR_t TOF_address_used;  // I2C-Adresse des Sensors
     I2C_TypeDef* I2C_instance;   // Zeiger auf I2C-Hardware-Instanz
@@ -147,9 +144,8 @@ typedef struct {
 
 
 
-
-
 //---------------------EXTERNAL FUNCTIONS---------------------
+
 
 /*
  * @function:	 TOF_init
@@ -163,6 +159,7 @@ typedef struct {
  */
 bool TOF_init(I2C_TypeDef *i2c, TOF_ADDR_t addr);
 
+
 /*
  * @function:	 TOF_startContinuous
  *
@@ -175,6 +172,7 @@ bool TOF_init(I2C_TypeDef *i2c, TOF_ADDR_t addr);
  */
 bool TOF_startContinuous(uint32_t period_ms);
 
+
 /*
  * @function:	 TOF_stopContinuous
  *
@@ -183,6 +181,7 @@ bool TOF_startContinuous(uint32_t period_ms);
  * @returns:	 bool: true if successful
  */
 bool TOF_stopContinuous();
+
 
 /*
  * @function:	 TOF_ReadContinuousDistance
@@ -195,6 +194,7 @@ bool TOF_stopContinuous();
  */
 bool TOF_ReadContinuousDistance(uint16_t *range);
 
+
 /*
  * @function:	 TOF_ReadSingleDistance
  *
@@ -205,7 +205,6 @@ bool TOF_ReadContinuousDistance(uint16_t *range);
  * @returns:	 bool: true if successful
  */
 bool TOF_ReadSingleDistance(uint16_t *range);
-
 
 
 //--------------- ADDITIONAL EXTERNAL FUNCTIONS---------------
@@ -221,9 +220,6 @@ bool TOF_ReadSingleDistance(uint16_t *range);
  * @returns:	 bool: true if successful
  */
 bool TOF_SetAddress( uint8_t newAddr);
-
-
-
 
 
 /*
@@ -268,13 +264,14 @@ bool SetRangingProfile(uint16_t Rangingprofile);
  */
 bool TOF_SetTimingBudget();
 
+
 /*
- * @function:	 TOF_SetVcselPulsePeriod
+ * @function:	 setVcselPulsePeriod
  *
- * @brief: 		 get distance in single mode with preset time delay
+ * @brief: 		 sets the pulse period
  *
- * @parameters:	 uint16_t *range :	variable with measurement
- * 				 uint16_t time :	variable with time preset
+ * @parameters:	 	vcselPeriodType type : typedef
+ * 					uint8_t period_pclks : defines limits based on the requested period
  *
  * @returns:	 bool: true if successful
  */
@@ -284,14 +281,14 @@ bool setVcselPulsePeriod(vcselPeriodType type, uint8_t period_pclks);
 /*
 * @function:	 encodeTimeOut
 *
-* @brief: 		 get distance in single mode with preset time delay
+* @brief: 		 sets the final range timeout
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 uint16_t final_range_timeout_mclks : defines encode timeout for final range
 *
-* @returns:	 bool: true if successful
+* @returns:	 uint16_t : ms_byte / ls_byte
 */
 uint16_t encodeTimeOut(uint16_t final_range_timeout_mclks);
+
 
 /*
 * @function:	 decodeTimeOut
@@ -305,89 +302,93 @@ uint16_t encodeTimeOut(uint16_t final_range_timeout_mclks);
 */
 uint16_t decodeTimeout(uint16_t reg_val);
 
+
 /*
  * @function:	 TOF_SetSignalRateLimit
  *
- * @brief: 		 get distance in single mode with preset time delay
+ * @brief: 		 sets the signal rate limit
  *
- * @parameters:	 uint16_t *range :	variable with measurement
- * 				 uint16_t time :	variable with time preset
+ * @parameters:	 float signalRateLimit : signal rate limit (e.g. based on the ranging profile)
  *
  * @returns:	 bool: true if successful
  */
 bool setSignalRateLimit(float signalRateLimit);
 
+
 /*
 * @function:	 getSequenceStepEnables
 *
-* @brief: 		 get distance in single mode with preset time delay
+* @brief: 		checks if the I2C read was succesful
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 SequenceStepEnables
 *
 * @returns:	 bool: true if successful
 */
 bool getSequenceStepEnables(SequenceStepEnables *enables);
 
+
 /*
 * @function:	 getSequenceStepTimeouts
 *
-* @brief: 		 get distance in single mode with preset time delay
+* @brief: 		 gets the sequence step timeouts
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 SequenceStepEnables
+* 				 SequenceStepTimeouts
 *
 * @returns:	 bool: true if successful
 */
 bool getSequenceStepTimeouts(SequenceStepEnables *enables, SequenceStepTimeouts *timeouts);
+
 
 /*
 * @function:	 timeoutMclksToMicroseconds
 *
 * @brief: 		 get distance in single mode with preset time delay
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 uint16_t timeout_period_mclks : timeout period in microseconds
+* 				 uint8_t vcsel_period_pclks : Vertical cavity surface emitting laser period
 *
-* @returns:	 bool: true if successful
+* @returns:	 uint32_t : returns timeout_period_mclks * macro_period_ns
 */
 uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks);
+
 
 /*
 * @function:	 getVcselPulsePeriod
 *
-* @brief: 		 get distance in single mode with preset time delay
+* @brief: 		 reads the current pulse period type
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 enum : vcselPeriodType
 *
-* @returns:	 bool: true if successful
+* @returns:	 uint8_t : vcsel_period
 */
 uint8_t getVcselPulsePeriod(vcselPeriodType type);
+
 
 /*
 * @function:	 setMeasurementTimingBudget
 *
-* @brief: 		 get distance in single mode with preset time delay
+* @brief: 		 calculates timing budget
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 uint32_t budget_us : current timing budget
 *
 * @returns:	 bool: true if successful
 */
 bool setMeasurementTimingBudget(uint32_t budget_us);
 
+
 /*
 * @function:	 timeoutMicrosecondsToMclks
 *
-* @brief: 		 get distance in single mode with preset time delay
+* @brief: 		 calculates the macro period in microseconds
 *
-* @parameters:	 uint16_t *range :	variable with measurement
-* 				 uint16_t time :	variable with time preset
+* @parameters:	 uint32_t timeout_period_us : timeout period in mycroseconds
+* 				 uint8_t vcsel_period_pclks : Vertical cavity surface emitting laser period
 *
-* @returns:	 bool: true if successful
+* @returns:	 uint32_t : return value
 */
 uint32_t timeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks);
+
 
 /*
 * @function:	 calcMacroPeriod
