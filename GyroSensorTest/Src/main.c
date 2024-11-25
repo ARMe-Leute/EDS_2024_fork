@@ -31,6 +31,7 @@
 // #include <ST7735.h> //DEL
 #include "GyroSensor.h"
 #include "RotaryPushButton.h"
+#include "MPU6050.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
@@ -102,6 +103,7 @@ static bool checkI2CCommunication(void)
 int main(void)
 {
 	initRotaryPushButton();
+	setRotaryColor(LED_BLACK);
 	 bool communicationOk;
 
 	    /* I²C initialisieren */
