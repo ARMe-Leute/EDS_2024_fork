@@ -84,13 +84,13 @@ typedef struct {
 } TempRegisters_t;
 
 struct MPU6050 {
-	I2C_TypeDef 		*i2c;				// ToDo: add name and description and setup
-	uint8_t 			i2cAddress;			// ToDo: add name and description and setup
-	uint8_t				GyroScale;			// ToDo: add name and description and setup // 0 = deactivate
-	uint8_t				AccelRange;			// ToDo: add name and description and setup
-	int16_t 			TempOut;			// ToDo: add name and description and setup
-	int16_t				GyroXYZ;			// ToDo: add name and description and setup // Werte als Array[x,Y,Z]
-	int16_t				AccelXYZ;			// ToDo: add name and description and setup // Werte als Array[x,Y,Z]
+	I2C_TypeDef 		*i2c;
+	uint8_t 			i2cAddress;
+	uint8_t				GyroScale;			// ToDo: 0 = deactivate
+	uint8_t				AccelRange;
+	int16_t 			TempOut;			// ToDo: Verrechnung kontrollieren
+	int16_t				GyroXYZ[3];			// ToDo: Werte als Array[x,Y,Z]
+	int16_t				AccelXYZ[3];		// ToDo: Werte als Array[x,Y,Z]
 
 	// init fkt für Range Gyro und accel, LP Filter
 };
