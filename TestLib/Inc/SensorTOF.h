@@ -69,7 +69,6 @@
 #define FINAL_RANGE_CONFIG_VALID_PHASE_LOW 0x47
 #define MSRC_CONFIG_TIMEOUT_MACROP 0x46
 #define GLOBAL_CONFIG_VCSEL_WIDTH 0x32
-#define FINAL_RANGE_CONFIG_VCSEL_PERIOD 0x70
 #define FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI 0x71
 #define SYSTEM_SEQUENCE_CONFIG 0x01
 #define encodeVcselPeriod(period_pclks) (((period_pclks) >> 1) - 1)
@@ -105,22 +104,14 @@ typedef enum
 } Ranging_Profiles_t;
 
 
-
+//enum for vcselPeriodType
 typedef enum {
     VcselPeriodPreRange = 0,
     VcselPeriodFinalRange =1
 } vcselPeriodType;
 
 
-typedef enum
-{
-	MODE1  		= 1,
-	MODE2		= 2,
-	MODE3  	= 3
-
-} vcselPeriodType_t;
-
-
+//struct for SequenceStepTimeouts
 typedef struct
 {
     uint8_t pre_range_vcsel_period_pclks;
@@ -133,6 +124,8 @@ typedef struct
     uint32_t final_range_us;
 } SequenceStepTimeouts;
 
+
+//struct for SequenceStepEnables
 typedef struct {
     uint8_t tcc;          // TCC step enabled (1 if enabled, 0 if disabled)
     uint8_t dss;          // DSS step enabled (1 if enabled, 0 if disabled)
@@ -140,6 +133,19 @@ typedef struct {
     uint8_t pre_range;    // Pre-range step enabled (1 if enabled, 0 if disabled)
     uint8_t final_range;  // Final range step enabled (1 if enabled, 0 if disabled)
 } SequenceStepEnables;
+
+
+
+
+typedef struct {
+    TOF_ADDR_t TOF_address_used;  // I2C-Adresse des Sensors
+    I2C_TypeDef* I2C_instance;   // Zeiger auf I2C-Hardware-Instanz
+    uint16_t distance;           // Letzter gemessener Abstand (in mm)
+    uint16_t Ranging_Profiles_t;
+
+} TOFSensNum_t;
+
+
 
 
 
