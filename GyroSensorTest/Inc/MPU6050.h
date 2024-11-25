@@ -8,11 +8,16 @@
 #ifndef MPU6050_H_
 #define MPU6050_H_
 
+/**
+ * ToDo: init fkt für Range Gyro und accel und LP Filter
+ */
+
 //**********Defines for Preset Values**********
 
 #define _pi 3.141
 
-// #define i2cAddr_MPU6050 		0x68
+#define i2cAddr_MPU6050 		0x68
+
 // Registeradressen für Config
 #define MPU6050_PWR_MGMT_1		0x6B
 #define MPU6050_PWR_MGMT_2		0x6C
@@ -57,7 +62,7 @@
 //**********TypeDefs**********
 
 // Pre- declare MPU6050 Type
-typedef struct MPU6050 MPU6050_t;
+// typedef struct MPU6050 MPU6050_t;
 
 typedef struct {
     uint8_t ACCEL_Burst_Reg;  	// Burst-Register für die Beschleunigung
@@ -83,18 +88,21 @@ typedef struct {
     uint8_t TEMP_OUT_L;  		// LSB des Temperaturwertes
 } TempRegisters_t;
 
-struct MPU6050 {
+typedef struct MPU6050 {
 	I2C_TypeDef 		*i2c;
 	uint8_t 			i2cAddress;
-	uint8_t				GyroScale;			// ToDo: 0 = deactivate
+	uint8_t				GyroScale;
 	uint8_t				AccelRange;
 	int16_t 			TempOut;			// ToDo: Verrechnung kontrollieren
-	int16_t				GyroXYZ[3];			// ToDo: Werte als Array[x,Y,Z]
-	int16_t				AccelXYZ[3];		// ToDo: Werte als Array[x,Y,Z]
+	int16_t				GyroXYZ[3];
+	int16_t				AccelXYZ[3];
+} MPU6050_t;
 
-	// init fkt für Range Gyro und accel, LP Filter
-};
+uint8_t initMPU(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddress, uint8_t gyroScale, uint8_t accelRange, uint8_t restart);
+// extern int16_t i2cMPU6050XYZ(I2C_TypeDef *i2c, int16_t *xyz);
+// extern int16_t i2cMPU6050GYRO(I2C_TypeDef *i2c, int16_t *xyz);
+// extern void i2cMPU6050LpFilt(I2C_TypeDef *i2c, uint8_t DLPF_CFG);
 
-extern const MPU6050_t MPU6050;
+// extern const MPU6050_t sensor;
 
 #endif /* MPU6050_H_ */

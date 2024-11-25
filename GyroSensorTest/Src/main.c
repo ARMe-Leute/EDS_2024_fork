@@ -29,7 +29,7 @@
 #include <mcalSPI.h>
 #include <mcalI2C.h>
 // #include <ST7735.h> //DEL
-#include "GyroSensor.h"
+// #include "GyroSensor.h"
 #include "RotaryPushButton.h"
 #include "MPU6050.h"
 
@@ -104,30 +104,33 @@ int main(void)
 {
 	initRotaryPushButton();
 	setRotaryColor(LED_BLACK);
-	 bool communicationOk;
+	bool communicationOk;
 
-	    /* I²C initialisieren */
-	    i2cActivate();
+	/* I²C initialisieren */
+	i2cActivate();
 
-	    /* Kommunikation mit dem Sensor prüfen */
-	    communicationOk = checkI2CCommunication();
+	MPU6050_t MPU1;
+	uint8_t testVal = initMPU(&MPU1, I2C1, i2cAddr_MPU6050, MPU6050_GYRO_FSCALE_250, MPU6050_ACCEL_RANGE_2, 1);
 
-	    if (communicationOk)
-	    {
-	    	setRotaryColor(LED_GREEN);
-	        /* Erfolgreiche Kommunikation */
-	        for (;;)
-	        {
-	            /* Blinkt z. B. eine LED oder setzt Debug-Ausgabe */
-	        }
-	    }
-	    else
-	    {
-	    	setRotaryColor(LED_RED);
-	        /* Fehlgeschlagene Kommunikation */
-	        for (;;)
-	        {
-	            /* Fehlerbehandlung, z. B. LED blinkt langsamer */
-	        }
-	    }
+	/* Kommunikation mit dem Sensor prüfen */
+	communicationOk = checkI2CCommunication();
+
+	if (communicationOk && testVal == 0)
+	{
+		setRotaryColor(LED_GREEN);
+		/* Erfolgreiche Kommunikation */
+		for (;;)
+		{
+			/* Blinkt z. B. eine LED oder setzt Debug-Ausgabe */
+		}
+	}
+	else
+	{
+		setRotaryColor(LED_RED);
+		/* Fehlgeschlagene Kommunikation */
+		for (;;)
+		{
+			/* Fehlerbehandlung, z. B. LED blinkt langsamer */
+		}
+	}
 }
