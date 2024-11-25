@@ -315,7 +315,7 @@ uint16_t decodeTimeout(uint16_t reg_val);
  *
  * @returns:	 bool: true if successful
  */
-bool setSignalRateLimit(float *signalRateLimit);
+bool setSignalRateLimit(float signalRateLimit);
 
 /*
 * @function:	 getSequenceStepEnables

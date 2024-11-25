@@ -914,7 +914,7 @@ bool SetRangingProfile(uint16_t Ranging_Profiles_t) {
         break;
 
     case LONG_RANGE_MODE_R:
-    	//if(!setSignalRateLimit(0.1)){return false;}
+    	if(!setSignalRateLimit(0.1)){return false;}
     	if(!setVcselPulsePeriod(VcselPeriodPreRange, 18)){return false;}
         if(!setVcselPulsePeriod(VcselPeriodFinalRange, 14)){return false;}
         break;
@@ -1143,10 +1143,10 @@ uint16_t decodeTimeout(uint16_t reg_val)
  *
  * @returns:	 bool: true if successful
  */
-bool setSignalRateLimit(float *signalRateLimit) {
+bool setSignalRateLimit(float signalRateLimit) {
 	I2C_RETURN_CODE_t i2c_return;
 
-	float limitMCPS = *signalRateLimit;
+	float limitMCPS = signalRateLimit;
 	  if (limitMCPS < 0 || limitMCPS > 511.99) {
 		  return false;
 	  }
