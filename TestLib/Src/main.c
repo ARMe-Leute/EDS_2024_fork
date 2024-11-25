@@ -84,25 +84,6 @@ EXIT_MENU_t exitMenu = EXIT_FALSE;			// variable to exit menu to a certain page
 // variable for MCAL SysTick
 bool timerTrigger = false;
 
-
-
-TOFSensNum_t sensor1 = {
-    .TOF_address_used = 0x29,  // Beispieladresse
-    .I2C_instance = I2C1,     // I2C-Instanz
-    .distance = 0             // Anfangswert
-};
-
-TOFSensNum_t sensor2 = {
-    .TOF_address_used = 0x30,  // Andere Adresse
-    .I2C_instance = I2C2,     // Andere I2C-Instanz
-    .distance = 0
-};
-
-
-
-
-
-
 /*
  * @function:	 main
  *
