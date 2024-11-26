@@ -96,10 +96,12 @@ typedef struct MPU6050 {
 	int16_t 			TempOut;			// ToDo: Verrechnung kontrollieren
 	int16_t				GyroXYZ[3];
 	int16_t				AccelXYZ[3];
+	float				AlphaBeta[2];
 } MPU6050_t;
 
-uint8_t initMPU(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddress, uint8_t gyroScale, uint8_t accelRange, uint8_t restart);
-// extern int16_t i2cMPU6050XYZ(I2C_TypeDef *i2c, int16_t *xyz);
+int8_t initMPU(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddress, uint8_t gyroScale, uint8_t accelRange, uint8_t restart);
+extern int16_t getAcceleration(MPU6050_t* sensor);
+extern int16_t getAngleFromAcc(MPU6050_t* sensor);
 // extern int16_t i2cMPU6050GYRO(I2C_TypeDef *i2c, int16_t *xyz);
 // extern void i2cMPU6050LpFilt(I2C_TypeDef *i2c, uint8_t DLPF_CFG);
 
