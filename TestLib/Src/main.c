@@ -123,7 +123,7 @@ int main(void)
     TOFSensor_t TOF_Sensor_1;
 
     // Initialisieren des TOF-Sensors
-    initializeTOFSensor(&TOF_Sensor_1, TOF_ADDR_VL53LOX, I2C_1, 999, distance); // Beispiel: Sensoradresse 0x29, I2C-Adresse 0x01, Messmodus 0x03, Maximaler Messbereich 5000mm
+    initializeTOFSensor(&TOF_Sensor_1, TOF_ADDR_VL53LOX, I2C_1, DEFAULT_MODE_D, distance); // Beispiel: Sensoradresse 0x29, I2C-Adresse 0x01, Messmodus 0x03, Maximaler Messbereich 5000mm
 
     //initializeTOFSensor(TOFSensor_t* sensor, uint16_t sensorAddress, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange) {
 
@@ -135,11 +135,11 @@ int main(void)
     i2cScanAndInit(i2c);
 
 
-    	enableTOFSensor = true;
-    	TOF_sensor_used = 0x29;
+enableTOFSensor = true;
+TOF_sensor_used = 0x29;
 
 
-	if(enableTOFSensor != ENABLE_TOF_FALSE && enableTOFSensor == (ENABLE_TOF_SENSOR_t)i2cInitPort)
+if(enableTOFSensor != ENABLE_TOF_FALSE && enableTOFSensor == (ENABLE_TOF_SENSOR_t)i2cInitPort)
 		{
 			// do TOF sensor initialization
 			//visualisationSensorInit(SENSOR_INIT_RUNNING); // Hier wird das TFT weiß
@@ -162,7 +162,8 @@ int main(void)
 			}
 		}
 
-	TOF_ReadSingleDistance(&TOF_Sensor_1, &distance);
+	TOF_ReadSingleDistance(&TOF_Sensor_1);
+
 
 //--------------------LIBTESTS---------------------
 
@@ -197,10 +198,10 @@ int main(void)
 
 
 			//visualisationTOF(distance, &olddistance);
-			TOF_ReadSingleDistance(&TOF_Sensor_1, &distance);
-			TOF_ReadSingleDistance(&TOF_Sensor_1, &distance);
-			TOF_ReadSingleDistance(&TOF_Sensor_1, &distance);
-			TOF_ReadSingleDistance(&TOF_Sensor_1, &distance);
+			TOF_ReadSingleDistance(&TOF_Sensor_1);
+			TOF_ReadSingleDistance(&TOF_Sensor_1);
+			TOF_ReadSingleDistance(&TOF_Sensor_1);
+			TOF_ReadSingleDistance(&TOF_Sensor_1);
 			}
 
 

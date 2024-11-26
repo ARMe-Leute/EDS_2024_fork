@@ -51,11 +51,11 @@ bool TOF_continuous_mode = false;
 //--------------------- SENSOR FUNCTIONS ------------------------
 
 // Funktion zur Initialisierung des TOF-Sensors
-void initializeTOFSensor(TOFSensor_t* sensor, uint16_t TOF_address_used, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange) {
+void initializeTOFSensor(TOFSensor_t* sensor, uint16_t TOF_address_used, uint16_t i2cAddress, uint16_t measurementMode, uint16_t measuredRange) {
     sensor->TOF_address_used = TOF_address_used;        // Setzt die Sensoradresse
     sensor->i2cAddress = i2cAddress;              // Setzt die I2C-Adresse
     sensor->measurementMode = measurementMode;    // Setzt den Messmodus
-    sensor->maxRange = maxRange;                  // Setzt den maximalen Messbereich
+    sensor->measuredRange = measuredRange;                  // Setzt den maximalen Messbereich
     sensor->distanceFromTOF = 0;                  // Initialisiert die Distanz mit Null
     sensor->enableTOFSensor = true;              // Deaktiviert den Sensor standardmäßig
 }
@@ -505,7 +505,7 @@ bool TOF_init_device()
 }
 
 
-bool TOF_getMeasurement(uint16_t *range)
+bool TOF_getMeasurement(uint16_t *range) //ToDo Funktion soweit fertig muss noch schön gemacht werden und Error Handling eingefügt werden
 {
 	I2C_RETURN_CODE_t i2c_return;
 
@@ -676,7 +676,7 @@ bool TOF_ReadContinuousDistance(uint16_t *range)
 }
 
 
-bool TOF_ReadSingleDistance(TOFSensor_t* TOFSENS, uint16_t *range)
+bool TOF_ReadSingleDistance(TOFSensor_t* TOFSENS) //ToDo Funktion soweit fertig muss noch schön gemacht werden und Error Handling eingefügt werden
 {
 	I2C_RETURN_CODE_t i2c_return;
 
@@ -713,8 +713,8 @@ bool TOF_ReadSingleDistance(TOFSensor_t* TOFSENS, uint16_t *range)
 	{
 		return false;
 	}
+	TOF_getMeasurement(&TOFSENS->distanceFromTOF);
 
-	TOF_getMeasurement(range);
 
 	return true;
 }

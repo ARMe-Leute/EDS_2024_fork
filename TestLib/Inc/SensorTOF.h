@@ -148,7 +148,7 @@ struct TOFSensor {
     uint16_t i2cAddress;           // Die I2C-Adresse des Sensors
     uint16_t measurementMode;      // Der Modus des Sensors für die Reichweitenmessung
     uint16_t distanceFromTOF;      // Die aktuelle Distanzmessung (distanz vom TOF)
-    uint16_t maxRange;             // Der maximal messbare Bereich
+    uint16_t measuredRange;             // Der maximal messbare Bereich
     bool enableTOFSensor;          // Aktivierung des Sensors (true/false)
 
     void (*initialize)(TOFSensor_t*, uint16_t, uint16_t, uint16_t, uint16_t);  // Initialisieren des TOF-Sensors
@@ -157,7 +157,7 @@ struct TOFSensor {
 };
 
 // Funktionsprototypen
-extern void initializeTOFSensor(TOFSensor_t* sensor, uint16_t TOF_address_used, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange);
+extern void initializeTOFSensor(TOFSensor_t* sensor, uint16_t TOF_address_used, uint16_t i2cAddress, uint16_t measurementMode, uint16_t measuredRange);
 extern void configureTOFSensor(TOFSensor_t* sensor, uint16_t measurementMode, bool enable);
 
 
@@ -340,7 +340,7 @@ bool TOF_ReadContinuousDistance(uint16_t *range);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_ReadSingleDistance(TOFSensor_t* TOFSensor, uint16_t *range);
+bool TOF_ReadSingleDistance(TOFSensor_t* TOFSensor);
 
 
 /*
