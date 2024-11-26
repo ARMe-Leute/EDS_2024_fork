@@ -19,4 +19,6 @@ typedef struct BluetoothModule {
 
 }BluetoothModule_t;
 
+int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART);
+
 #endif /* BLUETOOTH_H_ */
