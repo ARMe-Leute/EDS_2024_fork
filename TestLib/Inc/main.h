@@ -10,6 +10,7 @@
  ******************************************************************************
  */
 
+#include <SensorTOF.h>
 #ifndef MAIN_H
 #define MAIN_H
 
@@ -78,7 +79,6 @@ void initSubMenu(SCREEN_PAGES_t page);
  * @parameters:	 I2C_TypeDef   *i2c:	 i2c to be scanned
  */
 void i2cScanAndInit(I2C_TypeDef *i2c);
-
 /*
  * @function:	 I2C_SCAN
  *

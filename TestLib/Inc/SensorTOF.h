@@ -138,28 +138,150 @@ typedef struct {
 
 
 
-//-------------------- Predeclare PID Control Type ------------------------------
+//--------------------- SENSOR FUNCTIONS ------------------------
+
 // Strukturdefinition für den TOF-Sensor
 typedef struct TOFSensor TOFSensor_t;
 
 struct TOFSensor {
-    uint16_t sensorAddress;        // Die Adresse des Sensors (z.B. 0x29)
+    uint16_t TOF_address_used;        // Die Adresse des Sensors (z.B. 0x29)
     uint16_t i2cAddress;           // Die I2C-Adresse des Sensors
     uint16_t measurementMode;      // Der Modus des Sensors für die Reichweitenmessung
     uint16_t distanceFromTOF;      // Die aktuelle Distanzmessung (distanz vom TOF)
     uint16_t maxRange;             // Der maximal messbare Bereich
+    bool enableTOFSensor;          // Aktivierung des Sensors (true/false)
 
     void (*initialize)(TOFSensor_t*, uint16_t, uint16_t, uint16_t, uint16_t);  // Initialisieren des TOF-Sensors
-    void (*configure)(TOFSensor_t*, uint16_t, uint16_t, uint16_t);              // Konfigurieren des TOF-Sensors
-    uint16_t (*getMeasurement)(TOFSensor_t*);                                  // Abrufen des aktuellen Messwerts
+    void (*configure)(TOFSensor_t*, uint16_t, bool);      // Konfigurieren des TOF-Sensors
+    uint16_t (*getMeasurement)(TOFSensor_t*);                                 // Abrufen des aktuellen Messwerts
 };
 
 // Funktionsprototypen
-extern void initializeTOFSensor(TOFSensor_t* sensor, uint16_t sensorAddress, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange);
-extern void configureTOFSensor(TOFSensor_t* sensor, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange);
-extern uint16_t getTOFMeasurement(TOFSensor_t* sensor);
-//---------------------EXTERNAL FUNCTIONS---------------------
+extern void initializeTOFSensor(TOFSensor_t* sensor, uint16_t TOF_address_used, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange);
+extern void configureTOFSensor(TOFSensor_t* sensor, uint16_t measurementMode, bool enable);
 
+
+
+
+//---------------------INTERNAL FUNCTIONS---------------------
+
+/*
+ * @function:	 TOF_configure_interrupt
+ *
+ * @brief: 		 configure interrupt
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_configure_interrupt(void);
+
+
+/*
+ * @function:	 TOF_init_address
+ *
+ * @brief: 		 init address
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_init_address();
+
+/*
+ * @function:	 TOF_data_init
+ *
+ * @brief: 		 data init
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_data_init();
+
+
+/*
+ * @function:	 TOF_get_spad_info_from_nvm
+ *
+ * @brief: 		 get spad info from nvm
+ *
+ * @parameters:	 uint8_t * count:			count variable
+ * 				 bool * type_is_aperture:	flag type is aperture
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_get_spad_info_from_nvm(uint8_t * count, bool * type_is_aperture);
+
+
+/*
+ * @function:	 TOF_set_spads_from_nvmvoid
+ *
+ * @brief: 		 set spads from nvm
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_set_spads_from_nvm(void);
+
+
+/*
+ * @function:	 TOF_load_default_tuning_settings
+ *
+ * @brief: 		 Load tuning settings (same as default tuning settings provided by ST api code
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_load_default_tuning_settings(void);
+
+
+/*
+ * @function:	 TOF_set_sequence_steps_enabled
+ *
+ * @brief: 		 Enable (or disable) specific steps in the sequence
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_set_sequence_steps_enabled(uint8_t sequence_step);
+
+
+/*
+ * @function:	 TOF_perform_single_ref_calibration
+ *
+ * @brief: 		 perform calibration
+ *
+ * @parameters:	 STOF_calibration_type_t calib_type:	calibration type
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_perform_single_ref_calibration(TOF_calibration_type_t calib_type);
+
+
+/*
+ * @function:	 TOF_perform_ref_calibration
+ *
+ * @brief: 		 perform reference calibration
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_perform_ref_calibration();
+
+
+/*
+ * @function:	 TOF_init_device
+ *
+ * @brief: 		 do different device init
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_init_device();
+
+
+/*
+ * @function:	 TOF_getMeasurement
+ *
+ * @brief: 		 get the measured distance
+ *
+ * @parameters:	 uint16_t *range:		measured range
+ *
+ * @returns:	 bool: true if successful
+ */
+bool TOF_getMeasurement(uint16_t *range);
+
+
+//---------------------EXTERNAL FUNCTIONS---------------------
 
 /*
  * @function:	 TOF_init
@@ -218,10 +340,8 @@ bool TOF_ReadContinuousDistance(uint16_t *range);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_ReadSingleDistance(uint16_t *range);
+bool TOF_ReadSingleDistance(TOFSensor_t* TOFSensor, uint16_t *range);
 
-
-//--------------- ADDITIONAL EXTERNAL FUNCTIONS---------------
 
 /*
  * @function:	 TOF_SetAddress
@@ -260,10 +380,6 @@ bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range);
  * @returns:	 bool: true if successful
  */
 bool SetRangingProfile(uint16_t Rangingprofile);
-
-
-
-//--------------- NEUE ---------------
 
 
 /*
@@ -415,14 +531,6 @@ uint32_t timeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_pe
 * @returns:	 bool: true if successful
 */
 uint32_t calcMacroPeriod(uint8_t vcsel_period_pclks);
-
-
-
-
-
-
-
-
 
 
 #endif /* SENSORTOF_H */

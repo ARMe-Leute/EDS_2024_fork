@@ -93,19 +93,9 @@ bool timerTrigger = false;
 int main(void)
 {
 
-	// TOF-Instanz deklarieren
-	TOFSensor_t TOF_Sensor_1;
-	// Initialisieren des TOF-Sensors
-	initializeTOFSensor(&TOF_Sensor_1, 0x29, 0x01, 0x03, 5000); // Beispiel: Sensoradresse 0x29, I2C-Adresse 0x01, Messmodus 0x03, Maximaler Messbereich 5000mm
-
-
-
-
-
-
 	// variables to store the distance
 	uint16_t distance = 0;
-	uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
+	//uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
 
 
 	// timer variables
@@ -124,33 +114,55 @@ int main(void)
 	visualisationClearBody();
 
 
-	i2cScanAndInit(i2c);
 
-	enableTOFSensor = true;
-	TOF_sensor_used = 0x29;
+//-------------------------- TOF Deklaration -------------------------
+
+
+
+    // TOF-Instanz deklarieren
+    TOFSensor_t TOF_Sensor_1;
+
+    // Initialisieren des TOF-Sensors
+    initializeTOFSensor(&TOF_Sensor_1, TOF_ADDR_VL53LOX, I2C_1, 999, distance); // Beispiel: Sensoradresse 0x29, I2C-Adresse 0x01, Messmodus 0x03, Maximaler Messbereich 5000mm
+
+    //initializeTOFSensor(TOFSensor_t* sensor, uint16_t sensorAddress, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange) {
+
+
+    // Konfigurieren und Aktivieren des Sensors
+    configureTOFSensor(&TOF_Sensor_1, 999, true); // Aktiviert den Sensor
+
+
+    i2cScanAndInit(i2c);
+
+
+    	enableTOFSensor = true;
+    	TOF_sensor_used = 0x29;
+
 
 	if(enableTOFSensor != ENABLE_TOF_FALSE && enableTOFSensor == (ENABLE_TOF_SENSOR_t)i2cInitPort)
-	{
-		// do TOF sensor initialization
-		//visualisationSensorInit(SENSOR_INIT_RUNNING); // Hier wird das TFT weiß
-
-		i2c_tof = i2c;
-
-		bool result = TOF_init(i2c_tof, TOF_sensor_used);
-
-		// check if init was successful
-		if(result == true)
 		{
-			// show if init was successful
-			//visualisationSensorInit(SENSOR_INIT_DONE);
-			initedTOF = true;
+			// do TOF sensor initialization
+			//visualisationSensorInit(SENSOR_INIT_RUNNING); // Hier wird das TFT weiß
 
-			// give chance to read success-massage
-			delayms(500);
+			i2c_tof = i2c;
 
-			exitMenu = EXIT_FROMSUB1;
+			bool result = TOF_init(i2c_tof, TOF_sensor_used);
+
+			// check if init was successful
+			if(result == true)
+			{
+				// show if init was successful
+				//visualisationSensorInit(SENSOR_INIT_DONE);
+				initedTOF = true;
+
+				// give chance to read success-massage
+				delayms(500);
+
+				exitMenu = EXIT_FROMSUB1;
+			}
 		}
-	}
+
+	TOF_ReadSingleDistance(&TOF_Sensor_1, &distance);
 
 //--------------------LIBTESTS---------------------
 
@@ -161,17 +173,6 @@ int main(void)
 
 	//TOF_ReadDistanceTimed(time, &distance);
 
-
-if (!SetRangingProfile(DEFAULT_MODE_D))
-{
-	TOF_ReadSingleDistance(&distance);
-}
-
-TOF_ReadSingleDistance(&distance);
-TOF_ReadSingleDistance(&distance);
-TOF_ReadSingleDistance(&distance);
-TOF_ReadSingleDistance(&distance);
-TOF_ReadSingleDistance(&distance);
 
 
 //------------------LIBTESTS ENDE-------------------
@@ -190,9 +191,16 @@ TOF_ReadSingleDistance(&distance);
 		// if timer execute is expired
 		if (isSystickExpired(TimerExec))
 		{
-			visualisationTOF(distance, &olddistance);
-			TOF_ReadSingleDistance(&distance);
+			//TOF_ReadSingleDistance(uint16_t *range);
 
+			//bool TOF_ReadSingleDistance(TOFSensor_t* TOFSENS, uint16_t *range)
+
+
+			//visualisationTOF(distance, &olddistance);
+			TOF_ReadSingleDistance(&TOF_Sensor_1, &distance);
+			TOF_ReadSingleDistance(&TOF_Sensor_1, &distance);
+			TOF_ReadSingleDistance(&TOF_Sensor_1, &distance);
+			TOF_ReadSingleDistance(&TOF_Sensor_1, &distance);
 			}
 
 
@@ -406,7 +414,6 @@ void i2cScanAndInit(I2C_TypeDef   *i2c)
 	}
 	#endif /* BALA2024 */
 }
-
 /*
  * @function:	 I2C_SCAN
  *

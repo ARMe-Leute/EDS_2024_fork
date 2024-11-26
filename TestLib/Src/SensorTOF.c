@@ -45,15 +45,31 @@ bool TOF_continuous_mode = false;
 #define calcMacroPeriod(vcsel_period_pclks) (((uint32_t)(2304) * (vcsel_period_pclks) * 1655 + 500) / 1000)
 #define decodeVcselPeriod(reg_val)      (((reg_val) + 1) << 1)
 
+
+
+
+//--------------------- SENSOR FUNCTIONS ------------------------
+
+// Funktion zur Initialisierung des TOF-Sensors
+void initializeTOFSensor(TOFSensor_t* sensor, uint16_t TOF_address_used, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange) {
+    sensor->TOF_address_used = TOF_address_used;        // Setzt die Sensoradresse
+    sensor->i2cAddress = i2cAddress;              // Setzt die I2C-Adresse
+    sensor->measurementMode = measurementMode;    // Setzt den Messmodus
+    sensor->maxRange = maxRange;                  // Setzt den maximalen Messbereich
+    sensor->distanceFromTOF = 0;                  // Initialisiert die Distanz mit Null
+    sensor->enableTOFSensor = true;              // Deaktiviert den Sensor standardmäßig
+}
+
+// Funktion zum Konfigurieren des TOF-Sensors
+void configureTOFSensor(TOFSensor_t* sensor, uint16_t measurementMode, bool enable) {
+    sensor->measurementMode = measurementMode;    // Setzt den Messmodus
+    sensor->enableTOFSensor = enable;             // Aktiviert/Deaktiviert den Sensor
+}
+
+
+
 //---------------------INTERNAL FUNCTIONS---------------------
 
-/*
- * @function:	 TOF_configure_interrupt
- *
- * @brief: 		 configure interrupt
- *
- * @returns:	 bool: true if successful
- */
 bool TOF_configure_interrupt(void)
 {
 	I2C_RETURN_CODE_t i2c_return;
@@ -98,15 +114,10 @@ bool TOF_configure_interrupt(void)
     return true;
 }
 
-/*
- * @function:	 TOF_init_address
- *
- * @brief: 		 init address
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_init_address()
 {
+
 	//activate GPIO if not already done
 	//gpioActivate();
 
@@ -130,13 +141,7 @@ bool TOF_init_address()
 	return (device_id[0] == TOF_VL53L0X_EXPECTED_DEVICE_ID);
 }
 
-/*
- * @function:	 TOF_data_init
- *
- * @brief: 		 data init
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_data_init()
 {
 	I2C_RETURN_CODE_t success = false;
@@ -179,16 +184,7 @@ bool TOF_data_init()
 	return true;
 }
 
-/*
- * @function:	 TOF_get_spad_info_from_nvm
- *
- * @brief: 		 get spad info from nvm
- *
- * @parameters:	 uint8_t * count:			count variable
- * 				 bool * type_is_aperture:	flag type is aperture
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_get_spad_info_from_nvm(uint8_t * count, bool * type_is_aperture)
 {
 	uint8_t tmp;
@@ -242,13 +238,7 @@ bool TOF_get_spad_info_from_nvm(uint8_t * count, bool * type_is_aperture)
 	return true;
 }
 
-/*
- * @function:	 TOF_set_spads_from_nvmvoid
- *
- * @brief: 		 set spads from nvm
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_set_spads_from_nvm(void)
 {
 	uint8_t spad_count;
@@ -297,13 +287,7 @@ bool TOF_set_spads_from_nvm(void)
 	return true;
 }
 
-/*
- * @function:	 TOF_load_default_tuning_settings
- *
- * @brief: 		 Load tuning settings (same as default tuning settings provided by ST api code
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_load_default_tuning_settings(void)
 {
 	I2C_RETURN_CODE_t success = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x01);
@@ -395,13 +379,8 @@ bool TOF_load_default_tuning_settings(void)
 	return true;
 }
 
-/*
- * @function:	 TOF_set_sequence_steps_enabled
- *
- * @brief: 		 Enable (or disable) specific steps in the sequence
- *
- * @returns:	 bool: true if successful
- */
+
+
 bool TOF_set_sequence_steps_enabled(uint8_t sequence_step)
 {
 	bool result = false;
@@ -416,15 +395,7 @@ bool TOF_set_sequence_steps_enabled(uint8_t sequence_step)
 	return result;
 }
 
-/*
- * @function:	 TOF_perform_single_ref_calibration
- *
- * @brief: 		 perform calibration
- *
- * @parameters:	 STOF_calibration_type_t calib_type:	calibration type
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_perform_single_ref_calibration(TOF_calibration_type_t calib_type)
 {
 	I2C_RETURN_CODE_t success;
@@ -480,13 +451,7 @@ bool TOF_perform_single_ref_calibration(TOF_calibration_type_t calib_type)
     return true;
 }
 
-/*
- * @function:	 TOF_perform_ref_calibration
- *
- * @brief: 		 perform reference calibration
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_perform_ref_calibration()
 {
 	if (!TOF_perform_single_ref_calibration(TOF_CALIBRATION_TYPE_VHV)) {
@@ -504,13 +469,7 @@ bool TOF_perform_ref_calibration()
 	return true;
 }
 
-/*
- * @function:	 TOF_init_device
- *
- * @brief: 		 do different device init
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_init_device()
 {
 	if (!TOF_data_init())
@@ -545,15 +504,7 @@ bool TOF_init_device()
 	return true;
 }
 
-/*
- * @function:	 TOF_getMeasurement
- *
- * @brief: 		 get the measured distance
- *
- * @parameters:	 uint16_t *range:		measured range
- *
- * @returns:	 bool: true if successful
- */
+
 bool TOF_getMeasurement(uint16_t *range)
 {
 	I2C_RETURN_CODE_t i2c_return;
@@ -600,38 +551,6 @@ bool TOF_getMeasurement(uint16_t *range)
 
 	return true;
 }
-
-//--------------------- SENSOR ------------------------
-
-// Funktion zur Initialisierung des TOF-Sensors
-void initializeTOFSensor(TOFSensor_t* sensor, uint16_t sensorAddress, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange) {
-    sensor->sensorAddress = sensorAddress;        // Setzt die Sensoradresse
-    sensor->i2cAddress = i2cAddress;              // Setzt die I2C-Adresse
-    sensor->measurementMode = measurementMode;    // Setzt den Messmodus
-    sensor->maxRange = maxRange;                  // Setzt den maximalen Messbereich
-    sensor->distanceFromTOF = 0;                   // Initialisiert die Distanz mit Null
-}
-
-// Funktion zum Konfigurieren des TOF-Sensors
-void configureTOFSensor(TOFSensor_t* sensor, uint16_t i2cAddress, uint16_t measurementMode, uint16_t maxRange) {
-    sensor->i2cAddress = i2cAddress;             // Setzt die I2C-Adresse
-    sensor->measurementMode = measurementMode;   // Setzt den Messmodus
-    sensor->maxRange = maxRange;                 // Setzt den maximalen Messbereich
-}
-
-// Funktion zum Abrufen des Messwerts (Distanz)
-uint16_t getTOFMeasurement(TOFSensor_t* sensor) {
-    // Hier könnte der eigentliche Messwert vom TOF-Sensor abgerufen werden
-    // Zum Beispiel könnte ein I2C-Befehl zum Sensor geschickt werden.
-    // Für dieses Beispiel wird ein fiktiver Wert zurückgegeben.
-
-    sensor->distanceFromTOF = 1500;  // Beispielwert (Distanz = 1500mm)
-    return sensor->distanceFromTOF;  // Rückgabe des aktuellen Messwerts
-}
-
-
-
-
 
 
 //---------------------EXTERNAL FUNCTIONS---------------------
@@ -757,7 +676,7 @@ bool TOF_ReadContinuousDistance(uint16_t *range)
 }
 
 
-bool TOF_ReadSingleDistance(uint16_t *range)
+bool TOF_ReadSingleDistance(TOFSensor_t* TOFSENS, uint16_t *range)
 {
 	I2C_RETURN_CODE_t i2c_return;
 
@@ -799,9 +718,6 @@ bool TOF_ReadSingleDistance(uint16_t *range)
 
 	return true;
 }
-
-
-//--------------- ADDITIONAL EXTERNAL FUNCTIONS---------------
 
 
 bool TOF_SetAddress(uint8_t new_Addr) {

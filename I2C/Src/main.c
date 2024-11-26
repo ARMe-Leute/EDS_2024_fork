@@ -117,6 +117,7 @@ int main(void)
 
 	i2cScanAndInit(i2c);
 
+
 	enableTOFSensor = true;
 	TOF_sensor_used = 0x29;
 
@@ -142,9 +143,6 @@ int main(void)
 			exitMenu = EXIT_FROMSUB1;
 		}
 	}
-
-
-
 
 	// infinity loop to execute software
 	while (1)
