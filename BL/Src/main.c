@@ -23,6 +23,8 @@
 #include <mcalUsart.h>
 #include <mcalGPIO.h>
 
+#include <bluetooth.h>
+
 #define BLUETOOTH_SETUP_TIME 100 //ms
 
 typedef enum{

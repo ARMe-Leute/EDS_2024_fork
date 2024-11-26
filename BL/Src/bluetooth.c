@@ -5,4 +5,5 @@
  *
  */
 
+#include <bluetooth.h>
 
