@@ -17,29 +17,70 @@
  */
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include <mcalSysTick.h>
 #include <mcalUsart.h>
 #include <mcalGPIO.h>
+
+#define BLUETOOTH_SETUP_TIME 100 //ms
 
 typedef enum{
 	MAIN_INIT=0,
 	MAIN_LOOP
 }MAIN_MODE;
 
+int8_t init1(){
+	static test = -1;
+	return test++;
+}
 
 
+bool timerTrigger;
 
 int main(void)
 {
+
+	/*
+	 * Für Testzwecke
+	 */
+	gpioSelectPort(GPIOA);
+	gpioSelectPinMode(GPIOA, PIN10, OUTPUT);
+
+	uint32_t BluetoothTimer = 0UL; //Unsigned Long to set all bits to zero
+	uint32_t *timerList[] = { &BluetoothTimer };
+	uint8_t arraySize = sizeof(timerList) / sizeof(timerList[0]);
+
 	MAIN_MODE mode = MAIN_INIT;
 	for (;;) {
 		switch (mode) {
+		// Initialize
 		case MAIN_INIT:
+			systickInit(SYSTICK_1MS);
+			bool setupFinished = false;
 
-			break;
+			int8_t init1Status = -127;
+			while (setupFinished == false) {
+				if (timerTrigger == true) {
+					systickUpdateTimerList((uint32_t*) timerList, arraySize);
+
+				}
+				if (isSystickExpired(BluetoothTimer)) {
+					init1Status = init1();
+					gpioTogglePin(GPIOA, PIN10);
+					systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
+				}
+				if (init1Status == 0) {
+					setupFinished = true; // If all finished
+				}
+			}
+			gpioTogglePin(GPIOA, PIN10);
+			mode=MAIN_LOOP; // After setup switch to main loop
+			break; //case MAIN_INIT
+
+		// Loop forever
 		case MAIN_LOOP:
-			break;
+			break; // case MAIN_LOOP
 
 		}
 	}
