@@ -22,10 +22,25 @@
 #include <mcalUsart.h>
 #include <mcalGPIO.h>
 
+typedef enum{
+	MAIN_INIT=0,
+	MAIN_LOOP
+}MAIN_MODE;
+
+
 
 
 int main(void)
 {
-    /* Loop forever */
-	for(;;);
+	MAIN_MODE mode = MAIN_INIT;
+	for (;;) {
+		switch (mode) {
+		case MAIN_INIT:
+
+			break;
+		case MAIN_LOOP:
+			break;
+
+		}
+	}
 }
