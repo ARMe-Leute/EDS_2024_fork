@@ -12,4 +12,11 @@
 #include <mcalGPIO.h>
 
 
+typedef struct BluetoothModule {
+
+	USART_TypeDef *usart;
+	int8_t initStatus; //Todo: Defaultwert mitgeben
+
+}BluetoothModule_t;
+
 #endif /* BLUETOOTH_H_ */
