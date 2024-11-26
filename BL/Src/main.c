@@ -53,6 +53,8 @@ int main(void)
 	uint32_t *timerList[] = { &BluetoothTimer };
 	uint8_t arraySize = sizeof(timerList) / sizeof(timerList[0]);
 
+	BluetoothModule_t HM17_1;
+
 	MAIN_MODE mode = MAIN_INIT;
 	for (;;) {
 		switch (mode) {
@@ -62,13 +64,14 @@ int main(void)
 			bool setupFinished = false;
 
 			int8_t init1Status = -127;
+			HM17_1.initStatus=-10;
 			while (setupFinished == false) {
 				if (timerTrigger == true) {
 					systickUpdateTimerList((uint32_t*) timerList, arraySize);
 
 				}
 				if (isSystickExpired(BluetoothTimer)) {
-					init1Status = init1();
+					init1Status = bluetoothInit(&HM17_1, USART2);
 					gpioTogglePin(GPIOA, PIN10);
 					systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
 				}
