@@ -841,7 +841,7 @@ bool SetRangingProfile(TOFSensor_t* TOFSENS)
 	bool prevalue = false;
     switch (TOFSENS->Ranging_Profiles_t) {
     case DEFAULT_MODE_D:
-    	if(setMeasurementTimingBudget(TOFSENS, 30) == true)
+    	if(setMeasurementTimingBudget(TOFSENS, 30000) == true)
     	{
     		TOFSENS->Ranging_Profiles_t = DEFAULT_MODE_D;
     		value = true;
@@ -849,12 +849,13 @@ bool SetRangingProfile(TOFSensor_t* TOFSENS)
     	}
     	else
     	{
+        	TOFSENS->Ranging_Profiles_t = RANGINGPROFILE_ERROR;
     		return false;
     		break;
     	}
 
     case HIGH_SPEED_MODE_S:
-        if(setMeasurementTimingBudget(TOFSENS, 20) == true)
+        if(setMeasurementTimingBudget(TOFSENS, 28000) == true)		//20ms
         {
         	TOFSENS->Ranging_Profiles_t = HIGH_SPEED_MODE_S;
         	value = true;
@@ -869,7 +870,7 @@ bool SetRangingProfile(TOFSensor_t* TOFSENS)
         }
 
     case HIGH_ACCURACY_MODE_A:
-        if(setMeasurementTimingBudget(TOFSENS, 200) == true)
+        if(setMeasurementTimingBudget(TOFSENS, 32000) == true)		//200ms
         {
         	TOFSENS->Ranging_Profiles_t = HIGH_ACCURACY_MODE_A;
         	value = true;
@@ -883,7 +884,19 @@ bool SetRangingProfile(TOFSensor_t* TOFSENS)
         }
 
     case LONG_RANGE_MODE_R:
-    	if(setSignalRateLimit(TOFSENS, 0.1) == true)
+    	if(setMeasurementTimingBudget(TOFSENS, 30000) == true)		//33ms
+    	        {
+    	        	value = true;
+    	        	break;
+    	        }
+    	        else
+    	        {
+    	        	value = false;
+    	        	TOFSENS->Ranging_Profiles_t = RANGINGPROFILE_ERROR;
+    	        	break;
+    	        }
+
+        if(setSignalRateLimit(TOFSENS, 0.1) == true)
     	{
     		prevalue = true;
     		value = true;
