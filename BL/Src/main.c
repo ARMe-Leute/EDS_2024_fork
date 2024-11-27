@@ -32,10 +32,6 @@ typedef enum{
 	MAIN_LOOP
 }MAIN_MODE;
 
-int8_t init1(){
-	static test = -1;
-	return test++;
-}
 
 
 bool timerTrigger;
