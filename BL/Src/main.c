@@ -67,7 +67,7 @@ int main(void)
 
 				}
 				if (isSystickExpired(BluetoothTimer)) {
-					init1Status = bluetoothInit(&HM17_1, USART2);
+					init1Status = bluetoothInit(&HM17_1, USART2, 9600);
 					gpioTogglePin(GPIOA, PIN10);
 					systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
 				}
