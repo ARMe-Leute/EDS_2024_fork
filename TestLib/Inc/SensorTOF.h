@@ -98,7 +98,8 @@ typedef enum
 	DEFAULT_MODE_D  		= 1,
 	HIGH_SPEED_MODE_S		= 2,
 	HIGH_ACCURACY_MODE_A  	= 3,
-	LONG_RANGE_MODE_R		= 4
+	LONG_RANGE_MODE_R		= 4,
+	RANGINGPROFILE_ERROR = 5
 
 } Ranging_Profiles_t;
 
@@ -144,22 +145,21 @@ typedef struct {
 typedef struct TOFSensor TOFSensor_t;
 
 struct TOFSensor {
-    uint16_t TOF_address_used;        // Die Adresse des Sensors (z.B. 0x29)
-    uint16_t i2cAddress;           // Die I2C-Adresse des Sensors
-    uint16_t measurementMode;      // Der Modus des Sensors für die Reichweitenmessung
-    uint16_t distanceFromTOF;      // Die aktuelle Distanzmessung (distanz vom TOF)
-    uint16_t measuredRange;             // Der maximal messbare Bereich
-    bool enableTOFSensor;          // Aktivierung des Sensors (true/false)
+    uint16_t TOF_address_used;         // Die Adresse des Sensors (z.B. 0x29)
+    I2C_TypeDef *i2c_tof;          // Zeiger auf die I2C-Peripherie (z. B. I2C1, I2C2)
+    uint16_t Ranging_Profiles_t;          // Der Modus des Sensors für die Reichweitenmessung
+    uint16_t distanceFromTOF;          // Die aktuelle Distanzmessung (Distanz vom TOF)
+    uint16_t measuredRange;            // Der maximal messbare Bereich
+    bool enableTOFSensor;              // Aktivierung des Sensors (true/false)
 
-    void (*initialize)(TOFSensor_t*, uint16_t, uint16_t, uint16_t, uint16_t);  // Initialisieren des TOF-Sensors
-    void (*configure)(TOFSensor_t*, uint16_t, bool);      // Konfigurieren des TOF-Sensors
-    uint16_t (*getMeasurement)(TOFSensor_t*);                                 // Abrufen des aktuellen Messwerts
+    void (*initialize)(TOFSensor_t*, uint16_t, I2C_TypeDef *, uint16_t, uint16_t);  // Initialisieren des TOF-Sensors
+    void (*configure)(TOFSensor_t*, uint16_t, bool);                               // Konfigurieren des TOF-Sensors
+    uint16_t (*getMeasurement)(TOFSensor_t*);                                      // Abrufen des aktuellen Messwerts
 };
 
 // Funktionsprototypen
-extern void initializeTOFSensor(TOFSensor_t* sensor, uint16_t TOF_address_used, uint16_t i2cAddress, uint16_t measurementMode, uint16_t measuredRange);
-extern void configureTOFSensor(TOFSensor_t* sensor, uint16_t measurementMode, bool enable);
-
+extern void initializeTOFSensor(TOFSensor_t* sensor, uint16_t TOF_address_used, I2C_TypeDef *i2c_tof, uint16_t Ranging_Profiles_t, uint16_t measuredRange);
+extern void configureTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t, bool enable);
 
 
 
@@ -172,7 +172,7 @@ extern void configureTOFSensor(TOFSensor_t* sensor, uint16_t measurementMode, bo
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_configure_interrupt(void);
+bool TOF_configure_interrupt(TOFSensor_t* TOFSENS);
 
 
 /*
@@ -182,7 +182,7 @@ bool TOF_configure_interrupt(void);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_init_address();
+bool TOF_init_address(TOFSensor_t* TOFSENS);
 
 /*
  * @function:	 TOF_data_init
@@ -191,7 +191,7 @@ bool TOF_init_address();
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_data_init();
+bool TOF_data_init(TOFSensor_t* TOFSENS);
 
 
 /*
@@ -204,7 +204,7 @@ bool TOF_data_init();
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_get_spad_info_from_nvm(uint8_t * count, bool * type_is_aperture);
+bool TOF_get_spad_info_from_nvm(TOFSensor_t* TOFSENS, uint8_t * count, bool * type_is_aperture);
 
 
 /*
@@ -214,7 +214,7 @@ bool TOF_get_spad_info_from_nvm(uint8_t * count, bool * type_is_aperture);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_set_spads_from_nvm(void);
+bool TOF_set_spads_from_nvm(TOFSensor_t* TOFSENS);
 
 
 /*
@@ -224,7 +224,7 @@ bool TOF_set_spads_from_nvm(void);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_load_default_tuning_settings(void);
+bool TOF_load_default_tuning_settings(TOFSensor_t* TOFSENS);
 
 
 /*
@@ -234,7 +234,7 @@ bool TOF_load_default_tuning_settings(void);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_set_sequence_steps_enabled(uint8_t sequence_step);
+bool TOF_set_sequence_steps_enabled(TOFSensor_t* TOFSENS, uint8_t sequence_step);
 
 
 /*
@@ -246,7 +246,7 @@ bool TOF_set_sequence_steps_enabled(uint8_t sequence_step);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_perform_single_ref_calibration(TOF_calibration_type_t calib_type);
+bool TOF_perform_single_ref_calibration(TOFSensor_t* TOFSENS, TOF_calibration_type_t calib_type);
 
 
 /*
@@ -256,7 +256,7 @@ bool TOF_perform_single_ref_calibration(TOF_calibration_type_t calib_type);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_perform_ref_calibration();
+bool TOF_perform_ref_calibration(TOFSensor_t* TOFSENS);
 
 
 /*
@@ -266,7 +266,7 @@ bool TOF_perform_ref_calibration();
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_init_device();
+bool TOF_init_device(TOFSensor_t* TOFSENS);
 
 
 /*
@@ -293,7 +293,7 @@ bool TOF_getMeasurement(uint16_t *range);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_init(I2C_TypeDef *i2c, TOF_ADDR_t addr);
+bool TOF_init(TOFSensor_t* TOFSENS, I2C_TypeDef *i2c, TOF_ADDR_t addr);
 
 
 /*
@@ -306,7 +306,7 @@ bool TOF_init(I2C_TypeDef *i2c, TOF_ADDR_t addr);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_startContinuous(uint32_t period_ms);
+bool TOF_startContinuous(TOFSensor_t* TOFSENS, uint32_t period_ms);
 
 
 /*
@@ -316,7 +316,7 @@ bool TOF_startContinuous(uint32_t period_ms);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_stopContinuous();
+bool TOF_stopContinuous(TOFSensor_t* TOFSENS);
 
 
 /*
@@ -328,7 +328,7 @@ bool TOF_stopContinuous();
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_ReadContinuousDistance(uint16_t *range);
+bool TOF_ReadContinuousDistance(TOFSensor_t* TOFSENS);
 
 
 /*
@@ -353,7 +353,7 @@ bool TOF_ReadSingleDistance(TOFSensor_t* TOFSensor);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_SetAddress( uint8_t newAddr);
+bool TOF_SetAddress(TOFSensor_t* TOFSENS, uint8_t newAddr);
 
 
 /*
@@ -366,7 +366,7 @@ bool TOF_SetAddress( uint8_t newAddr);
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range);
+bool TOF_ReadDistanceTimed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *range);
 
 
 /*
@@ -379,7 +379,7 @@ bool TOF_ReadDistanceTimed( uint16_t time, uint16_t *range);
  *
  * @returns:	 bool: true if successful
  */
-bool SetRangingProfile(uint16_t Rangingprofile);
+bool SetRangingProfile(TOFSensor_t* TOFSENS);
 
 
 /*
@@ -405,7 +405,7 @@ bool TOF_SetTimingBudget();
  *
  * @returns:	 bool: true if successful
  */
-bool setVcselPulsePeriod(vcselPeriodType type, uint8_t period_pclks);
+bool setVcselPulsePeriod(TOFSensor_t* TOFSENS, vcselPeriodType type, uint8_t period_pclks);
 
 
 /*
@@ -442,7 +442,7 @@ uint16_t decodeTimeout(uint16_t reg_val);
  *
  * @returns:	 bool: true if successful
  */
-bool setSignalRateLimit(float signalRateLimit);
+bool setSignalRateLimit(TOFSensor_t* TOFSENS, float signalRateLimit);
 
 
 /*
@@ -454,7 +454,7 @@ bool setSignalRateLimit(float signalRateLimit);
 *
 * @returns:	 bool: true if successful
 */
-bool getSequenceStepEnables(SequenceStepEnables *enables);
+bool getSequenceStepEnables(TOFSensor_t* TOFSENS, SequenceStepEnables *enables);
 
 
 /*
@@ -467,7 +467,7 @@ bool getSequenceStepEnables(SequenceStepEnables *enables);
 *
 * @returns:	 bool: true if successful
 */
-bool getSequenceStepTimeouts(SequenceStepEnables *enables, SequenceStepTimeouts *timeouts);
+bool getSequenceStepTimeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *enables, SequenceStepTimeouts *timeouts);
 
 
 /*
@@ -492,7 +492,7 @@ uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel
 *
 * @returns:	 uint8_t : vcsel_period
 */
-uint8_t getVcselPulsePeriod(vcselPeriodType type);
+uint8_t getVcselPulsePeriod(TOFSensor_t* TOFSENS, vcselPeriodType type);
 
 
 /*
@@ -504,7 +504,7 @@ uint8_t getVcselPulsePeriod(vcselPeriodType type);
 *
 * @returns:	 bool: true if successful
 */
-bool setMeasurementTimingBudget(uint32_t budget_us);
+bool setMeasurementTimingBudget(TOFSensor_t* TOFSENS, uint32_t budget_us);
 
 
 /*
