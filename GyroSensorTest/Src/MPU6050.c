@@ -86,12 +86,14 @@ int8_t initMPU(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 
 		case -5:		// SW Reset
 			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_1, (MPU6050_SWRESET)); // reboot memory content
+			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_MST_CTRL, (MPU6050_MST_P_NSR)); // tell sensor to expect stop bit
 			step = -4;
 			break;
 
 		case -4:
 			// PWR Mngt
-			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_1, (MPU6050_PWR1_TEMP_dis|MPU6050_PWR1_CLKSEL));
+			//i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_1, (MPU6050_PWR1_TEMP_dis|MPU6050_PWR1_CLKSEL));
+			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_1, (MPU6050_PWR1_CLKSEL));
 			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_2, (MPU6050_PWR2_ACConXY_GYonZ));
 			step = -3;
 			break;
@@ -128,29 +130,41 @@ int8_t initMPU(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 	return step;
 }
 
-int16_t getAcceleration(MPU6050_t* sensor) {
-
+int16_t getAcceleration(MPU6050_t* sensor) { //ToDo: Überprüfen, wieso Z-Wert immer 0x00 (Sensor?)
+	I2C_RETURN_CODE_t i2c_return;
 	uint8_t readBuffer[6];
-	i2cBurstRegRead(sensor->i2c, sensor->i2cAddress, MPU6050_AccXYZ, readBuffer, 6);
-	sensor->AccelXYZ[0] = (readBuffer[0]<<8) + readBuffer[1];
-	sensor->AccelXYZ[1] = (readBuffer[2]<<8) + readBuffer[3];
-	sensor->AccelXYZ[2] = (readBuffer[4]<<8) + readBuffer[5];
+	int16_t X, Y, Z;
+	i2c_return = i2cBurstRegRead(sensor->i2c, sensor->i2cAddress, MPU6050_AccXYZ, readBuffer, 6);
+	X = (readBuffer[0]<<8) + readBuffer[1];
+	Y = (readBuffer[2]<<8) + readBuffer[3];
+	Z = (readBuffer[4]<<8) + readBuffer[5];
 
-	/* ToDo: Kommentierte alte Funktion entfernen, wenn Funktion tut
-	*xyz = (readBuffer[0]<<8) + readBuffer[1];
-	xyz++;
-	*xyz = (readBuffer[2]<<8) + readBuffer[3];
-	xyz++;
-	*xyz = (readBuffer[4]<<8) + readBuffer[5];
-	*/
-	return 0;
+	switch(sensor->AccelRange) {
+	case MPU6050_ACCEL_RANGE_2:		// Faktor 16384 LSB/g
+		sensor->AccelXYZ[0] = (float) X / 16384;
+		sensor->AccelXYZ[1] = (float) Y / 16384;
+		sensor->AccelXYZ[2] = (float) Z / 16384;
+	case MPU6050_ACCEL_RANGE_4:		// Faktor 8192 LSB/g
+		sensor->AccelXYZ[0] = (float) X / 8192;
+		sensor->AccelXYZ[1] = (float) Y / 8192;
+		sensor->AccelXYZ[2] = (float) Z / 8192;
+	case MPU6050_ACCEL_RANGE_8:		// Faktor 4096 LSB/g
+		sensor->AccelXYZ[0] = (float) X / 4096;
+		sensor->AccelXYZ[1] = (float) Y / 4096;
+		sensor->AccelXYZ[2] = (float) Z / 4096;
+	case MPU6050_ACCEL_RANGE_10:	// Faktor 2048 LSB/g
+		sensor->AccelXYZ[0] = (float) X / 2048;
+		sensor->AccelXYZ[1] = (float) Y / 2048;
+		sensor->AccelXYZ[2] = (float) Z / 2048;
+	}
+	return (int16_t) i2c_return;
 }
 
-int16_t getAngleFromAcc(MPU6050_t* sensor) {
+int16_t getAngleFromAcc(MPU6050_t* sensor) { //ToDo: Berechnung der Winkel checken
 	int16_t returnValue = getAcceleration(sensor);
-	float X = (float) sensor->AccelXYZ[0]/160;
-	float Y = (float) sensor->AccelXYZ[1]/160;
-	float Z = (float) sensor->AccelXYZ[2]/160;
+	float X = (float) sensor->AccelXYZ[0]*(_pi/180);
+	float Y = (float) sensor->AccelXYZ[1]*(_pi/180);
+	float Z = (float) sensor->AccelXYZ[2]*(_pi/180);
 
 	sensor->AlphaBeta[0] = atan(X / Z);
 	if (Z < 0) {
@@ -170,28 +184,46 @@ int16_t getAngleFromAcc(MPU6050_t* sensor) {
 		}
 	}
 	return returnValue;
-
-	/* ToDo: Kommentierte alte Funktion entfernen
-	float X = (float) xyz[0]/160;
-	float Y = (float) xyz[1]/160;
-	float Z = (float) xyz[2]/160;
-
-	AlphaBeta[0] = atan(X / Z);
-	if (Z < 0) {
-		if (X < 0) {
-			AlphaBeta[0] -= _pi;
-		} else {
-			AlphaBeta[0] += _pi;
-		}
-	}
-
-	AlphaBeta[1] = atan(Y / Z);
-	if (Z < 0) {
-		if (Y < 0) {
-			AlphaBeta[1] -= _pi;
-		} else {
-			AlphaBeta[1] += _pi;
-		}
-	}
-	*/
 }
+
+int16_t getGyro(MPU6050_t* sensor) {
+	uint8_t readBuffer[6];
+	int16_t X, Y, Z;
+	I2C_RETURN_CODE_t i2c_return;
+	i2c_return = i2cBurstRegRead(sensor->i2c, sensor->i2cAddress, MPU6050_GyroXYZ, readBuffer, 6);
+	X = (readBuffer[0]<<8) + readBuffer[1];
+	Y = (readBuffer[2]<<8) + readBuffer[3];
+	Z = (readBuffer[4]<<8) + readBuffer[5];
+
+	switch (sensor->GyroScale) {
+	case MPU6050_GYRO_FSCALE_250:		// Faktor 131 LSB/°/s
+		sensor->GyroXYZ[0] = (float) X / 131;
+		sensor->GyroXYZ[1] = (float) Y / 131;
+		sensor->GyroXYZ[2] = (float) Z / 131;
+	case MPU6050_GYRO_FSCALE_500:		// Faktor 65.5 LSB/°/s
+		sensor->GyroXYZ[0] = (float) X / 65.5;
+		sensor->GyroXYZ[1] = (float) Y / 65.5;
+		sensor->GyroXYZ[2] = (float) Z / 65.5;
+	case MPU6050_GYRO_FSCALE_1000:		// Faktor 32.8 LSB/°/s
+		sensor->GyroXYZ[0] = (float) X / 32.8;
+		sensor->GyroXYZ[1] = (float) Y / 32.8;
+		sensor->GyroXYZ[2] = (float) Z / 32.8;
+	case MPU6050_GYRO_FSCALE_2000:		// Faktor 16.4 LSB/°/s
+		sensor->GyroXYZ[0] = (float) X / 16.4;
+		sensor->GyroXYZ[1] = (float) Y / 16.4;
+		sensor->GyroXYZ[2] = (float) Z / 16.4;
+
+	}
+	return (int16_t) i2c_return;
+}
+
+int16_t getTemperature(MPU6050_t* sensor) {
+	uint8_t readBuffer[4];
+	int16_t rawTemp;
+	I2C_RETURN_CODE_t i2c_return;
+	i2c_return = i2cBurstRegRead(sensor->i2c, sensor->i2cAddress, MPU6050_Temp, readBuffer, 2);
+	rawTemp = (int16_t) (readBuffer[0]<<8) + readBuffer[1];
+	sensor->TempOut = (float) rawTemp/340 + 36.35;
+	return (int16_t) i2c_return;
+}
+

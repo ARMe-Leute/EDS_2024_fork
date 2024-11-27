@@ -505,52 +505,52 @@ I2C_RETURN_CODE_t i2cReadByteFromSlaveReg(I2C_TypeDef *i2c, uint8_t saddr, uint8
 I2C_RETURN_CODE_t i2cBurstRegRead(I2C_TypeDef *i2c, uint8_t saddr, uint8_t regAddr, uint8_t *data, uint8_t num)
 {
 	I2C_WAIT_BUSY(i2c);
-    //I2C_RESET_POS(i2c);                     // Must be used only in 16-bit transfer
+	//I2C_RESET_POS(i2c);                     // Must be used only in 16-bit transfer
 
-    __i2c_start(i2c);					 // send start condition
-    I2C_START_COMPLETED(i2c);           // Wait until START signal has been sent
+	__i2c_start(i2c);					 // send start condition
+	I2C_START_COMPLETED(i2c);           // Wait until START signal has been sent
 
-    i2c->DR = saddr<<1;                        // Send with bit 0 = '0'
-    I2C_ADDRESS_COMPLETED(i2c);             // Wait for ADDR ACK
+	i2c->DR = saddr<<1;                        // Send with bit 0 = '0'
+	I2C_ADDRESS_COMPLETED(i2c);             // Wait for ADDR ACK
 
-    __i2c_dummy_read_SR1_SR2(i2c);		// Reset SR1 & SR2
+	__i2c_dummy_read_SR1_SR2(i2c);		// Reset SR1 & SR2
 
-    i2c->DR = regAddr;                      // Send address of the functional register
+	i2c->DR = regAddr;                      // Send address of the functional register
 
-    __i2c_Chk_TX_empty(i2c);             // Wait until transmit buffer is empty
-    I2C_BYTE_TRANSFER_FINISHED(i2c);
-    __i2c_dummy_read_SR1_SR2(i2c);
-    i2c->CR1 |= I2C_CR1_START;          // Generate I2C RESTART
-    I2C_START_COMPLETED(i2c);           // Checks whether the START signal has been sent
-    i2c->DR = (saddr<<1) | 1;               // Resend 7Bit slave addr with bit 0 = '1'
-    I2C_ADDRESS_COMPLETED(i2c);             // Wait for ADDR ACK
+	__i2c_Chk_TX_empty(i2c);             // Wait until transmit buffer is empty
+	I2C_BYTE_TRANSFER_FINISHED(i2c);
+	__i2c_dummy_read_SR1_SR2(i2c);
+	i2c->CR1 |= I2C_CR1_START;          // Generate I2C RESTART
+	I2C_START_COMPLETED(i2c);           // Checks whether the START signal has been sent
+	i2c->DR = (saddr<<1) | 1;               // Resend 7Bit slave addr with bit 0 = '1'
+	I2C_ADDRESS_COMPLETED(i2c);             // Wait for ADDR ACK
 
-    I2C_SET_ACK(i2c);                       // Enable Acknowledge
+	I2C_SET_ACK(i2c);                       // Enable Acknowledge
 
-    while (num > 0)                          // Start reading multiple values
-    {
-        if (num == 1U)                      // If there is only one byte left...
-        {
-            I2C_RESET_ACK(i2c);             // Disable acknowledge
-            __i2c_dummy_read_SR1_SR2(i2c);		// Reset SR1 & SR2
-            I2C_CHECK_RXBUF_NOT_EMPTY(i2c); // Wait until receive buffer is no longer empty
+	while (num > 0)                          // Start reading multiple values
+	{
+		if (num == 1U)                      // If there is only one byte left...
+		{
+			I2C_RESET_ACK(i2c);             // Disable acknowledge
+			__i2c_dummy_read_SR1_SR2(i2c);		// Reset SR1 & SR2
+			I2C_CHECK_RXBUF_NOT_EMPTY(i2c); // Wait until receive buffer is no longer empty
 
-            *data++ = i2c->DR;              // Read data from data register
-            break;
-        }
-        else                                // More than one byte left
-        {
-        	__i2c_dummy_read_SR1_SR2(i2c);
-        	I2C_CHECK_RXBUF_NOT_EMPTY(i2c); // Wait until receive buffer is no longer empty
-            (*data++) = i2c->DR;            // Read data from data register
-            num--;
-        }
-    }
-    __i2c_dummy_read_SR1_SR2(i2c);
-    //I2C_BYTE_TRANSFER_FINISHED(i2c);
-    __i2c_stop(i2c);
+			*data++ = i2c->DR;              // Read data from data register
+			break;
+		}
+		else                                // More than one byte left
+		{
+			__i2c_dummy_read_SR1_SR2(i2c);
+			I2C_CHECK_RXBUF_NOT_EMPTY(i2c); // Wait until receive buffer is no longer empty
+			(*data++) = i2c->DR;            // Read data from data register
+			num--;
+		}
+	}
+	// __i2c_dummy_read_SR1_SR2(i2c);		//ToDo: Herausfinden, wieso das auskommentiert werden musste
+	// I2C_BYTE_TRANSFER_FINISHED(i2c);
+	__i2c_stop(i2c);
 
-    return I2C_OK;
+	return I2C_OK;
 }
 
 I2C_RETURN_CODE_t i2cBurstRead(I2C_TypeDef *i2c, uint8_t saddr, uint8_t *data, uint8_t num)
