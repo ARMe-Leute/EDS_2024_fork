@@ -36,3 +36,15 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 		return 0;
 	}
 }
+
+void USART2_IRQHandler(void) {
+	if (USART2->SR & USART_SR_RXNE) {
+#ifndef USART2_BUFFER_SIZE
+#warning USART2_BUFFER_SIZE not defined, using 1200 Bytes buffer. This may result in lost characters
+#define USART2_BUFFER_SIZE 1200 // One second at 9600 BAUD
+#endif
+		 usart2Buffer[usart2BufferIndex++]=USART2->DR & 0xFF;
+
+	}
+
+}

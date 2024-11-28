@@ -26,6 +26,7 @@
 #include <bluetooth.h>
 
 #define BLUETOOTH_SETUP_TIME 100 //ms
+#define USART2_BUFFER_SIZE 1200
 
 typedef enum{
 	MAIN_INIT=0,
@@ -35,6 +36,9 @@ typedef enum{
 
 
 bool timerTrigger;
+
+volatile char usart2Buffer[USART2_BUFFER_SIZE];
+volatile uint16_t usart2BufferIndex = 0;
 
 int main(void)
 {
