@@ -583,7 +583,7 @@ bool TOF_getMeasurement(uint16_t *range)
 //---------------------EXTERNAL FUNCTIONS---------------------
 
 
-bool TOF_init(TOFSensor_t* TOFSENS, I2C_TypeDef *i2c, TOF_ADDR_t addr)
+bool TOF_init(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;

@@ -389,7 +389,7 @@ void i2cScanAndInit(TOFSensor_t* TOFSENS, I2C_TypeDef   *i2c)
 
 		i2c_tof = i2c;
 
-		bool result = TOF_init(TOFSENS, i2c_tof, TOF_sensor_used);
+		bool result = TOF_init(TOFSENS);
 
 		// check if init was successful
 		if(result == true)

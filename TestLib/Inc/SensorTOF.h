@@ -166,21 +166,48 @@ extern void configureTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t,
 //---------------------INTERNAL FUNCTIONS---------------------
 
 /*
- * @function:	 TOF_configure_interrupt
+ * @function:    TOF_configure_interrupt
  *
- * @brief: 		 configure interrupt
+ * @brief:       Configures the interrupt settings for the Time-of-Flight (TOF) sensor.
  *
- * @returns:	 bool: true if successful
+ * @details:     This function initializes and configures the interrupt mechanism for the TOF sensor.
+ *               It sets the interrupt to trigger on a new sample being ready and configures the
+ *               GPIO interrupt pin as active low, which is compatible with most breakout boards.
+ *               The function communicates with the TOF sensor over I2C to apply the required settings.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the configuration is successful, otherwise false.
  */
 bool TOF_configure_interrupt(TOFSensor_t* TOFSENS);
 
 
-/*
- * @function:	 TOF_init_address
+/**
+ * @function:    TOF_verify_device
  *
- * @brief: 		 init address
+ * @brief:       Verifies the connection to the Time-of-Flight (TOF) sensor.
  *
- * @returns:	 bool: true if successful
+ * @details:     This function performs initialization steps to prepare communication with the TOF sensor.
+ *               It checks the sensor's I2C address and attempts to read the device identification register
+ *               to confirm the correct TOF sensor is connected. If the device ID matches the expected value,
+ *               the function confirms the presence of the correct sensor.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the correct TOF sensor is connected and communication is successful,
+ *                     false otherwise.
  */
 bool TOF_init_address(TOFSensor_t* TOFSENS);
 
@@ -188,6 +215,14 @@ bool TOF_init_address(TOFSensor_t* TOFSENS);
  * @function:	 TOF_data_init
  *
  * @brief: 		 data init
+ *
+ * @parameters:	 struct TOFSensor_t* TOFSENS
+ * 				 sensor->TOF_address_used
+ * 				 sensor->i2c_tof = i2c_tof
+ * 				 sensor->Ranging_Profiles_t = Ranging_Profiles_t
+ * 				 sensor->measuredRange = measuredRange
+ * 				 sensor->distanceFromTOF = 0;
+ * 				 sensor->enableTOFSensor = false;
  *
  * @returns:	 bool: true if successful
  */
@@ -199,7 +234,15 @@ bool TOF_data_init(TOFSensor_t* TOFSENS);
  *
  * @brief: 		 get spad info from nvm
  *
- * @parameters:	 uint8_t * count:			count variable
+ * @parameters:	 struct TOFSensor_t* TOFSENS
+ * 				 sensor->TOF_address_used
+ * 				 sensor->i2c_tof = i2c_tof
+ * 				 sensor->Ranging_Profiles_t = Ranging_Profiles_t
+ * 				 sensor->measuredRange = measuredRange
+ * 				 sensor->distanceFromTOF = 0;
+ * 				 sensor->enableTOFSensor = false;
+ *
+ * 				 uint8_t * count:			count variable
  * 				 bool * type_is_aperture:	flag type is aperture
  *
  * @returns:	 bool: true if successful
@@ -288,12 +331,18 @@ bool TOF_getMeasurement(uint16_t *range);
  *
  * @brief: 		 init TOF sensor
  *
- * @parameters:	 I2C_TypeDef *i2c:	i2c used
- * 				 TOF_ADDR_t addr:	TOF address used
+ * @parameters:	 struct TOFSensor_t* TOFSENS
+ * 				 includes:
+ * 				 sensor->TOF_address_used
+ * 				 sensor->i2c_tof = i2c_tof
+ * 				 sensor->Ranging_Profiles_t = Ranging_Profiles_t
+ * 				 sensor->measuredRange = measuredRange
+ * 				 sensor->distanceFromTOF = 0;
+ * 				 sensor->enableTOFSensor = false;
  *
  * @returns:	 bool: true if successful
  */
-bool TOF_init(TOFSensor_t* TOFSENS, I2C_TypeDef *i2c, TOF_ADDR_t addr);
+bool TOF_init(TOFSensor_t* TOFSENS);
 
 
 /*
@@ -302,9 +351,18 @@ bool TOF_init(TOFSensor_t* TOFSENS, I2C_TypeDef *i2c, TOF_ADDR_t addr);
  * @brief: 		 Start continuous ranging measurements
  * 				 get measurement with function TOF_ReadContinuousDistance()
  *
- * @parameters:	 uint32_t period_ms: 	period of measurement in ms
+ * @parameters:	 struct TOFSensor_t* TOFSENS
+ * 				 includes:
+ * 				 sensor->TOF_address_used
+ * 				 sensor->i2c_tof = i2c_tof
+ * 				 sensor->Ranging_Profiles_t = Ranging_Profiles_t
+ * 				 sensor->measuredRange = measuredRange
+ * 				 sensor->distanceFromTOF = 0;
+ * 				 sensor->enableTOFSensor = false;
  *
- * @returns:	 bool: true if successful
+ * 				 uint32_t period_ms: 	period of measurement in ms
+ *
+ * @returns:	 bool: returns true if successful
  */
 bool TOF_startContinuous(TOFSensor_t* TOFSENS, uint32_t period_ms);
 
@@ -314,7 +372,16 @@ bool TOF_startContinuous(TOFSensor_t* TOFSENS, uint32_t period_ms);
  *
  * @brief: 		 stops continuous measurment
  *
- * @returns:	 bool: true if successful
+ * @parameters:	 struct TOFSensor_t* TOFSENS
+ * 				 includes:
+ * 				 sensor->TOF_address_used
+ * 				 sensor->i2c_tof = i2c_tof
+ * 				 sensor->Ranging_Profiles_t = Ranging_Profiles_t
+ * 				 sensor->measuredRange = measuredRange
+ * 				 sensor->distanceFromTOF = 0;
+ * 				 sensor->enableTOFSensor = false;
+ *
+ * @returns:	 bool: returns true if successful
  */
 bool TOF_stopContinuous(TOFSensor_t* TOFSENS);
 
