@@ -72,14 +72,14 @@ int main(void)
 				}
 				if (isSystickExpired(BluetoothTimer)) {
 					init1Status = bluetoothInit(&HM17_1, USART2, 9600);
-					gpioTogglePin(GPIOA, PIN10);
+					//gpioTogglePin(GPIOA, PIN10);
 					systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
 				}
 				if (init1Status == 0) {
 					setupFinished = true; // If all finished
 				}
 			}
-			gpioTogglePin(GPIOA, PIN10);
+
 			mode=MAIN_LOOP; // After setup switch to main loop
 			break; //case MAIN_INIT
 
