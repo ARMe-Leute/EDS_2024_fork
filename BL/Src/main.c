@@ -25,8 +25,9 @@
 
 #include <bluetooth.h>
 
-#define BLUETOOTH_SETUP_TIME 100 //ms
-#define USART2_BUFFER_SIZE 1200
+#define BLUETOOTH_SETUP_TIME 500 //ms
+
+
 
 typedef enum{
 	MAIN_INIT=0,
