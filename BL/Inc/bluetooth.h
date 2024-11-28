@@ -11,6 +11,8 @@
 #include <mcalUsart.h>
 #include <mcalGPIO.h>
 
+#define BLUETOOTH_FETCH_TIME 50//ms
+#define USART2_BUFFER_SIZE (2*1200*BLUETOOTH_FETCH_TIME)/1000
 
 typedef struct BluetoothModule {
 
