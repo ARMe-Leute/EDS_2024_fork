@@ -33,9 +33,25 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 		__enable_irq();
 		return ++BluetoothModule->initStatus;
 	case -9:
-		usartSendString(USART2, (char*) "AT+ADDR?");
+		usartSendString(USART2, (char*) "AT");
 		return BluetoothModule->initStatus++;
-		break;
+	case -8:
+		if (BluetoothModule->counter > 10) { // after 10 attempts return negative acknowledge
+			return 0x15;
+		}
+		if (BluetoothModule->available == 2
+				&& strncmp(BluetoothModule->messageBuffer, "OK", 2) == 0) {
+
+			return ++BluetoothModule->initStatus;
+		}
+
+		else if (BluetoothModule->available > 0) {
+			BluetoothModule->counter++;
+			return --BluetoothModule->initStatus;
+		} else {
+			BluetoothModule->counter++;
+			return BluetoothModule->initStatus;
+		}
 	default:
 		return 0;
 	}

@@ -8,6 +8,8 @@
 #ifndef BLUETOOTH_H_
 #define BLUETOOTH_H_
 
+#include <string.h>
+
 #include <mcalUsart.h>
 #include <mcalGPIO.h>
 
