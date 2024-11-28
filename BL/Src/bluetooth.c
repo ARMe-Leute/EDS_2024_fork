@@ -14,6 +14,7 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 	case -10:
 		BluetoothModule->usart = usart;
 		BluetoothModule->baudRate = baudRate;
+		BluetoothModule->available=0;
 		RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; // GPIOA :Bustakt aktivieren
 		gpioSelectPinMode(GPIOA, PIN3, ALTFUNC); // PA2 :Modus = Alt. Funktion
 		gpioSelectAltFunc(GPIOA, PIN3, AF7); // PA2 :AF7 = USART2 Rx
@@ -37,6 +38,33 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 		break;
 	default:
 		return 0;
+	}
+}
+
+bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule) {
+	if (BluetoothModule->usart == USART2) {
+		static uint16_t lastIndex;
+		if (usart2BufferIndex == lastIndex && usart2BufferIndex != 0) { // No new characters received, message is finished
+			NVIC_DisableIRQ(USART2_IRQn); // Disable the IRQ while copying
+			for (uint16_t x = 0; x < usart2BufferIndex; x++) {
+
+				BluetoothModule->messageBuffer[BluetoothModule->available] =
+						usart2Buffer[x];
+				BluetoothModule->available++;
+			}
+			BluetoothModule->messageBuffer[BluetoothModule->available] = '\0';
+			usart2BufferIndex = 0;
+			NVIC_EnableIRQ(USART2_IRQn);
+			usartSendString(USART2, &BluetoothModule->messageBuffer);
+			return true;
+		} else {
+			lastIndex = usart2BufferIndex;
+			return false;
+		}
+
+	} else {
+		//Todo: Other USARTs
+		return false;
 	}
 }
 
