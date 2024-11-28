@@ -20,8 +20,6 @@ typedef struct BluetoothModule {
 
 }BluetoothModule_t;
 
-extern volatile uint16_t usart2BufferSize;
-
 int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART,
 		uint32_t baudRate);
 

@@ -5,8 +5,6 @@
  *
  */
 
-#include <math.h>
-
 #include <bluetooth.h>
 
 int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, uint32_t baudRate) {
@@ -27,7 +25,6 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 		usartEnableIrq(usart, USART_IRQ_RXNEIE);
 
 		if (BluetoothModule->usart == USART2) {
-			usart2BufferSize = ceil(2 * BluetoothModule->baudRate / 8 * 0.1); // Size to allocate Bytes per second * timerLength, *2 for safety
 			NVIC_EnableIRQ(USART2_IRQn);
 		} else {
 			//Todo
