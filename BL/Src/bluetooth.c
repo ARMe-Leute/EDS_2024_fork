@@ -31,7 +31,7 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 			//Todo
 		}
 		__enable_irq();
-		return BluetoothModule->initStatus++;
+		return ++BluetoothModule->initStatus;
 	case -9:
 		usartSendString(USART2, (char*) "AT+ADDR?");
 		return BluetoothModule->initStatus++;
