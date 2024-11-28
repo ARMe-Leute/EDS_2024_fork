@@ -51,7 +51,8 @@ int main(void)
 	gpioSelectPinMode(GPIOA, PIN10, OUTPUT);
 
 	uint32_t BluetoothTimer = 0UL; //Unsigned Long to set all bits to zero
-	uint32_t *timerList[] = { &BluetoothTimer };
+	uint32_t BluetoothFetchTimer = 0UL;
+	uint32_t *timerList[] = { &BluetoothTimer, &BluetoothFetchTimer };
 	uint8_t arraySize = sizeof(timerList) / sizeof(timerList[0]);
 
 	BluetoothModule_t HM17_1;
@@ -75,6 +76,11 @@ int main(void)
 					init1Status = bluetoothInit(&HM17_1, USART2, 9600);
 					//gpioTogglePin(GPIOA, PIN10);
 					systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
+				}
+				if (isSystickExpired(BluetoothFetchTimer)) {
+					bluetoothFetchBuffer(&HM17_1);
+
+					systickSetTicktime(&BluetoothFetchTimer, BLUETOOTH_FETCH_TIME);
 				}
 				if (init1Status == 0) {
 					setupFinished = true; // If all finished
