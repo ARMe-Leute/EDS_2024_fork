@@ -33,7 +33,6 @@ typedef enum{
 }MAIN_MODE;
 
 
-volatile uint16_t usart2BufferSize;
 
 bool timerTrigger;
 
