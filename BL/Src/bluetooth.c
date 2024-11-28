@@ -47,6 +47,7 @@ void USART2_IRQHandler(void) {
 #define USART2_BUFFER_SIZE 1200 // One second at 9600 BAUD
 #endif
 		 usart2Buffer[usart2BufferIndex++]=USART2->DR & 0xFF;
+		 gpioTogglePin(GPIOA, PIN10);
 
 	}
 
