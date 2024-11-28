@@ -17,6 +17,8 @@ typedef struct BluetoothModule {
 	USART_TypeDef *usart;
 	int8_t initStatus; //Todo: Defaultwert mitgeben
 	uint32_t baudRate;
+	char messageBuffer[USART2_BUFFER_SIZE+1];
+	uint16_t available;
 
 }BluetoothModule_t;
 
