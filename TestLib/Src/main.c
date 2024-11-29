@@ -37,10 +37,6 @@
 #include "visualisation.h"
 #include "main.h"
 
-
-#define PIGGYBAG
-
-
 // Time timer to check Button input, execute
 // Menu change, calculate 3DG rotation data
 #define timeTimerExec (50)
@@ -62,7 +58,7 @@ bool inited3DG = false;
 bool initedTOF = false;
 
 // current page to be loaded and executed
-SCREEN_PAGES_t page = SCREEN_PAGE3;		//SCREEN_MAIN
+SCREEN_PAGES_t page = SCREEN_MAIN;
 
 // variable to initialize TOF, just an internal flag,
 // not necessary to use TOF library. There it is located here
@@ -93,10 +89,30 @@ bool timerTrigger = false;
 int main(void)
 {
 
+	enableTOFSensor = true;
+	TOF_sensor_used = 0x29;
+
+	// variables to store rotation and push button
+	int32_t position = 0;
+	int32_t oldPosition = 0;
+	bool buttonPushed = false;
 
 	// variables to store the distance
-	uint16_t distance = 0;
-	//uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
+	uint16_t distance = 10;
+	uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
+
+	// variables to store values for 3DG communication
+	uint8_t getRawDataCounter = 0;
+	float XYZ_fastMean[3] = {0,0,0};
+	float XDataList[4] = {0,0,0,0};
+	float YDataList[4] = {0,0,0,0};
+	float ZDataList[4] = {0,0,0,0};
+	float XYZ_Mean[3] = {0,0,0};
+	float rotX = 0;
+
+
+	// orientation of the display, used to flip screen
+	ORIENTATION_SCREEN_t orientation = ORIENTATION_1;
 
 	// timer variables
 	uint32_t TimerExec = 0UL;
@@ -111,14 +127,6 @@ int main(void)
 	// init project
 	initBala();
 
-	visualisationClearBody();
-
-
-
-//-------------------------- TOF Deklaration -------------------------
-
-
-
 	// TOF-Instanz deklarieren
 	TOFSensor_t TOF_Sensor_1;
 
@@ -127,60 +135,6 @@ int main(void)
 
 	// Konfigurieren und Aktivieren des Sensors
 	configureTOFSensor(&TOF_Sensor_1, DEFAULT_MODE_D, true); // Aktiviert den Sensor
-
-
-
-enableTOFSensor = true;
-TOF_sensor_used = 0x29;
-i2cScanAndInit(&TOF_Sensor_1, i2c);
-
-TOF_perform_ref_calibration(&TOF_Sensor_1);
-
-//TOF_perform_single_ref_calibration(&TOF_Sensor_1, TOF_CALIBRATION_TYPE_VHV);
-
-TOF_read_single_distance(&TOF_Sensor_1);
-
-
-configureTOFSensor(&TOF_Sensor_1, DEFAULT_MODE_D, true); // Aktiviert den Sensor
-
-TOF_set_ranging_profile(&TOF_Sensor_1);
-
-TOF_read_single_distance(&TOF_Sensor_1);
-TOF_read_single_distance(&TOF_Sensor_1);
-TOF_read_single_distance(&TOF_Sensor_1);
-TOF_read_single_distance(&TOF_Sensor_1);
-
-
-configureTOFSensor(&TOF_Sensor_1, HIGH_SPEED_MODE_S, true); //ERROR
-
-TOF_set_ranging_profile(&TOF_Sensor_1);
-
-TOF_read_single_distance(&TOF_Sensor_1);
-TOF_read_single_distance(&TOF_Sensor_1);
-TOF_read_single_distance(&TOF_Sensor_1);
-TOF_read_single_distance(&TOF_Sensor_1);
-
-
-TOF_read_single_distance(&TOF_Sensor_1);
-
-configureTOFSensor(&TOF_Sensor_1, HIGH_ACCURACY_MODE_A, true); //ERROR
-
-TOF_set_ranging_profile(&TOF_Sensor_1);
-
-TOF_read_single_distance(&TOF_Sensor_1);
-TOF_read_single_distance(&TOF_Sensor_1);
-TOF_read_single_distance(&TOF_Sensor_1);
-
-configureTOFSensor(&TOF_Sensor_1, LONG_RANGE_MODE_R, true); // Aktiviert den Sensor
-
-TOF_set_ranging_profile(&TOF_Sensor_1);
-
-TOF_read_single_distance(&TOF_Sensor_1);
-TOF_read_single_distance(&TOF_Sensor_1);
-TOF_read_single_distance(&TOF_Sensor_1);
-
-
-
 	// infinity loop to execute software
 	while (1)
 	{
@@ -189,27 +143,202 @@ TOF_read_single_distance(&TOF_Sensor_1);
 			systickUpdateTimerList((uint32_t *) timerList, arraySize);
 		}
 
-
 		// if timer execute is expired
 		if (isSystickExpired(TimerExec))
 		{
-			//TOF_ReadSingleDistance(uint16_t *range);
+			position = getRotaryPosition();
+			buttonPushed = getRotaryPushButton();
 
-			//bool TOF_ReadSingleDistance(TOFSensor_t* TOFSENS, uint16_t *range)
+			// calculate fast mean with four last values
+			XYZ_fastMean[0] = fastMean(XDataList, 4);
+			XYZ_fastMean[1] = fastMean(YDataList, 4);
+			XYZ_fastMean[2] = fastMean(ZDataList, 4);
 
+			// recursive mean calculation
+			XYZ_Mean[0] = 0.25 * XYZ_fastMean[0] + 0.75 * XYZ_Mean[0];
+			XYZ_Mean[1] = 0.25 * XYZ_fastMean[1] + 0.75 * XYZ_Mean[1];
+			XYZ_Mean[2] = 0.25 * XYZ_fastMean[2] + 0.75 * XYZ_Mean[2];
 
-			//visualisationTOF(distance, &olddistance);
-			TOF_read_single_distance(&TOF_Sensor_1);
-			TOF_read_single_distance(&TOF_Sensor_1);
-			TOF_read_single_distance(&TOF_Sensor_1);
-			TOF_read_single_distance(&TOF_Sensor_1);
+			// get rotation angle
+			//getAngleFromAcc(XYZ_Mean, &rotX, &rotY);
+			//getAngleFromAcc(int16_t *xyz, float *AlphaBeta)
+
+			rotX = -1;
+			// check if display needs to be flipped
+			if(rotX < FLIP_THRESHHOLD_MIN && orientation == ORIENTATION_2)
+			{
+				orientation = ORIENTATION_1;
+				visualisationFlip(page, initedTOF, inited3DG, orientation);
+			}
+			else if(rotX > FLIP_THRESHHOLD_MAX && orientation == ORIENTATION_1)
+			{
+				orientation = ORIENTATION_2;
+				visualisationFlip(page, initedTOF, inited3DG, orientation);
 			}
 
+			// switch case for different screen pages
+			switch(page)
+			{
+			//main menu
+			case SCREEN_MAIN:
+				// go back if button was pressed
+				if(buttonPushed)
+				{
+					page = (uint16_t)position % 4 + 1;
+
+					// check if it is tried to go to the page of an not initialized sensor
+					if(page == 2 && initedTOF == false)
+					{
+						page = 0;
+
+						visualisationShowError(SCREEN_PAGE1);
+					}
+					else if(page == 3 && inited3DG == false)
+					{
+						page = 0;
+
+						visualisationShowError(SCREEN_PAGE2);
+					}
+
+
+					// change menu page
+					visualisationMenu(page, initedTOF, inited3DG);
+					initSubMenu(page);
+				}
+
+				if(oldPosition != position)
+				{
+					oldPosition = position;
+
+					visualisationMenuGridFocus((uint16_t)position % 4, tft_WHITE, tft_YELLOW);
+				}
+				break;
+
+			// init I2C page
+			case SCREEN_PAGE1:
+				// go back if button was pressed
+				if(buttonPushed)
+				{
+					exitMenu = EXIT_FROMSUB1;
+				}
+
+				// init i2c 1 or 2
+				switch(i2cInitPort)
+				{
+				case I2C_1:
+					i2cScanAndInit(&TOF_Sensor_1, i2c);
+					break;
+				case I2C_2:
+					//i2cScanAndInit(i2c2);
+					break;
+				}
+
+				break;
+
+			// TOF page
+			case SCREEN_PAGE2:
+				// go back if button was pressed
+				if(buttonPushed)
+				{
+					TOF_stop_continuous(&TOF_Sensor_1);
+					exitMenu = EXIT_FROMSUB2;
+				}
+
+				TOF_read_continuous_distance(&TOF_Sensor_1);
+				break;
+
+			// 2DG page
+			case SCREEN_PAGE3:
+				if(buttonPushed)
+				{
+					exitMenu = EXIT_FROMSUB3;
+				}
+				break;
+
+			// INFO page
+			case SCREEN_PAGE4:
+				// go back if button was pressed
+				if(buttonPushed)
+				{
+					exitMenu = EXIT_FROMSUB4;
+				}
+				break;
+			}
+
+			// exit sub page to main menu, focus right menu item
+			if(exitMenu != EXIT_FALSE)
+			{
+				page = SCREEN_MAIN;
+				setRotaryPosition(exitMenu);
+				visualisationMenu(page, initedTOF, inited3DG);
+
+				exitMenu = EXIT_FALSE;
+			}
 
 			systickSetTicktime(&TimerExec, timeTimerExec);
 		}
 
+		// if timer visualization is expired
+		if (isSystickExpired(TimerVisu))
+		{
+			// switch case for dynamic display update
+			switch(page)
+			{
+			case SCREEN_MAIN:
+				break;
+			case SCREEN_PAGE1:
+				break;
+			case SCREEN_PAGE2:
+				visualisationTOF(&TOF_Sensor_1, distance, &olddistance);
+				break;
+			case SCREEN_PAGE3:
+				//visualisation3DG(rotX, rotY, &oldrotX, &oldrotY);
+				break;
+			case SCREEN_PAGE4:
+				break;
+			}
+
+			systickSetTicktime(&TimerVisu, timeTimerVisu);
+		}
+
+		// if timer LED is expired
+		if (isSystickExpired(TimerLED))
+		{
+			// toggle LED to show current speed of system
+			gpioTogglePin(LED_BLUE_ADR);
+
+			systickSetTicktime(&TimerLED, timeTimerLED);
+		}
+
+		// if timer 3DG is expired
+		if (isSystickExpired(Timer3DG) && inited3DG == true)
+		{
+			// store data in array. store the last 4 values
+			if (getRawDataCounter > 3)
+			{
+				getRawDataCounter = 0;
+			}
+			//getAccData(i2c_3dg, &XDataList[getRawDataCounter], &YDataList[getRawDataCounter], &ZDataList[getRawDataCounter]);
+			//getAccData(I2C_TypeDef *i2c, int16_t *xyz)
+			getRawDataCounter++;
+			gpioResetPin(GPIOC,PIN6);
+
+			systickSetTicktime(&Timer3DG, timeTimer3DG);
+		}
 	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
  * @function:	 initBala

@@ -300,7 +300,7 @@ void visualisationShowError(SCREEN_PAGES_t page)
  * @parameters:	 uint16_t distance:		current distance
  * 				 uint16_t *olddistance: old distance
  */
-void visualisationTOF(uint16_t distance, uint16_t *olddistance)
+void visualisationTOF(TOFSensor_t* TOFSENS, uint16_t distance, uint16_t *olddistance)
 {
 	// if value is not out of range
 	if(distance != TOF_VL53L0X_OUT_OF_RANGE)
@@ -313,7 +313,7 @@ void visualisationTOF(uint16_t distance, uint16_t *olddistance)
 
 		// visualize mm in 4 digits
 		char buffer[100];
-		sprintf(buffer,"%04d",distance);
+		sprintf(buffer,"%04d",TOFSENS->measuredRange);
 		tftPrint(buffer, POS_SCREEN_LINE_4);
 	}
 	// if value is out of range
