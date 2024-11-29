@@ -2,22 +2,53 @@
  ******************************************************************************
  * @file           : SensorTOF.c
  * @author         : Andreas Ladner & Philipp Röhlke
- * @brief          : This is the library file to communicate with an TOF sensor.
- * 					 Currently adapted to VL53LOX.
- * 					 It is possible to get the distance in single mode and
- * 					 continuous mode. The configuration is implemented with the
- * 					 right register controls.
- * @date		   : December 2025
+ * @brief          : This library file handles communication with a Time-of-Flight (TOF) sensor.
+ *                    Currently adapted to the VL53LOX sensor.
+ *                    The library supports both single-shot and continuous measurement modes.
+ *                    Configuration is managed via the appropriate register settings for the sensor.
+ * @date           : December 2025
  ******************************************************************************
- */
 
-/**
+
  ******************************************************************************
- * This code and the pregister addresses are based on the official ai which can be found here:
+ * This code and the register addresses are based on the official API, which can be found here:
  * https://www.st.com/en/embedded-software/stsw-img005.html#get-software
  ******************************************************************************
- */
 
+
+ ******************************************************************************
+ * Sensor Configuration:
+ * - Supports the VL53LOX sensor via I2C communication.
+ * - Defines various operating modes such as high accuracy, long range, and high speed.
+ * - Allows for configuration of measurement profiles and VCSEL periods.
+ * - Provides functions to initialize, configure, and read measurements from the sensor.
+ *
+ * Macros:
+ * - Calculation of macro periods and VCSEL periods.
+ * - Handling of I2C communication for sensor register access.
+ *
+ * Structures:
+ * - The library includes structures for handling TOF sensor settings and configuration,
+ *   such as address, I2C instance, ranging profiles, and measured range.
+ *
+ * Functionality:
+ * - Initialize TOF sensor with specified settings (address, I2C, mode, range).
+ * - Configure the sensor for different measurement modes (e.g., single or continuous).
+ * - Retrieve distance measurements from the sensor.
+ *
+ * Supported modes:
+ * - Default mode, high accuracy mode, high-speed mode, and long-range mode.
+ * - Customizable for future sensors as per the interface and register mappings.
+ ******************************************************************************
+
+
+ ******************************************************************************
+ * @datasheets
+ * - VL53LOX Datasheet: [Insert link to VL53LOX datasheet here]
+ * - STMicroelectronics Time-of-Flight Sensor Overview: [Insert link to overview here]
+ * - API Documentation: [Insert link to official API documentation here]
+ ******************************************************************************
+ */
 // standard includes
 #include <stdbool.h>
 
@@ -30,43 +61,44 @@
 #include <ST7735.h>
 #include <Balancer.h>
 
-// variables for i2c and TOF address
-TOF_ADDR_t TOF_address_used = TOF_ADDR_NONE;
-I2C_TypeDef *TOF_i2c;
+// Variables for I2C and TOF sensor address
+TOF_ADDR_t TOF_address_used = TOF_ADDR_NONE; // TOF sensor address, initially set to NONE (-1)
+I2C_TypeDef *TOF_i2c;  // Pointer to the I2C peripheral (e.g., I2C1, I2C2)
 
-// TOF stop variable for register store value
+// TOF stop variable for register store value (used to store certain register values temporarily)
 static uint8_t TOF_stop_variable = 0;
 
-// flag for continuous_mode on or off
+// Flag for continuous mode (Indicates if the sensor is in continuous measurement mode)
 bool TOF_continuous_mode = false;
 
-//math defines
+// Math macros for sensor configuration and period decoding
 
+// Calculate macro period based on VCSEL period (pulses per clock)
 #define calcMacroPeriod(vcsel_period_pclks) (((uint32_t)(2304) * (vcsel_period_pclks) * 1655 + 500) / 1000)
+
+// Decode VCSEL period based on register value
 #define decodeVcselPeriod(reg_val)      (((reg_val) + 1) << 1)
-
-
 
 
 //--------------------- SENSOR FUNCTIONS ------------------------
 
-// Funktion zur Initialisierung des TOF-Sensors
+// Function to initialize the TOF sensor
+// Initializes the sensor with given address, I2C interface, ranging profile, and measurement range.
 void initializeTOFSensor(TOFSensor_t* sensor, uint16_t TOF_address_used, I2C_TypeDef *i2c_tof, uint16_t Ranging_Profiles_t, uint16_t measuredRange) {
-    sensor->TOF_address_used = TOF_address_used;  // Setzt die Sensoradresse
-    sensor->i2c_tof = i2c_tof;            // Setzt die I2C-Instanz
-    sensor->Ranging_Profiles_t = Ranging_Profiles_t;    // Setzt den Messmodus
-    sensor->measuredRange = measuredRange;        // Setzt den maximalen Messbereich
-    sensor->distanceFromTOF = 0;                  // Initialisiert die Distanz mit Null
-    sensor->enableTOFSensor = false;              // Deaktiviert den Sensor standardmäßig
+    sensor->TOF_address_used = TOF_address_used;  // Set the TOF sensor address
+    sensor->i2c_tof = i2c_tof;                    // Set the I2C interface (e.g., I2C1, I2C2)
+    sensor->Ranging_Profiles_t = Ranging_Profiles_t;  // Set the ranging profile (measurement mode)
+    sensor->measuredRange = measuredRange;        // Set the maximum measurable range
+    sensor->distanceFromTOF = 0;                  // Initialize the measured distance to zero
+    sensor->enableTOFSensor = false;              // Default is to keep the sensor disabled
 }
 
-
-// Funktion zum Konfigurieren des TOF-Sensors
+// Function to configure the TOF sensor
+// Configures the sensor's ranging profile and whether the sensor should be enabled or disabled.
 void configureTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t, bool enable) {
-    sensor->Ranging_Profiles_t = Ranging_Profiles_t;    // Setzt den Messmodus
-    sensor->enableTOFSensor = enable;             // Aktiviert/Deaktiviert den Sensor
+    sensor->Ranging_Profiles_t = Ranging_Profiles_t;  // Set the new ranging profile
+    sensor->enableTOFSensor = enable;                  // Enable or disable the TOF sensor
 }
-
 
 
 //---------------------INTERNAL FUNCTIONS---------------------
@@ -398,7 +430,6 @@ bool TOF_load_default_tuning_settings(TOFSensor_t* TOFSENS)
 }
 
 
-
 bool TOF_set_sequence_steps_enabled(TOFSensor_t* TOFSENS, uint8_t sequence_step)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -580,7 +611,7 @@ bool TOF_getMeasurement(uint16_t *range)
 }
 
 
-//---------------------EXTERNAL FUNCTIONS---------------------
+//--------------------- EXTERNAL FUNCTIONS ---------------------
 
 
 bool TOF_init(TOFSensor_t* TOFSENS)
@@ -605,7 +636,7 @@ bool TOF_init(TOFSensor_t* TOFSENS)
 }
 
 
-bool TOF_startContinuous(TOFSensor_t* TOFSENS, uint32_t period_ms)
+bool TOF_start_continuous(TOFSensor_t* TOFSENS, uint32_t period_ms)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
@@ -674,7 +705,7 @@ bool TOF_startContinuous(TOFSensor_t* TOFSENS, uint32_t period_ms)
 }
 
 
-bool TOF_stopContinuous(TOFSensor_t* TOFSENS)
+bool TOF_stop_continuous(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
@@ -697,7 +728,7 @@ bool TOF_stopContinuous(TOFSensor_t* TOFSENS)
 }
 
 
-bool TOF_ReadContinuousDistance(TOFSensor_t* TOFSENS)
+bool TOF_read_continuous_distance(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
@@ -716,7 +747,7 @@ bool TOF_ReadContinuousDistance(TOFSensor_t* TOFSENS)
 }
 
 
-bool TOF_ReadSingleDistance(TOFSensor_t* TOFSENS)
+bool TOF_read_single_distance(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
@@ -763,7 +794,7 @@ bool TOF_ReadSingleDistance(TOFSensor_t* TOFSENS)
 }
 
 
-bool TOF_SetAddress(TOFSensor_t* TOFSENS, uint8_t new_Addr)
+bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t new_Addr)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
@@ -783,7 +814,7 @@ bool TOF_SetAddress(TOFSensor_t* TOFSENS, uint8_t new_Addr)
 }
 
 
-bool TOF_ReadDistanceTimed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *range)
+bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *range)
 {
 
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -831,7 +862,7 @@ bool TOF_ReadDistanceTimed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *range)
 }
 
 
-bool SetRangingProfile(TOFSensor_t* TOFSENS)
+bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)
 {
 
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -841,7 +872,7 @@ bool SetRangingProfile(TOFSensor_t* TOFSENS)
 	bool prevalue = false;
     switch (TOFSENS->Ranging_Profiles_t) {
     case DEFAULT_MODE_D:
-    	if(setMeasurementTimingBudget(TOFSENS, 30000) == true)
+    	if(TOF_set_measurement_timing_budget(TOFSENS, 30000) == true)
     	{
     		TOFSENS->Ranging_Profiles_t = DEFAULT_MODE_D;
     		value = true;
@@ -855,7 +886,7 @@ bool SetRangingProfile(TOFSensor_t* TOFSENS)
     	}
 
     case HIGH_SPEED_MODE_S:
-        if(setMeasurementTimingBudget(TOFSENS, 28000) == true)		//20ms
+        if(TOF_set_measurement_timing_budget(TOFSENS, 28000) == true)		//20ms
         {
         	TOFSENS->Ranging_Profiles_t = HIGH_SPEED_MODE_S;
         	value = true;
@@ -870,7 +901,7 @@ bool SetRangingProfile(TOFSensor_t* TOFSENS)
         }
 
     case HIGH_ACCURACY_MODE_A:
-        if(setMeasurementTimingBudget(TOFSENS, 32000) == true)		//200ms
+        if(TOF_set_measurement_timing_budget(TOFSENS, 32000) == true)		//200ms
         {
         	TOFSENS->Ranging_Profiles_t = HIGH_ACCURACY_MODE_A;
         	value = true;
@@ -884,7 +915,7 @@ bool SetRangingProfile(TOFSensor_t* TOFSENS)
         }
 
     case LONG_RANGE_MODE_R:
-    	if(setMeasurementTimingBudget(TOFSENS, 30000) == true)		//33ms
+    	if(TOF_set_measurement_timing_budget(TOFSENS, 30000) == true)		//33ms
     	        {
     	        	value = true;
     	        	break;
@@ -896,7 +927,7 @@ bool SetRangingProfile(TOFSensor_t* TOFSENS)
     	        	break;
     	        }
 
-        if(setSignalRateLimit(TOFSENS, 0.1) == true)
+        if(TOF_set_signal_rate_limit(TOFSENS, 0.1) == true)
     	{
     		prevalue = true;
     		value = true;
@@ -909,7 +940,7 @@ bool SetRangingProfile(TOFSensor_t* TOFSENS)
     		break;
     	}
 
-    	if(setVcselPulsePeriod(TOFSENS, VcselPeriodPreRange, 18) == true && prevalue == true)
+    	if(TOF_set_vcsel_pulse_period(TOFSENS, VcselPeriodPreRange, 18) == true && prevalue == true)
     	{
     		prevalue = true;
     	}
@@ -921,7 +952,7 @@ bool SetRangingProfile(TOFSensor_t* TOFSENS)
     		break;
     	}
 
-    	if(setVcselPulsePeriod(TOFSENS, VcselPeriodFinalRange, 14) == true && prevalue == true)
+    	if(TOF_set_vcsel_pulse_period(TOFSENS, VcselPeriodFinalRange, 14) == true && prevalue == true)
     	{
         	TOFSENS->Ranging_Profiles_t = LONG_RANGE_MODE_R;
 
@@ -944,7 +975,7 @@ bool SetRangingProfile(TOFSensor_t* TOFSENS)
 }
 
 
-bool setVcselPulsePeriod(TOFSensor_t* TOFSENS, vcselPeriodType type, uint8_t period_pclks)
+bool TOF_set_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type, uint8_t period_pclks)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
@@ -956,8 +987,8 @@ bool setVcselPulsePeriod(TOFSensor_t* TOFSENS, vcselPeriodType type, uint8_t per
 	SequenceStepTimeouts timeouts;
 
 	// Get the current sequence step enables and timeouts from the sensor
-	getSequenceStepEnables(TOFSENS, &enables);
-	getSequenceStepTimeouts(TOFSENS, &enables, &timeouts);
+	TOF_get_sequence_step_enables(TOFSENS, &enables);
+	TOF_get_sequence_step_timeouts(TOFSENS, &enables, &timeouts);
 
 	// Apply specific settings for the requested VCSEL period
 	if (type == VcselPeriodPreRange)
@@ -998,12 +1029,12 @@ bool setVcselPulsePeriod(TOFSensor_t* TOFSENS, vcselPeriodType type, uint8_t per
 		i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_VCSEL_PERIOD, vcsel_period_reg);
 
 		// Update timeouts for pre-range
-		uint16_t new_pre_range_timeout_mclks = timeoutMicrosecondsToMclks(timeouts.pre_range_us, period_pclks);
-		new_pre_range_timeout_mclks = encodeTimeOut(new_pre_range_timeout_mclks);
+		uint16_t new_pre_range_timeout_mclks = timeout_microseconds_to_mclks(timeouts.pre_range_us, period_pclks);
+		new_pre_range_timeout_mclks = encode_timeOut(new_pre_range_timeout_mclks);
 		i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI, new_pre_range_timeout_mclks);
 
 		// Update MSRC timeout
-		uint16_t new_msrc_timeout_mclks = timeoutMicrosecondsToMclks(timeouts.msrc_dss_tcc_us, period_pclks);
+		uint16_t new_msrc_timeout_mclks = timeout_microseconds_to_mclks(timeouts.msrc_dss_tcc_us, period_pclks);
 		i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, MSRC_CONFIG_TIMEOUT_MACROP, (new_msrc_timeout_mclks > 256) ? 255 : (new_msrc_timeout_mclks - 1));
 	}
 	else if (type == VcselPeriodFinalRange)
@@ -1053,12 +1084,12 @@ bool setVcselPulsePeriod(TOFSensor_t* TOFSENS, vcselPeriodType type, uint8_t per
 			return false;
 		}
 		// Update timeouts for final-range
-		uint16_t new_final_range_timeout_mclks = timeoutMicrosecondsToMclks(timeouts.final_range_us, period_pclks);
+		uint16_t new_final_range_timeout_mclks = timeout_microseconds_to_mclks(timeouts.final_range_us, period_pclks);
 		if (enables.pre_range)
 		{
 			new_final_range_timeout_mclks += timeouts.pre_range_mclks;
 		}
-		new_final_range_timeout_mclks = encodeTimeOut(new_final_range_timeout_mclks);
+		new_final_range_timeout_mclks = encode_timeOut(new_final_range_timeout_mclks);
 		i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, new_final_range_timeout_mclks);
 		if (i2c_return != I2C_OK) {
 			return false;
@@ -1092,42 +1123,7 @@ bool setVcselPulsePeriod(TOFSensor_t* TOFSENS, vcselPeriodType type, uint8_t per
 }
 
 
-uint16_t encodeTimeOut(uint16_t final_range_timeout_mclks)
-{
-	uint32_t ls_byte = 0;
-	uint16_t ms_byte = 0;
-
-	if (final_range_timeout_mclks > 0){
-	ls_byte = final_range_timeout_mclks - 1;
-
-		while ((ls_byte & 0xFFFFFF00) > 0){
-	      ls_byte >>= 1;
-	      ms_byte++;
-	    }
-
-	    return (ms_byte << 8) | (ls_byte & 0xFF);
-	  }
-	  else { return 0; }
-}
-
-
-uint16_t decodeTimeout(uint16_t reg_val)
-{
-    // Formula: (LSByte * 2^MSByte) + 1
-    // reg_val is a 16-bit value; the MSByte (Most Significant Byte) is the upper 8 bits
-    // and the LSByte (Least Significant Byte) is the lower 8 bits.
-
-    uint8_t msb = (reg_val >> 8) & 0xFF;  // Extract the most significant byte
-    uint8_t lsb = reg_val & 0xFF;         // Extract the least significant byte
-
-    // Calculate the timeout as per the formula
-    uint16_t timeout = (lsb << msb) + 1;
-
-    return timeout;
-}
-
-
-bool setSignalRateLimit(TOFSensor_t* TOFSENS, float signalRateLimit)
+bool TOF_set_signal_rate_limit(TOFSensor_t* TOFSENS, float signalRateLimit)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
@@ -1149,7 +1145,7 @@ bool setSignalRateLimit(TOFSensor_t* TOFSENS, float signalRateLimit)
 }
 
 
-bool getSequenceStepEnables(TOFSensor_t* TOFSENS, SequenceStepEnables *enables)
+bool TOF_get_sequence_step_enables(TOFSensor_t* TOFSENS, SequenceStepEnables *enables)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
@@ -1177,7 +1173,7 @@ bool getSequenceStepEnables(TOFSensor_t* TOFSENS, SequenceStepEnables *enables)
 }
 
 
-bool getSequenceStepTimeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *enables, SequenceStepTimeouts *timeouts)
+bool TOF_get_sequence_step_timeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *enables, SequenceStepTimeouts *timeouts)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
@@ -1185,7 +1181,7 @@ bool getSequenceStepTimeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *enables,
 	uint8_t data;
 	I2C_RETURN_CODE_t i2c_return;
 
-    timeouts->pre_range_vcsel_period_pclks = getVcselPulsePeriod(TOFSENS, VcselPeriodPreRange);
+    timeouts->pre_range_vcsel_period_pclks = TOF_get_vcsel_pulse_period(TOFSENS, VcselPeriodPreRange);
 
     i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, MSRC_CONFIG_TIMEOUT_MACROP, &data);
     timeouts->msrc_dss_tcc_mclks = data;
@@ -1195,7 +1191,7 @@ bool getSequenceStepTimeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *enables,
 		return false;
 	}
     timeouts->msrc_dss_tcc_mclks += 1;
-    timeouts->msrc_dss_tcc_us = timeoutMclksToMicroseconds(timeouts->msrc_dss_tcc_mclks, timeouts->pre_range_vcsel_period_pclks);
+    timeouts->msrc_dss_tcc_us = timeout_mclks_to_microseconds(timeouts->msrc_dss_tcc_mclks, timeouts->pre_range_vcsel_period_pclks);
 
     i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI, &data);
     timeouts->pre_range_mclks = data;
@@ -1203,10 +1199,10 @@ bool getSequenceStepTimeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *enables,
     	{
     		return false;
     	}
-    timeouts->pre_range_mclks = decodeTimeout(timeouts->pre_range_mclks);
-    timeouts->pre_range_us = timeoutMclksToMicroseconds(timeouts->pre_range_mclks, timeouts->pre_range_vcsel_period_pclks);
+    timeouts->pre_range_mclks = decode_timeout(timeouts->pre_range_mclks);
+    timeouts->pre_range_us = timeout_mclks_to_microseconds(timeouts->pre_range_mclks, timeouts->pre_range_vcsel_period_pclks);
 
-    timeouts->final_range_vcsel_period_pclks = getVcselPulsePeriod(TOFSENS, VcselPeriodFinalRange);
+    timeouts->final_range_vcsel_period_pclks = TOF_get_vcsel_pulse_period(TOFSENS, VcselPeriodFinalRange);
 
 
     i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, &data);
@@ -1215,63 +1211,20 @@ bool getSequenceStepTimeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *enables,
     	{
     		return false;
     	}
-    timeouts->final_range_mclks = decodeTimeout(timeouts->final_range_mclks);
+    timeouts->final_range_mclks = decode_timeout(timeouts->final_range_mclks);
 
     if (enables->pre_range)
     {
         timeouts->final_range_mclks -= timeouts->pre_range_mclks;
     }
 
-    timeouts->final_range_us = timeoutMclksToMicroseconds(timeouts->final_range_mclks, timeouts->final_range_vcsel_period_pclks);
+    timeouts->final_range_us = timeout_mclks_to_microseconds(timeouts->final_range_mclks, timeouts->final_range_vcsel_period_pclks);
 
     return true;
 }
 
 
-uint32_t timeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks)
-{
-    // Calculate the macro period in nanoseconds
-    uint32_t macro_period_ns = calcMacroPeriod(vcsel_period_pclks);
-
-    // Convert the timeout period in MCLKs to microseconds
-
-    return (uint32_t)((timeout_period_mclks * macro_period_ns) + 500) / 1000;
-}
-
-
-uint8_t getVcselPulsePeriod(TOFSensor_t* TOFSENS, vcselPeriodType type)
-{
-	TOF_address_used = TOFSENS->TOF_address_used;
-	TOF_i2c = TOFSENS->i2c_tof;
-
-	I2C_RETURN_CODE_t i2c_return;
-
-    uint8_t vcsel_period = 255;  // Default to 255 (error case)
-
-    if (type == VcselPeriodPreRange)
-    {
-        // Read the pre-range VCSEL period register and decode
-        i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_VCSEL_PERIOD, &vcsel_period);
-    	if (i2c_return != I2C_OK){
-    		return false;
-    	}
-        vcsel_period = decodeVcselPeriod(vcsel_period);
-    }
-    else if (type == VcselPeriodFinalRange)
-    {
-        // Read the final range VCSEL period register and decode
-        i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_VCSEL_PERIOD, &vcsel_period);
-    	if (i2c_return != I2C_OK){
-    		return false;
-    	}
-    	vcsel_period = decodeVcselPeriod(vcsel_period);
-    }
-
-    return vcsel_period;
-}
-
-
-bool setMeasurementTimingBudget(TOFSensor_t* TOFSENS, uint32_t budget_us)
+bool TOF_set_measurement_timing_budget(TOFSensor_t* TOFSENS, uint32_t budget_us)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
@@ -1292,8 +1245,8 @@ bool setMeasurementTimingBudget(TOFSensor_t* TOFSENS, uint32_t budget_us)
     uint32_t used_budget_us = StartOverhead + EndOverhead;
 
     // Get sequence step enables and timeouts
-    getSequenceStepEnables(TOFSENS, &enables);
-    getSequenceStepTimeouts(TOFSENS, &enables, &timeouts);
+    TOF_get_sequence_step_enables(TOFSENS, &enables);
+    TOF_get_sequence_step_timeouts(TOFSENS, &enables, &timeouts);
 
     if (enables.tcc)
     {
@@ -1328,7 +1281,7 @@ bool setMeasurementTimingBudget(TOFSensor_t* TOFSENS, uint32_t budget_us)
 
         // Convert the final range timeout to MCLks
         uint32_t final_range_timeout_mclks =
-        timeoutMicrosecondsToMclks(final_range_timeout_us, timeouts.final_range_vcsel_period_pclks);
+        timeout_microseconds_to_mclks(final_range_timeout_us, timeouts.final_range_vcsel_period_pclks);
 
         if (enables.pre_range)
         {
@@ -1337,7 +1290,7 @@ bool setMeasurementTimingBudget(TOFSensor_t* TOFSENS, uint32_t budget_us)
 
         // Write the final range timeout to the register
 
-        final_range_timeout_mclks = encodeTimeOut(final_range_timeout_mclks);
+        final_range_timeout_mclks = encode_timeOut(final_range_timeout_mclks);
         i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI, final_range_timeout_mclks);
         if (i2c_return != I2C_OK){
             		return false;
@@ -1350,7 +1303,88 @@ bool setMeasurementTimingBudget(TOFSensor_t* TOFSENS, uint32_t budget_us)
 }
 
 
-uint32_t timeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks)
+uint8_t TOF_get_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type)
+{
+	TOF_address_used = TOFSENS->TOF_address_used;
+	TOF_i2c = TOFSENS->i2c_tof;
+
+	I2C_RETURN_CODE_t i2c_return;
+
+    uint8_t vcsel_period = 255;  // Default to 255 (error case)
+
+    if (type == VcselPeriodPreRange)
+    {
+        // Read the pre-range VCSEL period register and decode
+        i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, PRE_RANGE_CONFIG_VCSEL_PERIOD, &vcsel_period);
+    	if (i2c_return != I2C_OK){
+    		return false;
+    	}
+        vcsel_period = decodeVcselPeriod(vcsel_period);
+    }
+    else if (type == VcselPeriodFinalRange)
+    {
+        // Read the final range VCSEL period register and decode
+        i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, FINAL_RANGE_CONFIG_VCSEL_PERIOD, &vcsel_period);
+    	if (i2c_return != I2C_OK){
+    		return false;
+    	}
+    	vcsel_period = decodeVcselPeriod(vcsel_period);
+    }
+
+    return vcsel_period;
+}
+
+
+//--------------------- ADDITIONAL NON TOF FUNCTIONS ---------------------
+
+
+uint16_t encode_timeOut(uint16_t final_range_timeout_mclks)
+{
+	uint32_t ls_byte = 0;
+	uint16_t ms_byte = 0;
+
+	if (final_range_timeout_mclks > 0){
+	ls_byte = final_range_timeout_mclks - 1;
+
+		while ((ls_byte & 0xFFFFFF00) > 0){
+	      ls_byte >>= 1;
+	      ms_byte++;
+	    }
+
+	    return (ms_byte << 8) | (ls_byte & 0xFF);
+	  }
+	  else { return 0; }
+}
+
+
+uint16_t decode_timeout(uint16_t reg_val)
+{
+    // Formula: (LSByte * 2^MSByte) + 1
+    // reg_val is a 16-bit value; the MSByte (Most Significant Byte) is the upper 8 bits
+    // and the LSByte (Least Significant Byte) is the lower 8 bits.
+
+    uint8_t msb = (reg_val >> 8) & 0xFF;  // Extract the most significant byte
+    uint8_t lsb = reg_val & 0xFF;         // Extract the least significant byte
+
+    // Calculate the timeout as per the formula
+    uint16_t timeout = (lsb << msb) + 1;
+
+    return timeout;
+}
+
+
+uint32_t timeout_mclks_to_microseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks)
+{
+    // Calculate the macro period in nanoseconds
+    uint32_t macro_period_ns = calcMacroPeriod(vcsel_period_pclks);
+
+    // Convert the timeout period in MCLKs to microseconds
+
+    return (uint32_t)((timeout_period_mclks * macro_period_ns) + 500) / 1000;
+}
+
+
+uint32_t timeout_microseconds_to_mclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks)
 {
     // Calculate the macro period in nanoseconds
     uint32_t macro_period_ns = calcMacroPeriod(vcsel_period_pclks);

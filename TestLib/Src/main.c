@@ -138,46 +138,46 @@ TOF_perform_ref_calibration(&TOF_Sensor_1);
 
 //TOF_perform_single_ref_calibration(&TOF_Sensor_1, TOF_CALIBRATION_TYPE_VHV);
 
-TOF_ReadSingleDistance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
 
 
 configureTOFSensor(&TOF_Sensor_1, DEFAULT_MODE_D, true); // Aktiviert den Sensor
 
-SetRangingProfile(&TOF_Sensor_1);
+TOF_set_ranging_profile(&TOF_Sensor_1);
 
-TOF_ReadSingleDistance(&TOF_Sensor_1);
-TOF_ReadSingleDistance(&TOF_Sensor_1);
-TOF_ReadSingleDistance(&TOF_Sensor_1);
-TOF_ReadSingleDistance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
 
 
 configureTOFSensor(&TOF_Sensor_1, HIGH_SPEED_MODE_S, true); //ERROR
 
-SetRangingProfile(&TOF_Sensor_1);
+TOF_set_ranging_profile(&TOF_Sensor_1);
 
-TOF_ReadSingleDistance(&TOF_Sensor_1);
-TOF_ReadSingleDistance(&TOF_Sensor_1);
-TOF_ReadSingleDistance(&TOF_Sensor_1);
-TOF_ReadSingleDistance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
 
 
-TOF_ReadSingleDistance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
 
 configureTOFSensor(&TOF_Sensor_1, HIGH_ACCURACY_MODE_A, true); //ERROR
 
-SetRangingProfile(&TOF_Sensor_1);
+TOF_set_ranging_profile(&TOF_Sensor_1);
 
-TOF_ReadSingleDistance(&TOF_Sensor_1);
-TOF_ReadSingleDistance(&TOF_Sensor_1);
-TOF_ReadSingleDistance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
 
 configureTOFSensor(&TOF_Sensor_1, LONG_RANGE_MODE_R, true); // Aktiviert den Sensor
 
-SetRangingProfile(&TOF_Sensor_1);
+TOF_set_ranging_profile(&TOF_Sensor_1);
 
-TOF_ReadSingleDistance(&TOF_Sensor_1);
-TOF_ReadSingleDistance(&TOF_Sensor_1);
-TOF_ReadSingleDistance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
+TOF_read_single_distance(&TOF_Sensor_1);
 
 
 
@@ -199,10 +199,10 @@ TOF_ReadSingleDistance(&TOF_Sensor_1);
 
 
 			//visualisationTOF(distance, &olddistance);
-			TOF_ReadSingleDistance(&TOF_Sensor_1);
-			TOF_ReadSingleDistance(&TOF_Sensor_1);
-			TOF_ReadSingleDistance(&TOF_Sensor_1);
-			TOF_ReadSingleDistance(&TOF_Sensor_1);
+			TOF_read_single_distance(&TOF_Sensor_1);
+			TOF_read_single_distance(&TOF_Sensor_1);
+			TOF_read_single_distance(&TOF_Sensor_1);
+			TOF_read_single_distance(&TOF_Sensor_1);
 			}
 
 
