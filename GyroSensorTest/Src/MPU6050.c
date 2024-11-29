@@ -11,17 +11,7 @@
 
 #include <MPU6050.h>
 
-/**
- * Sets given Values to instance of MPU6050 Gyro Sensor
- *
- * @param sensor:		Pointer to instance of MPU6050_t type
- * @param i2cBus:		Pointer to instance of I2C_TypeDef type
- * @param i2cAddr:		I2C Address to be assigned to Sensor
- * @param gyroScale:	Bit mask for setting the scaling of the gyroscope measurement
- * @param accelRange: 	Bit mask for setting the range of the acceleration measurement
- * @param restart:		//ToDo: Figure out why this is necessary
- */
-int8_t initMPU(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t gyroScale, uint8_t accelRange, uint8_t restart) {
+int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t gyroScale, uint8_t accelRange, uint8_t restart) {
 
 	sensor->i2c = i2cBus;
 
@@ -29,7 +19,13 @@ int8_t initMPU(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 		sensor->i2cAddress = i2cAddr;
 	}
 	else {
-		// ToDo: set method for non standard i2c address?
+		/**
+		 * To change I2C Address of the MPU6050, the AD0-Pin of the sensor must be set high
+		 * This pin is not connected to the board
+		 * therefore, the standard address is always used
+		 * ToDo: Abklären, ob Addressse setzen nötig, Sensor entsprechend umlöten
+		 */
+		sensor->i2cAddress = (uint8_t) 0x68;
 	}
 
 	switch (gyroScale) {
@@ -37,19 +33,19 @@ int8_t initMPU(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 		sensor->GyroScale = (uint8_t) MPU6050_GYRO_FSCALE_250;
 		break;
 	case MPU6050_GYRO_FSCALE_500:
-			sensor->GyroScale = (uint8_t) MPU6050_GYRO_FSCALE_500;
-			break;
-	case MPU6050_GYRO_FSCALE_1000:
-			sensor->GyroScale = (uint8_t) MPU6050_GYRO_FSCALE_1000;
-			break;
-	case MPU6050_GYRO_FSCALE_2000:
-			sensor->GyroScale = (uint8_t) MPU6050_GYRO_FSCALE_2000;
-			break;
-	case 0xff:
-		//ToDo: Funktion implementieren, die Gyroregister bei Eingabe 0xff zu deaktivieren
+		sensor->GyroScale = (uint8_t) MPU6050_GYRO_FSCALE_500;
 		break;
-	default: //ToDo: maybe adjust handling of wrong user input
+	case MPU6050_GYRO_FSCALE_1000:
+		sensor->GyroScale = (uint8_t) MPU6050_GYRO_FSCALE_1000;
+		break;
+	case MPU6050_GYRO_FSCALE_2000:
 		sensor->GyroScale = (uint8_t) MPU6050_GYRO_FSCALE_2000;
+		break;
+	case 0xff:
+		sensor->GyroScale = (uint8_t) DISABLE;
+		break;
+	default:
+		sensor->GyroScale = (uint8_t) MPU6050_GYRO_FSCALE_250;
 		break;
 	}
 
@@ -58,17 +54,19 @@ int8_t initMPU(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 		sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_2;
 		break;
 	case MPU6050_ACCEL_RANGE_4:
-			sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_4;
-			break;
+		sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_4;
+		break;
 	case MPU6050_ACCEL_RANGE_8:
-			sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_8;
-			break;
+		sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_8;
+		break;
 	case MPU6050_ACCEL_RANGE_10:
-			sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_10;
-			break;
-	default: //ToDo: maybe adjust handling of wrong user input
-			sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_10;
-			break;
+		sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_10;
+		break;
+	case DISABLE:
+		sensor->AccelRange = (uint8_t) DISABLE;
+	default:
+		sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_10;
+		break;
 	}
 
 	static int8_t step = -5;
@@ -90,18 +88,32 @@ int8_t initMPU(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 			step = -4;
 			break;
 
-		case -4:
+		case -4: // ToDo: Bitmasken für Sleep-Modi überprüfen, vorher Flämig fragen
 			// PWR Mngt
-			//i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_1, (MPU6050_PWR1_TEMP_dis|MPU6050_PWR1_CLKSEL));
+			/*
 			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_1, (MPU6050_PWR1_CLKSEL));
-			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_2, (MPU6050_PWR2_ACConXY_GYonZ));
+			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_2, (MPU6050_PWR2_ACConXY_GYonZ)); //ToDo: Fragen, wo der Sinn liegt?
+			*/
+			if (sensor->AccelRange == (uint8_t) DISABLE) { // Disable acceleration measurement
+				i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_1, (MPU6050_PWR1_CLKSEL));
+				i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_2, (0b00111000));
+			}
+			else {
+				if (sensor->GyroScale == (uint8_t) DISABLE) { // Disable gyroscope
+					i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_1, (MPU6050_PWR1_CLKSEL));
+					i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_2, (0b00000111));
+				}
+				else { // enable all measurements
+					i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_1, (MPU6050_PWR1_CLKSEL));
+					i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_2, (0b00000000));
+				}
+			}
 			step = -3;
 			break;
 
 		case -3:
 			// GYRO Config
-			if (sensor->GyroScale == 0xff) {
-				//ToDo: Funktion zum Ausschalten finden und einfügen
+			if (sensor->GyroScale == DISABLE) {
 				step=-2;
 			}
 			else {
@@ -112,8 +124,13 @@ int8_t initMPU(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 
 		case -2:
 			// ACCEL Config
-			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_ACCEL_CONFIG, sensor->AccelRange); 	// set scale range of accelerometer
-			step = -1;
+			if (sensor->AccelRange == DISABLE) {
+				step = -1;
+			}
+			else {
+				i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_ACCEL_CONFIG, sensor->AccelRange); 	// set scale range of accelerometer
+				step = -1;
+			}
 			break;
 
 		case -1:	// LowPass Config
@@ -130,95 +147,103 @@ int8_t initMPU(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 	return step;
 }
 
-int16_t getAcceleration(MPU6050_t* sensor) { //ToDo: Überprüfen, wieso Z-Wert immer 0x00 (Sensor?)
-	I2C_RETURN_CODE_t i2c_return;
-	uint8_t readBuffer[6];
-	int16_t X, Y, Z;
-	i2c_return = i2cBurstRegRead(sensor->i2c, sensor->i2cAddress, MPU6050_AccXYZ, readBuffer, 6);
-	X = (readBuffer[0]<<8) + readBuffer[1];
-	Y = (readBuffer[2]<<8) + readBuffer[3];
-	Z = (readBuffer[4]<<8) + readBuffer[5];
 
-	switch(sensor->AccelRange) {
-	case MPU6050_ACCEL_RANGE_2:		// Faktor 16384 LSB/g
-		sensor->AccelXYZ[0] = (float) X / 16384;
-		sensor->AccelXYZ[1] = (float) Y / 16384;
-		sensor->AccelXYZ[2] = (float) Z / 16384;
-	case MPU6050_ACCEL_RANGE_4:		// Faktor 8192 LSB/g
-		sensor->AccelXYZ[0] = (float) X / 8192;
-		sensor->AccelXYZ[1] = (float) Y / 8192;
-		sensor->AccelXYZ[2] = (float) Z / 8192;
-	case MPU6050_ACCEL_RANGE_8:		// Faktor 4096 LSB/g
-		sensor->AccelXYZ[0] = (float) X / 4096;
-		sensor->AccelXYZ[1] = (float) Y / 4096;
-		sensor->AccelXYZ[2] = (float) Z / 4096;
-	case MPU6050_ACCEL_RANGE_10:	// Faktor 2048 LSB/g
-		sensor->AccelXYZ[0] = (float) X / 2048;
-		sensor->AccelXYZ[1] = (float) Y / 2048;
-		sensor->AccelXYZ[2] = (float) Z / 2048;
+int16_t MPU_get_acceleration(MPU6050_t* sensor) {
+	if (sensor->AccelRange != (uint8_t) DISABLE) {
+		I2C_RETURN_CODE_t i2c_return;
+		uint8_t readBuffer[6];
+		int16_t X, Y, Z;
+
+		i2c_return = i2cBurstRegRead(sensor->i2c, sensor->i2cAddress, MPU6050_AccXYZ, readBuffer, 6);
+		X = ((readBuffer[0]<<8) | readBuffer[1]);
+		Y = ((readBuffer[2]<<8) | readBuffer[3]);
+		Z = ((readBuffer[4]<<8) | readBuffer[5]);
+
+		switch(sensor->AccelRange) {
+		case MPU6050_ACCEL_RANGE_2:		// Faktor 16384 LSB/g
+			sensor->AccelXYZ[0] = (float) X / 16384;
+			sensor->AccelXYZ[1] = (float) Y / 16384;
+			sensor->AccelXYZ[2] = (float) Z / 16384;
+			break;
+		case MPU6050_ACCEL_RANGE_4:		// Faktor 8192 LSB/g
+			sensor->AccelXYZ[0] = (float) X / 8192;
+			sensor->AccelXYZ[1] = (float) Y / 8192;
+			sensor->AccelXYZ[2] = (float) Z / 8192;
+			break;
+		case MPU6050_ACCEL_RANGE_8:		// Faktor 4096 LSB/g
+			sensor->AccelXYZ[0] = (float) X / 4096;
+			sensor->AccelXYZ[1] = (float) Y / 4096;
+			sensor->AccelXYZ[2] = (float) Z / 4096;
+			break;
+		case MPU6050_ACCEL_RANGE_10:	// Faktor 2048 LSB/g
+			sensor->AccelXYZ[0] = (float) X / 2048;
+			sensor->AccelXYZ[1] = (float) Y / 2048;
+			sensor->AccelXYZ[2] = (float) Z / 2048;
+			break;
+		}
+		return (int16_t) i2c_return;
 	}
-	return (int16_t) i2c_return;
+	else {
+		return (int16_t) 1;
+	}
 }
 
-int16_t getAngleFromAcc(MPU6050_t* sensor) { //ToDo: Berechnung der Winkel checken
-	int16_t returnValue = getAcceleration(sensor);
-	float X = (float) sensor->AccelXYZ[0]*(_pi/180);
-	float Y = (float) sensor->AccelXYZ[1]*(_pi/180);
-	float Z = (float) sensor->AccelXYZ[2]*(_pi/180);
 
-	sensor->AlphaBeta[0] = atan(X / Z);
-	if (Z < 0) {
-		if (X < 0) {
-			sensor->AlphaBeta[0] -= _pi;
-		} else {
-			sensor->AlphaBeta[0] += _pi;
-		}
-	}
+int16_t MPU_get_angle_from_acceleration(MPU6050_t* sensor) {
+	int16_t returnValue = MPU_get_acceleration(sensor);
+	float X = (float) sensor->AccelXYZ[0];
+	float Y = (float) sensor->AccelXYZ[1];
+	float Z = (float) sensor->AccelXYZ[2];
 
-	sensor->AlphaBeta[1] = atan(Y / Z);
-	if (Z < 0) {
-		if (Y < 0) {
-			sensor->AlphaBeta[1] -= _pi;
-		} else {
-			sensor->AlphaBeta[1] += _pi;
-		}
-	}
+	sensor->AlphaBeta[0] = atan2(X, Z);
+	sensor->AlphaBeta[1] = atan2(Y, Z);
+
 	return returnValue;
 }
 
-int16_t getGyro(MPU6050_t* sensor) {
-	uint8_t readBuffer[6];
-	int16_t X, Y, Z;
-	I2C_RETURN_CODE_t i2c_return;
-	i2c_return = i2cBurstRegRead(sensor->i2c, sensor->i2cAddress, MPU6050_GyroXYZ, readBuffer, 6);
-	X = (readBuffer[0]<<8) + readBuffer[1];
-	Y = (readBuffer[2]<<8) + readBuffer[3];
-	Z = (readBuffer[4]<<8) + readBuffer[5];
 
-	switch (sensor->GyroScale) {
-	case MPU6050_GYRO_FSCALE_250:		// Faktor 131 LSB/°/s
-		sensor->GyroXYZ[0] = (float) X / 131;
-		sensor->GyroXYZ[1] = (float) Y / 131;
-		sensor->GyroXYZ[2] = (float) Z / 131;
-	case MPU6050_GYRO_FSCALE_500:		// Faktor 65.5 LSB/°/s
-		sensor->GyroXYZ[0] = (float) X / 65.5;
-		sensor->GyroXYZ[1] = (float) Y / 65.5;
-		sensor->GyroXYZ[2] = (float) Z / 65.5;
-	case MPU6050_GYRO_FSCALE_1000:		// Faktor 32.8 LSB/°/s
-		sensor->GyroXYZ[0] = (float) X / 32.8;
-		sensor->GyroXYZ[1] = (float) Y / 32.8;
-		sensor->GyroXYZ[2] = (float) Z / 32.8;
-	case MPU6050_GYRO_FSCALE_2000:		// Faktor 16.4 LSB/°/s
-		sensor->GyroXYZ[0] = (float) X / 16.4;
-		sensor->GyroXYZ[1] = (float) Y / 16.4;
-		sensor->GyroXYZ[2] = (float) Z / 16.4;
+int16_t MPU_get_gyro(MPU6050_t* sensor) {
+	if (sensor->GyroScale != (uint8_t) DISABLE) {
+		uint8_t readBuffer[6];
+		int16_t X, Y, Z;
+		I2C_RETURN_CODE_t i2c_return;
+		i2c_return = i2cBurstRegRead(sensor->i2c, sensor->i2cAddress, MPU6050_GyroXYZ, readBuffer, 6);
+		X = ((readBuffer[0]<<8) | readBuffer[1]);
+		Y = ((readBuffer[2]<<8) | readBuffer[3]);
+		Z = ((readBuffer[4]<<8) | readBuffer[5]);
 
+		switch (sensor->GyroScale) {
+		case MPU6050_GYRO_FSCALE_250:		// Factor 131 LSB/°/s
+			sensor->GyroXYZ[0] = (float) X / 131;
+			sensor->GyroXYZ[1] = (float) Y / 131;
+			sensor->GyroXYZ[2] = (float) Z / 131;
+			break;
+		case MPU6050_GYRO_FSCALE_500:		// Factor 65.5 LSB/°/s
+			sensor->GyroXYZ[0] = (float) X / 65.5;
+			sensor->GyroXYZ[1] = (float) Y / 65.5;
+			sensor->GyroXYZ[2] = (float) Z / 65.5;
+			break;
+		case MPU6050_GYRO_FSCALE_1000:		// Factor 32.8 LSB/°/s
+			sensor->GyroXYZ[0] = (float) X / 32.8;
+			sensor->GyroXYZ[1] = (float) Y / 32.8;
+			sensor->GyroXYZ[2] = (float) Z / 32.8;
+			break;
+		case MPU6050_GYRO_FSCALE_2000:		// Factor 16.4 LSB/°/s
+			sensor->GyroXYZ[0] = (float) X / 16.4;
+			sensor->GyroXYZ[1] = (float) Y / 16.4;
+			sensor->GyroXYZ[2] = (float) Z / 16.4;
+			break;
+		}
+		return (int16_t) i2c_return;
 	}
-	return (int16_t) i2c_return;
+	else {
+		return (uint16_t) 1;
+	}
 }
 
-int16_t getTemperature(MPU6050_t* sensor) {
-	uint8_t readBuffer[4];
+
+int16_t MPU_get_temperature(MPU6050_t* sensor) {
+	uint8_t readBuffer[2];
 	int16_t rawTemp;
 	I2C_RETURN_CODE_t i2c_return;
 	i2c_return = i2cBurstRegRead(sensor->i2c, sensor->i2cAddress, MPU6050_Temp, readBuffer, 2);
@@ -227,3 +252,7 @@ int16_t getTemperature(MPU6050_t* sensor) {
 	return (int16_t) i2c_return;
 }
 
+
+int16_t MPU_init_lowpass_filter(MPU6050_t* sensor) { //ToDo: Funktion schreiben
+	return 0;
+}
