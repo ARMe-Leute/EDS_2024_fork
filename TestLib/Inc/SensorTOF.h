@@ -165,7 +165,7 @@ extern void configureTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t,
 
 //---------------------INTERNAL FUNCTIONS---------------------
 
-/*
+/**
  * @function:    TOF_configure_interrupt
  *
  * @brief:       Configures the interrupt settings for the Time-of-Flight (TOF) sensor.
@@ -211,41 +211,53 @@ bool TOF_configure_interrupt(TOFSensor_t* TOFSENS);
  */
 bool TOF_init_address(TOFSensor_t* TOFSENS);
 
-/*
- * @function:	 TOF_data_init
+/**
+ * @function:    TOF_data_init
  *
- * @brief: 		 data init
+ * @brief:       Initializes data communication and operating modes for the Time-of-Flight (TOF) sensor.
  *
- * @parameters:	 struct TOFSensor_t* TOFSENS
- * 				 sensor->TOF_address_used
- * 				 sensor->i2c_tof = i2c_tof
- * 				 sensor->Ranging_Profiles_t = Ranging_Profiles_t
- * 				 sensor->measuredRange = measuredRange
- * 				 sensor->distanceFromTOF = 0;
- * 				 sensor->enableTOFSensor = false;
+ * @details:     This function sets up the TOF sensor by configuring its power supply mode and I2C communication
+ *               parameters. It enables 2.8V mode for the sensor's power pads and configures the sensor to use
+ *               standard I2C mode. The function also initializes internal sensor variables required for
+ *               proper communication and operation. If any I2C operation fails, the initialization process
+ *               terminates and the function returns false.
  *
- * @returns:	 bool: true if successful
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the sensor is successfully initialized, otherwise false.
  */
 bool TOF_data_init(TOFSensor_t* TOFSENS);
 
 
-/*
- * @function:	 TOF_get_spad_info_from_nvm
+/**
+ * @function:    TOF_get_spad_info_from_nvm
  *
- * @brief: 		 get spad info from nvm
+ * @brief:       Retrieves SPAD (Single Photon Avalanche Diode) configuration information from the TOF sensor's NVM.
  *
- * @parameters:	 struct TOFSensor_t* TOFSENS
- * 				 sensor->TOF_address_used
- * 				 sensor->i2c_tof = i2c_tof
- * 				 sensor->Ranging_Profiles_t = Ranging_Profiles_t
- * 				 sensor->measuredRange = measuredRange
- * 				 sensor->distanceFromTOF = 0;
- * 				 sensor->enableTOFSensor = false;
+ * @details:     This function reads the TOF sensor's non-volatile memory (NVM) to retrieve information about
+ *               the SPAD array, including the count of active SPADs and whether they are of the aperture type.
+ *               The function uses a sequence of I2C register reads and writes to configure the sensor, access
+ *               the NVM, and extract the required information. Upon successful execution, the SPAD count and
+ *               type information are stored in the provided output parameters.
  *
- * 				 uint8_t * count:			count variable
- * 				 bool * type_is_aperture:	flag type is aperture
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
  *
- * @returns:	 bool: true if successful
+ *				uint8_t * count 							where the SPAD count will be stored.
+ * 				bool * type_is_aperture						indicating whether the SPADs are of the aperture type.
+ *
+ * @returns:    bool: true if the SPAD information is successfully retrieved, `false` otherwise.
  */
 bool TOF_get_spad_info_from_nvm(TOFSensor_t* TOFSENS, uint8_t * count, bool * type_is_aperture);
 
