@@ -51,6 +51,15 @@
 #define MPU6050_ACCEL_RANGE_8		0b10000   //full scale range of accelerometer = ± 8g
 #define MPU6050_ACCEL_RANGE_10		0b11000   //full scale range of accelerometer = ± 10g
 
+// LOW_PASS_CONFIG
+#define MPU6050_LPBW_260			0b00000		// Accelerometer bandwidth 260Hz,	Gyroscope bandwidth 256Hz
+#define MPU6050_LPBW_184			0b00001		// Accelerometer bandwidth 184Hz,	Gyroscope bandwidth 188Hz
+#define MPU6050_LPBW_94				0b00010		// Accelerometer bandwidth 94Hz,	Gyroscope bandwidth 98Hz
+#define MPU6050_LPBW_44				0b00011		// Accelerometer bandwidth 44Hz,	Gyroscope bandwidth 42Hz
+#define MPU6050_LPBW_21				0b00100		// Accelerometer bandwidth 21Hz,	Gyroscope bandwidth 20Hz
+#define MPU6050_LPBW_10				0b00101		// Accelerometer bandwidth 10Hz,	Gyroscope bandwidth 10Hz
+#define MPU6050_LPBW_5				0b00110		// Accelerometer bandwidth 5Hz,		Gyroscope bandwidth 5Hz
+
 //Registeradressen Externe Sensoren
 #define MPU6050_EXT_SENS_DATA_00 0x49
 
@@ -95,7 +104,7 @@ typedef struct MPU6050 {
 	uint8_t 			i2cAddress;
 	uint8_t				GyroScale;
 	uint8_t				AccelRange;
-	// uint8_t				LPFiltConfig;
+	uint8_t				LPFiltConfig;
 	float	 			TempOut;
 	float				GyroXYZ[3];
 	float				AccelXYZ[3];
@@ -107,46 +116,55 @@ typedef struct MPU6050 {
 /**
  * @function MPU_init
  *
- * @brief Initializes the MPU6050 sensor with the specified configuration values.
+ * @brief Initializes the MPU6050 sensor with specified configurations.
  *
- * This function configures the MPU6050 sensor, including its I2C address, gyroscope scale,
- * accelerometer range, and power/reset management. It ensures proper initialization
- * and prepares the sensor for data acquisition. The initialization process is divided
- * into multiple steps, allowing for flexibility and fault tolerance.
+ * This function configures the MPU6050 sensor by setting its I2C address, gyroscope scale, accelerometer range,
+ * low-pass filter settings, and power management options. Additionally, it handles optional sensor restart and
+ * measurement enable/disable states.
  *
- * @param sensor       Pointer to an instance of the MPU6050_t structure, which stores the sensor's configuration and state.
- * @param i2cBus       Pointer to the I2C bus instance (I2C_TypeDef) used for communication with the sensor.
- * @param i2cAddr      The I2C address to assign to the sensor. If an invalid address is provided, the default (0x68) is used.
- * @param gyroScale    A bitmask to configure the gyroscope's sensitivity range:
- *                     - `MPU6050_GYRO_FSCALE_250`: ±250°/s
- *                     - `MPU6050_GYRO_FSCALE_500`: ±500°/s
- *                     - `MPU6050_GYRO_FSCALE_1000`: ±1000°/s
- *                     - `MPU6050_GYRO_FSCALE_2000`: ±2000°/s
- *                     - `DISABLE`: Disable gyroscope measurement
- * @param accelRange   A bitmask to configure the accelerometer's measurement range:
- *                     - `MPU6050_ACCEL_RANGE_2`: ±2g
- *                     - `MPU6050_ACCEL_RANGE_4`: ±4g
- *                     - `MPU6050_ACCEL_RANGE_8`: ±8g
- *                     - `MPU6050_ACCEL_RANGE_10`: ±16g
- *                     - `DISABLE`: Disable accelerometer measurement
- * @param restart      Indicates whether to restart the initialization process. Non-zero values trigger a restart.
+ * @param sensor       Pointer to an instance of the `MPU6050_t` structure to hold the sensor's configuration and state.
+ * @param i2cBus       Pointer to the I2C bus (e.g., `I2C_TypeDef*`) used to communicate with the sensor.
+ * @param i2cAddr      I2C address of the sensor. If not set to `0x68`, the function defaults to `0x68` as the standard address.
+ * @param gyroScale    Desired gyroscope full-scale range. Accepts predefined values:
+ *                     - `MPU6050_GYRO_FSCALE_250` (±250°/s)
+ *                     - `MPU6050_GYRO_FSCALE_500` (±500°/s)
+ *                     - `MPU6050_GYRO_FSCALE_1000` (±1000°/s)
+ *                     - `MPU6050_GYRO_FSCALE_2000` (±2000°/s)
+ *                     - `DISABLE` to disable gyroscope measurements.
+ * @param accelRange   Desired accelerometer range. Accepts predefined values:
+ *                     - `MPU6050_ACCEL_RANGE_2` (±2g)
+ *                     - `MPU6050_ACCEL_RANGE_4` (±4g)
+ *                     - `MPU6050_ACCEL_RANGE_8` (±8g)
+ *                     - `MPU6050_ACCEL_RANGE_16` (±16g)
+ *                     - `DISABLE` to disable accelerometer measurements.
+ * @param lPconfig     Low-pass filter configuration. Accepts predefined values corresponding to filter cutoff frequencies.
+ *                     - `MPU6050_LPBW_260`, `MPU6050_LPBW_44`, etc.
+ * @param restart      A non-zero value triggers a software reset of the sensor before initialization.
  *
- * @return int8_t      Returns 0 if all initialization steps complete successfully, or a negative value if an error occurs during the process.
+ * @return int8_t
+ * - Returns `0` on successful initialization.
+ * - Returns a negative value if the initialization process is incomplete or a step fails.
  *
  * @details
- * The function follows these steps:
- * 1. Configures the sensor's I2C bus and validates the I2C address.
- * 2. Sets the gyroscope scale and accelerometer range according to the provided bitmasks.
- * 3. Manages power and reset settings:
- *    - Resets the sensor memory.
- *    - Configures the power management registers based on the measurement mode.
- * 4. Applies the gyroscope and accelerometer configurations to the sensor's internal registers.
- * 5. Configures the low-pass filter settings for the sensor.
+ * 1. Configures the I2C bus and verifies the I2C address. If the address is not `0x68`, the function defaults it to `0x68`.
+ * 2. Sets the gyroscope scale, accelerometer range, and low-pass filter configuration using the provided parameters.
+ * 3. Manages sensor power states based on the `gyroScale` and `accelRange` settings:
+ *    - Disables unused sensors if their configurations are set to `DISABLE`.
+ *    - Configures power management registers to enable required sensors.
+ * 4. Supports optional sensor restart by triggering a software reset and reinitializing the configuration registers.
+ * 5. Handles the initialization process in discrete steps (`step` variable) to ensure sequential and stable setup.
  *
- * If a `restart` is requested, the initialization process begins from the initial step.
- * Any errors encountered during initialization will result in a negative return value.
+ * @note
+ * - The function expects the sensor instance (`MPU6050_t`) to be properly allocated before use.
+ * - Ensure the I2C bus is initialized before calling this function.
+ * - Refer to the MPU6050 datasheet for valid configuration values and register settings.
+ * - The `step` mechanism allows reentry into the initialization process for debugging or staged setup.
+ *
+ * @warning
+ * - Incorrect configuration values may lead to undefined sensor behavior or inaccurate measurements.
+ * - Modifications to the I2C address may require hardware changes (e.g., soldering the AD0 pin).
  */
-int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddress, uint8_t gyroScale, uint8_t accelRange, uint8_t restart);
+int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddress, uint8_t gyroScale, uint8_t accelRange, uint8_t lPconfig, uint8_t restart);
 
 /**
  * @function MPU_get_acceleration
@@ -270,8 +288,29 @@ int16_t MPU_get_gyro(MPU6050_t* sensor);
  */
 int16_t MPU_get_temperature(MPU6050_t* sensor);
 
-
-int16_t MPU_init_lowpass_filter(MPU6050_t* sensor);
+/**
+ * @function MPU_init_lowpass_filter
+ *
+ * @brief Initializes the low-pass filter settings for the MPU6050 sensor.
+ *
+ * This function configures the MPU6050's digital low-pass filter (DLPF) by writing the specified configuration
+ * value (`LPFiltConfig`) to the sensor's **CONFIG** register. The DLPF affects both the gyroscope and accelerometer
+ * measurements, providing noise reduction and bandwidth control.
+ *
+ * @param sensor       Pointer to an instance of the `MPU6050_t` structure containing the sensor configuration and state.
+ *
+ * @details
+ * 1. The function sends the value of `sensor->LPFiltConfig` to the **CONFIG** register of the MPU6050 using I2C communication.
+ * 2. The low-pass filter setting controls the cutoff frequency for gyroscope and accelerometer signals, as defined by the
+ *    MPU6050 datasheet.
+ * 3. The user must set the desired filter configuration value in the `LPFiltConfig` field of the `sensor` structure
+ *    before calling this function.
+ *
+ * @note
+ * - Ensure the MPU6050 sensor is properly initialized and powered before calling this function.
+ * - Refer to the MPU6050 datasheet for valid DLPF configuration values and their corresponding cutoff frequencies.
+ */
+void MPU_init_lowpass_filter(MPU6050_t* sensor);
 
 // extern const MPU6050_t sensor;
 

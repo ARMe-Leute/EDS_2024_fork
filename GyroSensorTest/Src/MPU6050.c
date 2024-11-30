@@ -11,7 +11,58 @@
 
 #include <MPU6050.h>
 
-int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t gyroScale, uint8_t accelRange, uint8_t restart) {
+/**
+ * @function MPU_init
+ *
+ * @brief Initializes the MPU6050 sensor with specified configurations.
+ *
+ * This function configures the MPU6050 sensor by setting its I2C address, gyroscope scale, accelerometer range,
+ * low-pass filter settings, and power management options. Additionally, it handles optional sensor restart and
+ * measurement enable/disable states.
+ *
+ * @param sensor       Pointer to an instance of the `MPU6050_t` structure to hold the sensor's configuration and state.
+ * @param i2cBus       Pointer to the I2C bus (e.g., `I2C_TypeDef*`) used to communicate with the sensor.
+ * @param i2cAddr      I2C address of the sensor. If not set to `0x68`, the function defaults to `0x68` as the standard address.
+ * @param gyroScale    Desired gyroscope full-scale range. Accepts predefined values:
+ *                     - `MPU6050_GYRO_FSCALE_250` (±250°/s)
+ *                     - `MPU6050_GYRO_FSCALE_500` (±500°/s)
+ *                     - `MPU6050_GYRO_FSCALE_1000` (±1000°/s)
+ *                     - `MPU6050_GYRO_FSCALE_2000` (±2000°/s)
+ *                     - `DISABLE` to disable gyroscope measurements.
+ * @param accelRange   Desired accelerometer range. Accepts predefined values:
+ *                     - `MPU6050_ACCEL_RANGE_2` (±2g)
+ *                     - `MPU6050_ACCEL_RANGE_4` (±4g)
+ *                     - `MPU6050_ACCEL_RANGE_8` (±8g)
+ *                     - `MPU6050_ACCEL_RANGE_16` (±16g)
+ *                     - `DISABLE` to disable accelerometer measurements.
+ * @param lPconfig     Low-pass filter configuration. Accepts predefined values corresponding to filter cutoff frequencies.
+ *                     - `MPU6050_LPBW_260`, `MPU6050_LPBW_44`, etc.
+ * @param restart      A non-zero value triggers a software reset of the sensor before initialization.
+ *
+ * @return int8_t
+ * - Returns `0` on successful initialization.
+ * - Returns a negative value if the initialization process is incomplete or a step fails.
+ *
+ * @details
+ * 1. Configures the I2C bus and verifies the I2C address. If the address is not `0x68`, the function defaults it to `0x68`.
+ * 2. Sets the gyroscope scale, accelerometer range, and low-pass filter configuration using the provided parameters.
+ * 3. Manages sensor power states based on the `gyroScale` and `accelRange` settings:
+ *    - Disables unused sensors if their configurations are set to `DISABLE`.
+ *    - Configures power management registers to enable required sensors.
+ * 4. Supports optional sensor restart by triggering a software reset and reinitializing the configuration registers.
+ * 5. Handles the initialization process in discrete steps (`step` variable) to ensure sequential and stable setup.
+ *
+ * @note
+ * - The function expects the sensor instance (`MPU6050_t`) to be properly allocated before use.
+ * - Ensure the I2C bus is initialized before calling this function.
+ * - Refer to the MPU6050 datasheet for valid configuration values and register settings.
+ * - The `step` mechanism allows reentry into the initialization process for debugging or staged setup.
+ *
+ * @warning
+ * - Incorrect configuration values may lead to undefined sensor behavior or inaccurate measurements.
+ * - Modifications to the I2C address may require hardware changes (e.g., soldering the AD0 pin).
+ */
+int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t gyroScale, uint8_t accelRange, uint8_t lPconfig, uint8_t restart) {
 
 	sensor->i2c = i2cBus;
 
@@ -66,6 +117,30 @@ int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t
 		sensor->AccelRange = (uint8_t) DISABLE;
 	default:
 		sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_10;
+		break;
+	}
+
+	switch (lPconfig) {
+	case MPU6050_LPBW_260:
+		sensor->LPFiltConfig = (uint8_t) MPU6050_LPBW_260;
+		break;
+	case MPU6050_LPBW_184:
+		sensor->LPFiltConfig = (uint8_t) MPU6050_LPBW_184;
+		break;
+	case MPU6050_LPBW_94:
+		sensor->LPFiltConfig = (uint8_t) MPU6050_LPBW_94;
+		break;
+	case MPU6050_LPBW_44:
+		sensor->LPFiltConfig = (uint8_t) MPU6050_LPBW_44;
+		break;
+	case MPU6050_LPBW_21:
+		sensor->LPFiltConfig = (uint8_t) MPU6050_LPBW_21;
+		break;
+	case MPU6050_LPBW_5:
+		sensor->LPFiltConfig = (uint8_t) MPU6050_LPBW_5;
+		break;
+	default:
+		sensor->LPFiltConfig = (uint8_t) MPU6050_LPBW_260;
 		break;
 	}
 
@@ -134,8 +209,7 @@ int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t
 			break;
 
 		case -1:	// LowPass Config
-			// i2cMPU6050LpFilt(sensor->i2c, 4); //ToDo: Funktion überprüfen
-			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_CONFIG, (0b0111 & 4));
+			MPU_init_lowpass_filter(sensor);
 			step = 0;
 			break;
 
@@ -147,7 +221,38 @@ int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t
 	return step;
 }
 
-
+/**
+ * @function MPU_get_acceleration
+ *
+ * @brief Reads the accelerometer data from the MPU6050 sensor, if enabled.
+ *
+ * This function retrieves acceleration values along the X, Y, and Z axes from the MPU6050 sensor, converts them to
+ * physical units in terms of g (gravitational acceleration), and stores them in the `AccelXYZ` array of the provided
+ * sensor instance. If the accelerometer is disabled, the function skips the I2C read and returns an error code.
+ *
+ * @param sensor       Pointer to an instance of the `MPU6050_t` structure containing the sensor configuration and state.
+ *
+ * @return int16_t
+ * - Returns the result of the I2C transaction (`I2C_RETURN_CODE_t`) if the accelerometer is enabled.
+ *   A value of `I2C_SUCCESS` (0) indicates successful data retrieval.
+ * - Returns `1` if the accelerometer is disabled (`AccelRange` set to `DISABLE`).
+ *
+ * @details
+ * 1. Checks if the accelerometer is enabled by verifying the `AccelRange` parameter in the sensor instance.
+ *    If disabled, the function immediately returns `1`.
+ * 2. Reads 6 bytes of acceleration data from the MPU6050 registers via I2C communication.
+ * 3. Combines the bytes to form 16-bit signed values representing the acceleration for each axis (X, Y, Z).
+ * 4. Converts the raw acceleration data to physical acceleration in units of g using the scaling factors:
+ *    - `MPU6050_ACCEL_RANGE_2`: ±2g, scaling factor = 16384 LSB/g
+ *    - `MPU6050_ACCEL_RANGE_4`: ±4g, scaling factor = 8192 LSB/g
+ *    - `MPU6050_ACCEL_RANGE_8`: ±8g, scaling factor = 4096 LSB/g
+ *    - `MPU6050_ACCEL_RANGE_16`: ±16g, scaling factor = 2048 LSB/g
+ * 5. The converted values are stored in the `AccelXYZ` array of the `sensor` instance.
+ *
+ * @note
+ * - Ensure the MPU6050 sensor has been properly initialized using `initMPU` before calling this function.
+ * - This function assumes the accelerometer is properly configured during initialization.
+ */
 int16_t MPU_get_acceleration(MPU6050_t* sensor) {
 	if (sensor->AccelRange != (uint8_t) DISABLE) {
 		I2C_RETURN_CODE_t i2c_return;
@@ -188,7 +293,29 @@ int16_t MPU_get_acceleration(MPU6050_t* sensor) {
 	}
 }
 
-
+/**
+ * @function MPU_get_angle_from_acceleration
+ *
+ * @brief Calculates the tilt angles of the MPU6050 sensor based on acceleration data.
+ *
+ * This function computes the tilt angles (alpha and beta) of the MPU6050 sensor in radians using the
+ * acceleration data from the X, Y, and Z axes. The angles are stored in the `AlphaBeta` array of
+ * the provided sensor instance.
+ *
+ * @param sensor       Pointer to an instance of the `MPU6050_t` structure containing the sensor configuration and state.
+ *
+ * @return int16_t     Returns the result of the `getAcceleration` function, which indicates the
+ *                     status of the I2C transaction. A value of `I2C_SUCCESS` (0) indicates success.
+ *
+ * @details
+ * 1. Calls the `getAcceleration` function to retrieve the latest acceleration data from the sensor.
+ * 2. Converts the acceleration values to radians by multiplying by a constant factor (`π/180`).
+ * 3. Calculates the tilt angles:
+ *    - `AlphaBeta[0]`: Tilt angle in the X-Z plane (alpha) using the formula `atan(X / Z)`.
+ *    - `AlphaBeta[1]`: Tilt angle in the Y-Z plane (beta) using the formula `atan(Y / Z)`.
+ * 4. Adjusts the calculated angles based on the sign of the Z-axis acceleration to handle angle wrapping:
+ *    - Adds or subtracts π as needed for correct angle representation.
+ */
 int16_t MPU_get_angle_from_acceleration(MPU6050_t* sensor) {
 	int16_t returnValue = MPU_get_acceleration(sensor);
 	float X = (float) sensor->AccelXYZ[0];
@@ -201,7 +328,39 @@ int16_t MPU_get_angle_from_acceleration(MPU6050_t* sensor) {
 	return returnValue;
 }
 
-
+/**
+ * @function MPU_get_gyro
+ *
+  * @brief Reads the gyroscope data from the MPU6050 sensor, if enabled.
+ *
+ * This function retrieves the rotational velocity values for the X, Y, and Z axes from the MPU6050 sensor,
+ * converts them to physical values in degrees per second (°/s), and stores them in the `GyroXYZ` array
+ * of the provided sensor instance. If the gyroscope is disabled, the function skips the I2C read and
+ * returns an error code.
+ *
+ * @param sensor       Pointer to an instance of the `MPU6050_t` structure containing the sensor configuration and state.
+ *
+ * @return int16_t
+ * - Returns the result of the I2C transaction (`I2C_RETURN_CODE_t`) if the gyroscope is enabled.
+ *   A value of `I2C_SUCCESS` (0) indicates successful data retrieval.
+ * - Returns `1` if the gyroscope is disabled (`GyroScale` set to `DISABLE`).
+ *
+ * @details
+ * 1. Checks if the gyroscope is enabled by verifying the `GyroScale` parameter in the sensor instance.
+ *    If disabled, the function immediately returns `1`.
+ * 2. Reads 6 bytes of gyroscope data from the MPU6050 registers via I2C communication.
+ * 3. Combines the bytes to form 16-bit signed values representing the rotational velocity for each axis (X, Y, Z).
+ * 4. Converts the raw gyroscope data to physical rotational velocity in °/s using the scaling factors:
+ *    - `MPU6050_GYRO_FSCALE_250`: ±250°/s, scaling factor = 131 LSB/°/s
+ *    - `MPU6050_GYRO_FSCALE_500`: ±500°/s, scaling factor = 65.5 LSB/°/s
+ *    - `MPU6050_GYRO_FSCALE_1000`: ±1000°/s, scaling factor = 32.8 LSB/°/s
+ *    - `MPU6050_GYRO_FSCALE_2000`: ±2000°/s, scaling factor = 16.4 LSB/°/s
+ * 5. The converted values are stored in the `GyroXYZ` array of the `sensor` instance.
+ *
+ * @note
+ * - Ensure the MPU6050 sensor has been properly initialized using `initMPU` before calling this function.
+ * - This function assumes the gyroscope is properly configured during initialization.
+ */
 int16_t MPU_get_gyro(MPU6050_t* sensor) {
 	if (sensor->GyroScale != (uint8_t) DISABLE) {
 		uint8_t readBuffer[6];
@@ -241,7 +400,32 @@ int16_t MPU_get_gyro(MPU6050_t* sensor) {
 	}
 }
 
-
+/**
+ * @function MPU_get_temperature
+ *
+ * @brief Reads the temperature data from the MPU6050 sensor.
+ *
+ * This function retrieves the raw temperature data from the MPU6050 sensor, converts it to degrees Celsius,
+ * and stores the result in the `TempOut` field of the provided sensor instance.
+ *
+ * @param sensor       Pointer to an instance of the `MPU6050_t` structure containing the sensor configuration and state.
+ *
+ * @return int16_t     Returns the result of the I2C transaction (`I2C_RETURN_CODE_t`).
+ *                     A value of `I2C_SUCCESS` (0) indicates successful data retrieval.
+ *
+ * @details
+ * 1. Reads 2 bytes of temperature data from the MPU6050's temperature register via I2C communication.
+ * 2. Combines the bytes to form a 16-bit signed value representing the raw temperature.
+ * 3. Converts the raw temperature data to degrees Celsius using the formula:
+ *    \[
+ *    \text{Temperature} = \frac{\text{RawTemp}}{340} + 36.35
+ *    \]
+ * 4. Stores the converted temperature value in the `TempOut` field of the `sensor` instance.
+ *
+ * @note
+ * - Ensure the MPU6050 sensor has been properly initialized using `MPU_init` before calling this function.
+ * - The temperature measurement reflects the internal sensor temperature, which may not correspond to the ambient temperature.
+ */
 int16_t MPU_get_temperature(MPU6050_t* sensor) {
 	uint8_t readBuffer[2];
 	int16_t rawTemp;
@@ -252,7 +436,28 @@ int16_t MPU_get_temperature(MPU6050_t* sensor) {
 	return (int16_t) i2c_return;
 }
 
-
-int16_t MPU_init_lowpass_filter(MPU6050_t* sensor) { //ToDo: Funktion schreiben
-	return 0;
+/**
+ * @function MPU_init_lowpass_filter
+ *
+ * @brief Initializes the low-pass filter settings for the MPU6050 sensor.
+ *
+ * This function configures the MPU6050's digital low-pass filter (DLPF) by writing the specified configuration
+ * value (`LPFiltConfig`) to the sensor's **CONFIG** register. The DLPF affects both the gyroscope and accelerometer
+ * measurements, providing noise reduction and bandwidth control.
+ *
+ * @param sensor       Pointer to an instance of the `MPU6050_t` structure containing the sensor configuration and state.
+ *
+ * @details
+ * 1. The function sends the value of `sensor->LPFiltConfig` to the **CONFIG** register of the MPU6050 using I2C communication.
+ * 2. The low-pass filter setting controls the cutoff frequency for gyroscope and accelerometer signals, as defined by the
+ *    MPU6050 datasheet.
+ * 3. The user must set the desired filter configuration value in the `LPFiltConfig` field of the `sensor` structure
+ *    before calling this function.
+ *
+ * @note
+ * - Ensure the MPU6050 sensor is properly initialized and powered before calling this function.
+ * - Refer to the MPU6050 datasheet for valid DLPF configuration values and their corresponding cutoff frequencies.
+ */
+void MPU_init_lowpass_filter(MPU6050_t* sensor) {
+	i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_CONFIG, sensor->LPFiltConfig);
 }

@@ -69,14 +69,13 @@ int main(void)
 	i2cActivate();
 
 	MPU6050_t MPU1;
-	int8_t testVal = MPU_init(&MPU1, I2C1, i2cAddr_MPU6050, MPU6050_GYRO_FSCALE_250, MPU6050_ACCEL_RANGE_2, 1);
+	int8_t testVal = MPU_init(&MPU1, I2C1, i2cAddr_MPU6050, MPU6050_GYRO_FSCALE_250, MPU6050_ACCEL_RANGE_2, MPU6050_LPBW_94, 1);
 
 	if (testVal == 0)
 	{
 		setRotaryColor(LED_GREEN);
 		/* Erfolgreiche Kommunikation */
-		for (;;)
-		{
+		for (;;) {
 			testVal = MPU_get_angle_from_acceleration(&MPU1);
 			testVal += MPU_get_temperature(&MPU1);
 			testVal += MPU_get_gyro(&MPU1);
@@ -92,9 +91,8 @@ int main(void)
 	{
 		setRotaryColor(LED_RED);
 		/* Fehlgeschlagene Kommunikation */
-		for (;;)
-		{
-			/* Fehlerbehandlung, z. B. LED blinkt langsamer */
+		for (;;) {
+
 		}
 	}
 }
