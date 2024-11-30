@@ -60,7 +60,7 @@ void i2cActivate()
 	i2cEnableDevice(i2c);   // MCAL I2C1 activ
 }
 
-int main(void)
+int main(void) // ToDo: Fragen, was das Testprogramm können soll
 {
 	initRotaryPushButton();
 	initRotaryPushButtonLED();
