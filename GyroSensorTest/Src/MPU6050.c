@@ -11,6 +11,8 @@
 
 #include <MPU6050.h>
 
+//--------------------------- Function Declarations ---------------------------
+
 /**
  * @function MPU_init
  *
@@ -66,7 +68,7 @@ int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t
 
 	sensor->i2c = i2cBus;
 
-	if(i2cAddr == 0x68) {
+	if(i2cAddr == i2cAddr_MPU6050) {
 		sensor->i2cAddress = i2cAddr;
 	}
 	else {
@@ -76,7 +78,7 @@ int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t
 		 * therefore, the standard address is always used
 		 * ToDo: Abklären, ob Addressse setzen nötig, Sensor entsprechend umlöten
 		 */
-		sensor->i2cAddress = (uint8_t) 0x68;
+		sensor->i2cAddress = (uint8_t) i2cAddr_MPU6050;
 	}
 
 	switch (gyroScale) {
@@ -110,13 +112,13 @@ int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t
 	case MPU6050_ACCEL_RANGE_8:
 		sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_8;
 		break;
-	case MPU6050_ACCEL_RANGE_10:
-		sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_10;
+	case MPU6050_ACCEL_RANGE_16:
+		sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_16;
 		break;
 	case DISABLE:
 		sensor->AccelRange = (uint8_t) DISABLE;
 	default:
-		sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_10;
+		sensor->AccelRange = (uint8_t) MPU6050_ACCEL_RANGE_16;
 		break;
 	}
 
@@ -168,7 +170,7 @@ int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t
 			/*
 			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_1, (MPU6050_PWR1_CLKSEL));
 			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_2, (MPU6050_PWR2_ACConXY_GYonZ)); //ToDo: Fragen, wo der Sinn liegt?
-			*/
+			 */
 			if (sensor->AccelRange == (uint8_t) DISABLE) { // Disable acceleration measurement
 				i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_1, (MPU6050_PWR1_CLKSEL));
 				i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_2, (0b00111000));
@@ -280,7 +282,7 @@ int16_t MPU_get_acceleration(MPU6050_t* sensor) {
 			sensor->AccelXYZ[1] = (float) Y / 4096;
 			sensor->AccelXYZ[2] = (float) Z / 4096;
 			break;
-		case MPU6050_ACCEL_RANGE_10:	// Faktor 2048 LSB/g
+		case MPU6050_ACCEL_RANGE_16:	// Faktor 2048 LSB/g
 			sensor->AccelXYZ[0] = (float) X / 2048;
 			sensor->AccelXYZ[1] = (float) Y / 2048;
 			sensor->AccelXYZ[2] = (float) Z / 2048;
@@ -296,25 +298,27 @@ int16_t MPU_get_acceleration(MPU6050_t* sensor) {
 /**
  * @function MPU_get_angle_from_acceleration
  *
- * @brief Calculates the tilt angles of the MPU6050 sensor based on acceleration data.
+ * @brief Computes the tilt angles (alpha and beta) of the MPU6050 sensor based on acceleration data.
  *
- * This function computes the tilt angles (alpha and beta) of the MPU6050 sensor in radians using the
- * acceleration data from the X, Y, and Z axes. The angles are stored in the `AlphaBeta` array of
+ * This function calculates the tilt angles of the MPU6050 sensor in radians using acceleration data
+ * retrieved from the X, Y, and Z axes. The calculated angles are stored in the `AlphaBeta` array of
  * the provided sensor instance.
  *
- * @param sensor       Pointer to an instance of the `MPU6050_t` structure containing the sensor configuration and state.
+ * @param sensor       Pointer to an instance of the `MPU6050_t` structure, which contains the sensor's
+ *                     configuration and current state.
  *
- * @return int16_t     Returns the result of the `getAcceleration` function, which indicates the
- *                     status of the I2C transaction. A value of `I2C_SUCCESS` (0) indicates success.
+ * @return int16_t     Returns the result of the `MPU_get_acceleration` function, indicating the status
+ *                     of the I2C transaction. Typically:
+ *                     - 0 (`I2C_SUCCESS`) indicates success.
+ *                     - Negative values indicate an error.
  *
  * @details
- * 1. Calls the `getAcceleration` function to retrieve the latest acceleration data from the sensor.
- * 2. Converts the acceleration values to radians by multiplying by a constant factor (`π/180`).
- * 3. Calculates the tilt angles:
- *    - `AlphaBeta[0]`: Tilt angle in the X-Z plane (alpha) using the formula `atan(X / Z)`.
- *    - `AlphaBeta[1]`: Tilt angle in the Y-Z plane (beta) using the formula `atan(Y / Z)`.
- * 4. Adjusts the calculated angles based on the sign of the Z-axis acceleration to handle angle wrapping:
- *    - Adds or subtracts π as needed for correct angle representation.
+ * 1. Calls the `MPU_get_acceleration` function to update the sensor's acceleration data.
+ * 2. Extracts the X, Y, and Z-axis acceleration values from the `AccelXYZ` array of the sensor instance.
+ * 3. Computes tilt angles in radians:
+ *    - `AlphaBeta[0]`: Tilt angle in the X-Z plane (alpha) using the formula `atan2(X, Z)`.
+ *    - `AlphaBeta[1]`: Tilt angle in the Y-Z plane (beta) using the formula `atan2(Y, Z)`.
+ * 4. The calculated angles are stored in the `AlphaBeta` array for further use.
  */
 int16_t MPU_get_angle_from_acceleration(MPU6050_t* sensor) {
 	int16_t returnValue = MPU_get_acceleration(sensor);
@@ -331,7 +335,7 @@ int16_t MPU_get_angle_from_acceleration(MPU6050_t* sensor) {
 /**
  * @function MPU_get_gyro
  *
-  * @brief Reads the gyroscope data from the MPU6050 sensor, if enabled.
+ * @brief Reads the gyroscope data from the MPU6050 sensor, if enabled.
  *
  * This function retrieves the rotational velocity values for the X, Y, and Z axes from the MPU6050 sensor,
  * converts them to physical values in degrees per second (°/s), and stores them in the `GyroXYZ` array
@@ -438,6 +442,8 @@ int16_t MPU_get_temperature(MPU6050_t* sensor) {
 
 /**
  * @function MPU_init_lowpass_filter
+ *
+ * ToDo: Abklären, ob eigene Funktion nötig, oder in Init Funktion schreiben?
  *
  * @brief Initializes the low-pass filter settings for the MPU6050 sensor.
  *

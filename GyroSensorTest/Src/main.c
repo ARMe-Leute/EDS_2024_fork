@@ -49,6 +49,7 @@ void i2cActivate()
 	gpioSelectPinMode(portB, PIN9, ALTFUNC);
 	gpioSelectAltFunc(portB, PIN9, AF4);         // PB9 : I2C1 SDA
 	/*
+	 * ToDo: nach Relevanz fragen
 	 * Verwenden Sie auf keinen Fall die MCU-internen Pull-up-Widerstaende!
 	 * Widerstandswerte: jeweils 4k7 fuer SDA und SCL!
 	 */
@@ -69,19 +70,19 @@ int main(void)
 	i2cActivate();
 
 	MPU6050_t MPU1;
-	int8_t testVal = MPU_init(&MPU1, I2C1, i2cAddr_MPU6050, MPU6050_GYRO_FSCALE_250, MPU6050_ACCEL_RANGE_2, MPU6050_LPBW_94, 1);
+	int8_t testVal = MPU_init(&MPU1, I2C1, i2cAddr_MPU6050, MPU6050_GYRO_FSCALE_250, MPU6050_ACCEL_RANGE_2, MPU6050_LPBW_5, 1);
 
 	if (testVal == 0)
 	{
 		setRotaryColor(LED_GREEN);
 		/* Erfolgreiche Kommunikation */
 		for (;;) {
-			testVal = MPU_get_angle_from_acceleration(&MPU1);
-			testVal += MPU_get_temperature(&MPU1);
-			testVal += MPU_get_gyro(&MPU1);
+			testVal = 	MPU_get_angle_from_acceleration(&MPU1);
+			testVal += 	MPU_get_temperature(&MPU1);
+			testVal += 	MPU_get_gyro(&MPU1);
 			// In Grad umrechnen, da besser greifbar
-			MPU1.AlphaBeta[0] = MPU1.AlphaBeta[0]*180/_pi;
-			MPU1.AlphaBeta[1] = MPU1.AlphaBeta[1]*180/_pi;
+			float alpha	= MPU1.AlphaBeta[0]*180/_pi;
+			float beta	= MPU1.AlphaBeta[1]*180/_pi;
 			if (testVal != 0) {
 				setRotaryColor(LED_RED);
 			}
