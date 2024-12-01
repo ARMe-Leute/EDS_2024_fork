@@ -52,10 +52,7 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 			return ++BluetoothModule->initStatus;
 		}
 
-		else if (BluetoothModule->available > 0) {
-			BluetoothModule->counter++;
-			return --BluetoothModule->initStatus;
-		} else {
+		else {
 			BluetoothModule->counter++;
 			return BluetoothModule->initStatus;
 		}
