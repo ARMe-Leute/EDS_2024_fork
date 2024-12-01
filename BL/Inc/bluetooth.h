@@ -24,6 +24,7 @@ typedef struct BluetoothModule {
 	char messageBuffer[USART2_BUFFER_SIZE+1];
 	uint16_t available;
 	uint8_t counter;
+	bool ATInProgress;
 
 }BluetoothModule_t;
 

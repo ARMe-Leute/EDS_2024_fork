@@ -34,9 +34,15 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 		__enable_irq();
 		return ++BluetoothModule->initStatus;
 	case -9:
-		usartSendString(USART2, (char*) "AT");
-		return BluetoothModule->initStatus++;
+		if (BluetoothModule->ATInProgress == false) {
+			BluetoothModule->ATInProgress = true;
+			usartSendString(USART2, (char*) "AT");
+			return ++BluetoothModule->initStatus;
+		} else {
+			return BluetoothModule->initStatus;
+		}
 	case -8:
+		BluetoothModule->ATInProgress=false;
 		if (BluetoothModule->counter > 10) { // after 10 attempts return negative acknowledge
 			return 0x15;
 		}
