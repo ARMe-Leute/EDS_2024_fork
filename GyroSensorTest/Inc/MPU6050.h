@@ -68,19 +68,25 @@
 #define MPU6050_I2C_SLV3_DO             0x66
 
 #define DISABLE                         0xFF
+#define RESTART							0x01
+#define NO_RESTART						0x00
 
 //********** Type Definitions **********
 
 typedef struct MPU6050 {
     I2C_TypeDef* i2c;
-    uint8_t i2cAddress;
-    uint8_t GyroScale;
-    uint8_t AccelRange;
-    uint8_t LPFiltConfig;
-    float TempOut;
-    float GyroXYZ[3];
-    float AccelXYZ[3];
-    float AlphaBeta[2];
+    uint8_t i2c_address;
+    uint8_t gyro_scale;
+    float gyro_scale_factor;
+    uint8_t accel_range;
+    float accel_range_factor;
+    uint8_t low_pass_filt_config;
+    float temperature_out;
+    float temperature_factor;
+    float temperature_offset;
+    float gyro_xyz[3];
+    float accel_xyz[3];
+    float alpha_beta[2];
 } MPU6050_t;
 
 //--------------------------- Function Declarations ---------------------------

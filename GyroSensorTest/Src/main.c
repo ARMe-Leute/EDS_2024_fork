@@ -49,7 +49,6 @@ void i2cActivate()
 	gpioSelectPinMode(portB, PIN9, ALTFUNC);
 	gpioSelectAltFunc(portB, PIN9, AF4);         // PB9 : I2C1 SDA
 	/*
-	 * ToDo: nach Relevanz fragen
 	 * Verwenden Sie auf keinen Fall die MCU-internen Pull-up-Widerstaende!
 	 * Widerstandswerte: jeweils 4k7 fuer SDA und SCL!
 	 */
@@ -60,7 +59,7 @@ void i2cActivate()
 	i2cEnableDevice(i2c);   // MCAL I2C1 activ
 }
 
-int main(void) // ToDo: Fragen, was das Testprogramm können soll
+int main(void) // ToDo: Visualisierung über Oszilloskop, in BALO
 {
 	initRotaryPushButton();
 	initRotaryPushButtonLED();
@@ -70,10 +69,10 @@ int main(void) // ToDo: Fragen, was das Testprogramm können soll
 	i2cActivate();
 
 	MPU6050_t MPU1;
-	int8_t testVal = MPU_init(&MPU1, I2C1, i2cAddr_MPU6050, MPU6050_GYRO_FSCALE_250, MPU6050_ACCEL_RANGE_2, MPU6050_LPBW_5, 1);
+	int8_t testVal = MPU_init(&MPU1, I2C1, i2cAddr_MPU6050, 2, 3, MPU6050_LPBW_5, RESTART);
+	float anclefactor = 180/_pi;
 
-	if (testVal == 0)
-	{
+	if (testVal >= 0) {
 		setRotaryColor(LED_GREEN);
 		/* Erfolgreiche Kommunikation */
 		for (;;) {
@@ -81,15 +80,14 @@ int main(void) // ToDo: Fragen, was das Testprogramm können soll
 			testVal += 	MPU_get_temperature(&MPU1);
 			testVal += 	MPU_get_gyro(&MPU1);
 			// In Grad umrechnen, da besser greifbar
-			float alpha	= MPU1.AlphaBeta[0]*180/_pi;
-			float beta	= MPU1.AlphaBeta[1]*180/_pi;
+			float alpha	= MPU1.alpha_beta[0]*anclefactor;
+			float beta	= MPU1.alpha_beta[1]*anclefactor;
 			if (testVal != 0) {
 				setRotaryColor(LED_RED);
 			}
 		}
 	}
-	else
-	{
+	else {
 		setRotaryColor(LED_RED);
 		/* Fehlgeschlagene Kommunikation */
 		for (;;) {
