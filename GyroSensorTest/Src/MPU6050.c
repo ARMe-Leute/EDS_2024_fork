@@ -212,7 +212,7 @@ int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t
 			step = -4;
 			break;
 
-		case -4: // ToDo: Bitmasken für Sleep-Modi überprüfen, vorher Flämig fragen
+		case -4: // ToDo: Bitmasken für Sleep-Modi überprüfen
 			// PWR Mngt
 			/*
 			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2cAddress, MPU6050_PWR_MGMT_1, (MPU6050_PWR1_CLKSEL));

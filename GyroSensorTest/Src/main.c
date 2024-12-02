@@ -28,14 +28,17 @@
 #include <mcalGPIO.h>
 #include <mcalSPI.h>
 #include <mcalI2C.h>
+#include <mcalSysTick.h>
 #include <RotaryPushButton.h>
+#include <BALO.h>
+#include <ST7735.h>
 #include <MPU6050.h>
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
-void i2cActivate()
+/*void i2cActivate()
 {
 	I2C_TypeDef   *i2c  = I2C1;
 
@@ -48,18 +51,19 @@ void i2cActivate()
 	gpioSelectAltFunc(portB, PIN8, AF4);         // PB8 : I2C1 SCL
 	gpioSelectPinMode(portB, PIN9, ALTFUNC);
 	gpioSelectAltFunc(portB, PIN9, AF4);         // PB9 : I2C1 SDA
-	/*
+
 	 * Verwenden Sie auf keinen Fall die MCU-internen Pull-up-Widerstaende!
 	 * Widerstandswerte: jeweils 4k7 fuer SDA und SCL!
-	 */
+
 	gpioSetOutputType(portB, PIN8, OPENDRAIN);   // Immer externe Pull-up-
 	gpioSetOutputType(portB, PIN9, OPENDRAIN);   // Widerstaende verwenden!!!
 	// Initialisierung des I2C-Controllers
 	i2cInitI2C(i2c, I2C_DUTY_CYCLE_2, 17, I2C_CLOCK_50);
 	i2cEnableDevice(i2c);   // MCAL I2C1 activ
-}
+}*/
+bool timerTrigger;
 
-int main(void) // ToDo: Visualisierung über Oszilloskop, in BALO
+int main(void) // ToDo: Visualisierung über Oszilloskop
 {
 	initRotaryPushButton();
 	initRotaryPushButtonLED();
@@ -70,7 +74,7 @@ int main(void) // ToDo: Visualisierung über Oszilloskop, in BALO
 
 	MPU6050_t MPU1;
 	int8_t testVal = MPU_init(&MPU1, I2C1, i2cAddr_MPU6050, 2, 3, MPU6050_LPBW_5, RESTART);
-	float anclefactor = 180/_pi;
+	float anglefactor = 180/_pi;
 
 	if (testVal >= 0) {
 		setRotaryColor(LED_GREEN);
@@ -80,8 +84,8 @@ int main(void) // ToDo: Visualisierung über Oszilloskop, in BALO
 			testVal += 	MPU_get_temperature(&MPU1);
 			testVal += 	MPU_get_gyro(&MPU1);
 			// In Grad umrechnen, da besser greifbar
-			float alpha	= MPU1.alpha_beta[0]*anclefactor;
-			float beta	= MPU1.alpha_beta[1]*anclefactor;
+			float alpha	= MPU1.alpha_beta[0]*anglefactor;
+			float beta	= MPU1.alpha_beta[1]*anglefactor;
 			if (testVal != 0) {
 				setRotaryColor(LED_RED);
 			}
