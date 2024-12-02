@@ -61,6 +61,52 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 	}
 }
 
+BluetoothATReplyBool_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule){
+
+	if (BluetoothModule->usart == USART2){
+		static int8_t status = -10;
+		BluetoothATReplyBool_t returnValue = {status, false};
+		switch (status) {
+		case -10:
+
+			if (BluetoothModule->ATInProgress == false) {
+				BluetoothModule->ATInProgress = true;
+				usartSendString(USART2, (char*) "AT");
+				returnValue.status = status + 1; // We can go to the next step
+				return returnValue;
+			} else { // We couldn't send the command
+				return returnValue;
+			}
+
+		case -9:
+			status = -10 // Last step, make sure to reset the status, otherwise we can't use the funcction anymore
+			BluetoothModule->ATInProgress = false;
+
+			if (BluetoothModule->available == 2
+					&& strncmp(BluetoothModule->messageBuffer, "OK", 2) == 0) {
+
+				returnValue.status = 0;
+				return returnValue;
+			}
+
+			else {
+				returnValue.status = 0x15;
+				return returnValue;
+			}
+
+		default: // Unknown status, should never be called
+			returnValue.status = 0x15;
+			returnValue.boolean = false;
+			return 0x18;
+		}
+
+	}else{
+		//Todo
+	}
+
+
+}
+
 bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule) {
 	if (BluetoothModule->usart == USART2) {
 		static uint16_t lastIndex;
