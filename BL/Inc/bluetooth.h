@@ -62,7 +62,7 @@ typedef struct BluetoothATReplyBool{
  * The step counter. Begins with a negative number. Once finished, it will be 0.
  * If something didn't work, it will return 0x15 (negative acknowledge).
  *
- * @var BluetoothATReplyBool::string
+ * @var BluetoothATReplyString::string
  * The string a function returns, with max. 20 characters
  */
 typedef struct BluetoothATReplyString{
