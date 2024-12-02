@@ -33,6 +33,23 @@ if (usart == USART2){
 		}
 		__enable_irq();
 		return ++BluetoothModule->initStatus;
+
+	case -9:
+		if (BluetoothModule->counter > 10) { // after 10 attempts return negative acknowledge
+			return 0x15;
+		}
+		BluetoothATReplyBool_t reply;
+		reply = bluetoothGetStatus(BluetoothModule);
+		if(reply.status == 0 && reply.boolean == true){ // We are OK
+			return ++BluetoothModule->initStatus;
+		} else if (reply.status < 0){ // We have steps to do
+			return BluetoothModule->initStatus;
+		} else{ // Something went wrong, try again
+			BluetoothModule->counter++;
+			return --BluetoothModule->initStatus;
+		}
+
+		/*
 	case -9:
 		if (BluetoothModule->ATInProgress == false) {
 			BluetoothModule->ATInProgress = true;
@@ -55,8 +72,9 @@ if (usart == USART2){
 		else {
 			BluetoothModule->counter++;
 			return BluetoothModule->initStatus;
-		}
+		}*/
 	default:
+		 gpioTogglePin(GPIOA, PIN10);
 		return 0;
 	}
 }else{
@@ -72,12 +90,15 @@ BluetoothATReplyBool_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule){
 		switch (status) {
 		case -10:
 
+
 			if (BluetoothModule->ATInProgress == false) {
 				BluetoothModule->ATInProgress = true;
 				usartSendString(USART2, (char*) "AT");
 				returnValue.status = status + 1; // We can go to the next step
 				return returnValue;
 			} else { // We couldn't send the command
+				 gpioTogglePin(GPIOA, PIN10);
+
 				return returnValue;
 			}
 
@@ -144,7 +165,7 @@ void USART2_IRQHandler(void) {
 #define USART2_BUFFER_SIZE 1200 // One second at 9600 BAUD
 #endif
 		 usart2Buffer[usart2BufferIndex++]=USART2->DR & 0xFF;
-		 gpioTogglePin(GPIOA, PIN10);
+		// gpioTogglePin(GPIOA, PIN10);
 
 	}
 
