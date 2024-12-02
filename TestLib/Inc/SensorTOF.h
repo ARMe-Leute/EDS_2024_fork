@@ -143,11 +143,11 @@ typedef enum
 // Enum defining Ranging Profiles for the TOF sensor
 typedef enum
 {
-	DEFAULT_MODE_D         = 1, // Default mode
-	HIGH_SPEED_MODE_S      = 2, // High speed mode
-	HIGH_ACCURACY_MODE_A   = 3, // High accuracy mode
-	LONG_RANGE_MODE_R      = 4, // Long range mode
-	RANGINGPROFILE_ERROR   = 5  // Error state
+	TOF_DEFAULT_MODE_D         = 1, // Default mode
+	TOF_HIGH_SPEED_MODE_S      = 2, // High speed mode
+	TOF_HIGH_ACCURACY_MODE_A   = 3, // High accuracy mode
+	TOF_LONG_RANGE_MODE_R      = 4, // Long range mode
+	TOF_RANGINGPROFILE_ERROR   = 5  // Error state
 } Ranging_Profiles_t;
 
 // Enum for VCSEL Period Types (Pre-range and Final-range)
@@ -188,8 +188,8 @@ typedef struct
 typedef struct TOFSensor TOFSensor_t;
 
 struct TOFSensor {
-	uint16_t TOF_address_used;         // The sensor's I2C address (e.g., 0x29 for VL53LOX) 		//ToDO tauschen I2C Bus ganz oben
 	I2C_TypeDef *i2c_tof;              // Pointer to the I2C peripheral (e.g., I2C1, I2C2)
+	uint16_t TOF_address_used;         // The sensor's I2C address (e.g., 0x29 for VL53LOX) 		//ToDO tauschen I2C Bus ganz oben
 	uint16_t Ranging_Profiles_t;       // The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
 	uint16_t distanceFromTOF;          // The current distance measurement (in mm)
 	uint16_t measuredRange;            // The maximum measurable range of the sensor
@@ -197,13 +197,13 @@ struct TOFSensor {
 	uint32_t Ranging_Profile_time;	   // Time for the execution for readcontinuos
 
 	// Function pointers for initializing, configuring, and retrieving measurements from the TOF sensor
-	void (*initialize)(TOFSensor_t*, uint16_t, I2C_TypeDef*, uint16_t, uint16_t);  // Function for initializing the sensor
+	void (*initialize)(TOFSensor_t*, I2C_TypeDef*, uint16_t, uint16_t, uint16_t);  // Function for initializing the sensor
 	void (*configure)(TOFSensor_t*, uint16_t, bool);                               // Function for configuring the sensor
 	uint16_t (*getMeasurement)(TOFSensor_t*);                                      // Function for retrieving the current measurement
 };
 
 // Function prototypes for initializing and configuring the TOF sensor
-extern void initializeTOFSensor(TOFSensor_t* sensor, uint16_t TOF_address_used, I2C_TypeDef *i2c_tof, uint16_t Ranging_Profiles_t, uint16_t measuredRange);
+extern void initializeTOFSensor(TOFSensor_t* sensor, I2C_TypeDef *i2c_tof, uint16_t TOF_address_used, uint16_t Ranging_Profiles_t, uint16_t measuredRange);
 extern void configureTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t, bool enable);
 
 
@@ -650,6 +650,10 @@ bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t newAddr);
  * @param[out]:  uint16_t *range							Pointer to store the measured distance in millimeters.
  *
  * @returns:     bool: true if the distance was successfully read, false otherwise.
+ *
+ * @warning: 	NOT FULL IMPLEMENTED YET
+ *
+ *
  */
 bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *range);
 

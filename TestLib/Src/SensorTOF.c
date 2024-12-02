@@ -95,9 +95,9 @@ bool TOF_continuous_mode = false;
 
 // Function to initialize the TOF sensor
 // Initializes the sensor with given address, I2C interface, ranging profile, and measurement range.
-void initializeTOFSensor(TOFSensor_t* sensor, uint16_t TOF_address_used, I2C_TypeDef *i2c_tof, uint16_t Ranging_Profiles_t, uint16_t measuredRange) {
-    sensor->TOF_address_used = TOF_address_used;  // Set the TOF sensor address
-    sensor->i2c_tof = i2c_tof;                    // Set the I2C interface (e.g., I2C1, I2C2)
+void initializeTOFSensor(TOFSensor_t* sensor, I2C_TypeDef *i2c_tof, uint16_t TOF_address_used, uint16_t Ranging_Profiles_t, uint16_t measuredRange) {
+	sensor->i2c_tof = i2c_tof;                    // Set the I2C interface (e.g., I2C1, I2C2)
+	sensor->TOF_address_used = TOF_address_used;  // Set the TOF sensor address
     sensor->Ranging_Profiles_t = Ranging_Profiles_t;  // Set the ranging profile (measurement mode)
     sensor->measuredRange = measuredRange;        // Set the maximum measurable range
     sensor->distanceFromTOF = 0;                  // Initialize the measured distance to zero
@@ -655,9 +655,6 @@ bool TOF_start_continuous(TOFSensor_t* TOFSENS)
 	uint32_t period_ms = TOFSENS->Ranging_Profile_time;
 	I2C_RETURN_CODE_t i2c_return;
 
-	//uint16_t TOF_i2caddress_used;
-
-	//TOF_i2caddress_used = (uint16_t)TOFSENS->i2cAddress;
 	TOF_address_used = TOFSENS->TOF_address_used;
 
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x01);
@@ -874,7 +871,7 @@ bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *rang
 }
 
 
-bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)		//ToDo TOF_MODE_1 bis 4
+bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)
 {
 
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -883,54 +880,54 @@ bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)		//ToDo TOF_MODE_1 bis 4
 	bool value = false;
 	bool prevalue = false;
     switch (TOFSENS->Ranging_Profiles_t) {
-    case DEFAULT_MODE_D:
+    case TOF_DEFAULT_MODE_D:
     	if(TOF_set_measurement_timing_budget(TOFSENS, 30000) == true)
     	{
-    		TOFSENS->Ranging_Profiles_t = DEFAULT_MODE_D;
+    		TOFSENS->Ranging_Profiles_t = TOF_DEFAULT_MODE_D;
     		TOFSENS->Ranging_Profile_time = 30;
     		value = true;
     		break;
     	}
     	else
     	{
-        	TOFSENS->Ranging_Profiles_t = RANGINGPROFILE_ERROR;
-        	//ToDO return value = RANGINGPROFILE_ERROR
+        	TOFSENS->Ranging_Profiles_t = TOF_RANGINGPROFILE_ERROR;
+        	value = TOF_RANGINGPROFILE_ERROR;
     		return false;
     		break;
     	}
 
-    case HIGH_SPEED_MODE_S:
+    case TOF_HIGH_SPEED_MODE_S:
         if(TOF_set_measurement_timing_budget(TOFSENS, 20000) == true)
         {
-        	TOFSENS->Ranging_Profiles_t = HIGH_SPEED_MODE_S;
+        	TOFSENS->Ranging_Profiles_t = TOF_HIGH_SPEED_MODE_S;
         	TOFSENS->Ranging_Profile_time = 20;
         	value = true;
         	break;
         }
         else
         {
-        	value = false;
-        	TOFSENS->Ranging_Profiles_t = RANGINGPROFILE_ERROR;
+        	value = TOF_RANGINGPROFILE_ERROR;
+        	TOFSENS->Ranging_Profiles_t = TOF_RANGINGPROFILE_ERROR;
 
         	break;
         }
 
-    case HIGH_ACCURACY_MODE_A:
+    case TOF_HIGH_ACCURACY_MODE_A:
         if(TOF_set_measurement_timing_budget(TOFSENS, 200) == true)
         {
-        	TOFSENS->Ranging_Profiles_t = HIGH_ACCURACY_MODE_A;
+        	TOFSENS->Ranging_Profiles_t = TOF_HIGH_ACCURACY_MODE_A;
         	TOFSENS->Ranging_Profile_time = 200000;
         	value = true;
         	break;
         }
         else
         {
-        	value = false;
-        	TOFSENS->Ranging_Profiles_t = RANGINGPROFILE_ERROR;
+        	value = TOF_RANGINGPROFILE_ERROR;
+        	TOFSENS->Ranging_Profiles_t = TOF_RANGINGPROFILE_ERROR;
         	break;
         }
 
-    case LONG_RANGE_MODE_R:
+    case TOF_LONG_RANGE_MODE_R:
     	if(TOF_set_measurement_timing_budget(TOFSENS, 33) == true)
     	        {
     	        	value = true;
@@ -938,8 +935,8 @@ bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)		//ToDo TOF_MODE_1 bis 4
     	        }
     	        else
     	        {
-    	        	value = false;
-    	        	TOFSENS->Ranging_Profiles_t = RANGINGPROFILE_ERROR;
+    	        	value = TOF_RANGINGPROFILE_ERROR;
+    	        	TOFSENS->Ranging_Profiles_t = TOF_RANGINGPROFILE_ERROR;
     	        	break;
     	        }
 
@@ -952,7 +949,8 @@ bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)		//ToDo TOF_MODE_1 bis 4
     	else
     	{
     		prevalue = false;
-    		TOFSENS->Ranging_Profiles_t = RANGINGPROFILE_ERROR;
+        	value = TOF_RANGINGPROFILE_ERROR;
+    		TOFSENS->Ranging_Profiles_t = TOF_RANGINGPROFILE_ERROR;
     		break;
     	}
 
@@ -963,14 +961,14 @@ bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)		//ToDo TOF_MODE_1 bis 4
     	else
     	{
 
-    		prevalue = false;
-    		TOFSENS->Ranging_Profiles_t = RANGINGPROFILE_ERROR;
+        	value = TOF_RANGINGPROFILE_ERROR;
+    		TOFSENS->Ranging_Profiles_t = TOF_RANGINGPROFILE_ERROR;
     		break;
     	}
 
     	if(TOF_set_vcsel_pulse_period(TOFSENS, VcselPeriodFinalRange, 14) == true && prevalue == true)
     	{
-        	TOFSENS->Ranging_Profiles_t = LONG_RANGE_MODE_R;
+        	TOFSENS->Ranging_Profiles_t = TOF_LONG_RANGE_MODE_R;
         	TOFSENS->Ranging_Profile_time = 33000;
 
     		break;
@@ -979,7 +977,8 @@ bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)		//ToDo TOF_MODE_1 bis 4
     	else
     	{
     		prevalue = false;
-    		TOFSENS->Ranging_Profiles_t = RANGINGPROFILE_ERROR;
+        	value = TOF_RANGINGPROFILE_ERROR;
+    		TOFSENS->Ranging_Profiles_t = TOF_RANGINGPROFILE_ERROR;
     		break;
     	}
 

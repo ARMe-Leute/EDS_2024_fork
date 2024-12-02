@@ -55,7 +55,7 @@ void visualisationStart(void)
 
 	// welcome massage
 	tftPrint("----------------",0,10,0);
-	tftPrint("TimeofFlight Sensor",0,30,0);
+	tftPrint("TimeOfFlight Sensor",0,30,0);
 	tftPrint("Philipp & Andreas",0,50,0);
 	tftPrint("----------------",0,70,0);
 
@@ -171,7 +171,7 @@ void visualisationMenuGridFocus(int32_t position, uint16_t colorDefault, uint16_
  * 				 bool initedTOF:		flag if TOF is initialized
  * 				 bool inited3DG:		flag if 3DG is initialized
  */
-void visualisationMenu(SCREEN_PAGES_t page, bool initedTOF, bool inited3DG)
+void visualisationMenu(SCREEN_PAGES_t page, bool initedTOF, bool inited3DG, TOFSensor_t* TOFSENS)
 {
 	// clear content
 	visualisationClearBody();
@@ -192,17 +192,13 @@ void visualisationMenu(SCREEN_PAGES_t page, bool initedTOF, bool inited3DG)
 		// show if sensor is not connected
 		if(initedTOF == false)
 		{
-			tftPrint("Mode", 3 + tftGetWidth()/2, 39, 0);
+			tftPrint("(discon.)", 3 + tftGetWidth()/2, 39, 0);
 		}
 
 		// 3. Submenu
-		tftPrint("Ranging", 28 + tftGetWidth()/2, 20 + tftGetHeight()/2, 0);
+		tftPrint("Mode", 28 + tftGetWidth()/2, 20 + tftGetHeight()/2, 0);
 
-		// show if sensor is not connected
-		if(inited3DG == false)
-		{
-			tftPrint("(discon.)", 3 + tftGetWidth()/2, 32 + tftGetHeight()/2, 0);
-		}
+
 
 		// 4. Submenu
 		tftPrint("INFO", 24, 20 + tftGetHeight()/2, 0);
@@ -217,10 +213,34 @@ void visualisationMenu(SCREEN_PAGES_t page, bool initedTOF, bool inited3DG)
 		tftPrint("Read distance with", POS_SCREEN_LINE_1);
 		tftPrint("TOF Sensor:", POS_SCREEN_LINE_2);
 		tftPrint("     mm      ", POS_SCREEN_LINE_4);
+
 		tftPrint("- PRESS TO GO BACK-", POS_SCREEN_LINE_10);
 		break;
 	case SCREEN_PAGE3:
 		visualisationMenuGrid(GRID1, tft_WHITE);
+
+		tftPrint("Current Mode", POS_SCREEN_LINE_3);
+		switch(TOFSENS->Ranging_Profiles_t) {
+		    case TOF_DEFAULT_MODE_D:
+		        tftPrint("DEFAULT        ", POS_SCREEN_LINE_4);
+		        break;
+
+		    case TOF_HIGH_SPEED_MODE_S:
+		        tftPrint("HIGH SPEED     ", POS_SCREEN_LINE_4);
+		        break;
+
+		    case TOF_HIGH_ACCURACY_MODE_A:
+		        tftPrint("HIGH ACCURACY  ", POS_SCREEN_LINE_4);
+		        break;
+
+		    case TOF_LONG_RANGE_MODE_R:
+		        tftPrint("LONG RANGE     ", POS_SCREEN_LINE_4);
+		        break;
+
+		    default:
+		        tftPrint("RANGINGERROR   ", POS_SCREEN_LINE_4);
+		        break;
+		}
 
 		tftPrint("- PRESS TO GO BACK-", POS_SCREEN_LINE_10);
 		break;
@@ -292,6 +312,8 @@ void visualisationShowError(SCREEN_PAGES_t page)
  */
 void visualisationTOF(TOFSensor_t* TOFSENS, uint16_t distance, uint16_t *olddistance)
 {
+
+
 	// if value is not out of range
 	if(TOFSENS->distanceFromTOF != TOF_VL53L0X_OUT_OF_RANGE)
 	{
@@ -317,11 +339,24 @@ void visualisationTOF(TOFSensor_t* TOFSENS, uint16_t distance, uint16_t *olddist
 }
 
 
-void visualisationRangingProfileTOF(TOFSensor_t* TOFSENS){
-	tftPrint("Current Mode", POS_SCREEN_LINE_3);
-
-	tftPrint("DEFAULT MODE", POS_SCREEN_LINE_6);
-
+void visualisationRangingProfileTOF(MODE_PAGES_t* MODE){
+	switch((uint16_t) MODE)
+	{
+		case DEFAULTMODE:
+			tftPrint("DEFAULT MODE      ", POS_SCREEN_LINE_6);
+			break;
+		case HIGHSPEEDMODE:
+			tftPrint("HIGH SPEED MODE   ", POS_SCREEN_LINE_6);
+			break;
+		case HIGHACCURACYMODE:
+			tftPrint("HIGH ACCURACY MODE", POS_SCREEN_LINE_6);
+			break;
+		case LONGRANGEMODE:
+			tftPrint("LONG RANGE MODE   ", POS_SCREEN_LINE_6);
+			break;
+		default:
+			break;
+	}
 
 
 }
@@ -518,7 +553,7 @@ void visualisationSensorInit(VIS_SENSOR_INIT_t step)
  * 				 bool inited3DG:					flag if 3DG is inited
  * 				 ORIENTATION_SCREEN_t orientation:	destination orientation
  */
-void visualisationFlip(SCREEN_PAGES_t page, bool initedTOF, bool inited3DG, ORIENTATION_SCREEN_t orientation)
+void visualisationFlip(SCREEN_PAGES_t page, bool initedTOF, bool inited3DG, ORIENTATION_SCREEN_t orientation,  TOFSensor_t* TOFSENS)
 {
 	// store orientation
 	screen_orientation = orientation;
@@ -537,7 +572,7 @@ void visualisationFlip(SCREEN_PAGES_t page, bool initedTOF, bool inited3DG, ORIE
 	// reload screen in right orientation
 	tftFillRect(0, 0, tftGetWidth(), 14, tft_BLACK);
 
-	visualisationMenu(page, initedTOF, inited3DG);
+	visualisationMenu(page, initedTOF, inited3DG, TOFSENS);
 
 	visualisationHeader();
 }

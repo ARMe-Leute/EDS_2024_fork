@@ -39,7 +39,7 @@
 
 // Time timer to check Button input, execute
 // Menu change, calculate 3DG rotation data
-uint16_t timeTimerExec = 50;
+uint16_t timeTimerExec = 30;
 
 // Time timer for visualization
 #define timeTimerVisu (100)
@@ -119,11 +119,10 @@ int main(void)
 	TOFSensor_t TOF_Sensor_1;
 
 	// Initialisieren des TOF-Sensors
-	initializeTOFSensor(&TOF_Sensor_1, TOF_ADDR_VL53LOX, I2C1, DEFAULT_MODE_D, distance);		//ToDo Wert noch richtig übergeben
+	initializeTOFSensor(&TOF_Sensor_1, I2C1, TOF_ADDR_VL53LOX, TOF_DEFAULT_MODE_D, distance);		//ToDo Wert noch richtig übergeben
 
 	// Konfigurieren und Aktivieren des Sensors
-	configureTOFSensor(&TOF_Sensor_1, DEFAULT_MODE_D, true); // Aktiviert den Sensor
-	// infinity loop to execute software
+	configureTOFSensor(&TOF_Sensor_1, TOF_DEFAULT_MODE_D, true); // Aktiviert den Sensor
 
 	TOF_set_ranging_profile(&TOF_Sensor_1);
 
@@ -143,11 +142,9 @@ int main(void)
 			// switch case for different screen pages
 			switch(page)
 			{
-			//main menu
 			case SCREEN_MAIN:
-				// go back if button was pressed
 				if(buttonPushed)
-				{
+					{
 					page = (uint16_t)position % 4 + 1;
 
 					// check if it is tried to go to the page of an not initialized sensor
@@ -158,12 +155,18 @@ int main(void)
 						visualisationShowError(SCREEN_PAGE1);
 					}
 
+					if(page == 3 && initedTOF == false)
+					{
+						page = 0;
+
+						visualisationShowError(SCREEN_PAGE1);
+					}
 
 
 					// change menu page
-					visualisationMenu(page, initedTOF, inited3DG);
+					visualisationMenu(page, initedTOF, inited3DG, &TOF_Sensor_1);
 					initSubMenu(page, &TOF_Sensor_1);
-				}
+					}
 
 				if(oldPosition != position)
 				{
@@ -175,13 +178,10 @@ int main(void)
 
 			// init I2C page
 			case SCREEN_PAGE1:
-				// go back if button was pressed
 				if(buttonPushed)
 				{
 					exitMenu = EXIT_FROMSUB1;
 				}
-
-				// init i2c 1 or 2
 				switch(i2cInitPort)
 				{
 				case I2C_1:
@@ -196,28 +196,52 @@ int main(void)
 
 			// TOF page
 			case SCREEN_PAGE2:
-				// go back if button was pressed
 				if(buttonPushed)
 				{
 					TOF_stop_continuous(&TOF_Sensor_1);
 					exitMenu = EXIT_FROMSUB2;
 				}
-
 				TOF_read_continuous_distance(&TOF_Sensor_1);
 				break;
 
-			// 2DG page
+			// Ranging Mode Page page
 			case SCREEN_PAGE3:
+				position = getRotaryPosition();
+				uint16_t MODE = (uint16_t)position % 4 + 1;
+				visualisationRangingProfileTOF(MODE);
+
 				if(buttonPushed)
 				{
-					//execution code
+					configureTOFSensor(&TOF_Sensor_1, MODE, true);
+					TOF_set_ranging_profile(&TOF_Sensor_1);
+
+					switch(MODE){		//change timerexecution time to recommended +3ms to make shure works
+					case 1:
+						timeTimerExec = 30;
+						break;
+					case 2:
+						timeTimerExec = 23;
+						break;
+					case 3:
+						timeTimerExec = 203;
+						break;
+					case 4:
+						timeTimerExec = 36;
+						break;
+					default:
+						timeTimerExec = 30;
+						break;
+					}
+					TimerExec = 0UL;
+					TimerVisu = 0UL;
+					TimerLED = 0UL;
+					Timer3DG = 0UL;
+
 					exitMenu = EXIT_FROMSUB3;
 				}
 				break;
 
-			// INFO page
 			case SCREEN_PAGE4:
-				// go back if button was pressed
 				if(buttonPushed)
 				{
 					exitMenu = EXIT_FROMSUB4;
@@ -230,7 +254,7 @@ int main(void)
 			{
 				page = SCREEN_MAIN;
 				setRotaryPosition(exitMenu);
-				visualisationMenu(page, initedTOF, inited3DG);
+				visualisationMenu(page, initedTOF, inited3DG, &TOF_Sensor_1);
 
 				exitMenu = EXIT_FALSE;
 			}
@@ -252,7 +276,7 @@ int main(void)
 				visualisationTOF(&TOF_Sensor_1, distance, &olddistance);
 				break;
 			case SCREEN_PAGE3:
-				visualisationRangingProfileTOF(&TOF_Sensor_1);
+				//visualisationRangingProfileTOF(mode);
 				break;
 			case SCREEN_PAGE4:
 				break;
@@ -333,8 +357,7 @@ void initSubMenu(SCREEN_PAGES_t page, TOFSensor_t* TOFSENS)
 
 		// reset sensor initialization
 		initedTOF = false;
-		inited3DG = false;
-			break;
+		break;
 	case SCREEN_PAGE2:
 		TOF_start_continuous(TOFSENS);
 			break;

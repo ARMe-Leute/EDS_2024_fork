@@ -52,6 +52,19 @@ typedef enum
 	SCREEN_PAGE4	= 4,  // page 4
 }SCREEN_PAGES_t;
 
+
+// screen enum to be visualized
+typedef enum
+{
+	DEFAULTMODE 		= 1,  // Main screen
+	HIGHSPEEDMODE		= 2,  // page 1
+	HIGHACCURACYMODE	= 3,  // page 2
+	LONGRANGEMODE		= 4,  // page 3
+
+}MODE_PAGES_t;
+
+
+
 // enum for sensor init the right sensor
 typedef enum
 {
@@ -120,7 +133,7 @@ void visualisationMenuGridFocus(int32_t position, uint16_t colorDefault, uint16_
  * 				 bool initedTOF:		flag if TOF is initialized
  * 				 bool inited3DG:		flag if 3DG is initialized
  */
-void visualisationMenu(SCREEN_PAGES_t page, bool initedTOF, bool inited3DG);
+void visualisationMenu(SCREEN_PAGES_t page, bool initedTOF, bool inited3DG, TOFSensor_t* TOFSENS);
 
 /*
  * @function:	 visualisationClearBody
@@ -151,7 +164,7 @@ void visualisationTOF(TOFSensor_t* TOFSENS, uint16_t distance, uint16_t *olddist
 
 
 
-void visualisationRangingProfileTOF(TOFSensor_t* TOFSENS);
+void visualisationRangingProfileTOF(MODE_PAGES_t* MODE);
 
 
 
@@ -206,7 +219,7 @@ void visualisationSensorInit(VIS_SENSOR_INIT_t step);
  * 				 bool inited3DG:					flag if 3DG is inited
  * 				 ORIENTATION_SCREEN_t orientation:	destination orientation
  */
-void visualisationFlip(SCREEN_PAGES_t page, bool initedTOF, bool inited3DG, ORIENTATION_SCREEN_t orientation);
+void visualisationFlip(SCREEN_PAGES_t page, bool initedTOF, bool inited3DG, ORIENTATION_SCREEN_t orientation,  TOFSensor_t* TOFSENS);
 
 // for BALA2024
 #ifdef BALA2024
