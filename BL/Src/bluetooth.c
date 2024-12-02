@@ -117,6 +117,11 @@ BluetoothATReplyBool_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule){
 				returnValue.status = 0x15;
 				return returnValue;
 			}
+		case -8: //MAC Anfragen
+		status=-7
+		case -7: //MAC auswerten
+			statu = 0
+		case -6: // Verbindung abfragen
 
 		default: // Unknown status, should never be called
 			returnValue.status = 0x15;
