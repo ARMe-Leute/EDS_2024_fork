@@ -88,6 +88,8 @@ int main(void)
 			}
 
 			mode=MAIN_LOOP; // After setup switch to main loop
+			 gpioTogglePin(GPIOA, PIN10);
+
 			break; //case MAIN_INIT
 
 		// Loop forever
