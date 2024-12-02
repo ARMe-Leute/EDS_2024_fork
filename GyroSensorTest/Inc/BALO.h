@@ -2,7 +2,8 @@
 #define BALO_H_
 
 // use define BALA2024 for HW DemoBoard Balancer V1.0
-#define BALA2024
+//#define BALA2024
+#define PIGGYBAG
 
 #define DELAY_red      (900)
 #define DELAY_green    (1500)

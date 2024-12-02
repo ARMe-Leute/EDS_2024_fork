@@ -29,6 +29,7 @@
 #include <mcalSPI.h>
 #include <mcalI2C.h>
 #include <mcalSysTick.h>
+
 #include <RotaryPushButton.h>
 #include <BALO.h>
 #include <ST7735.h>
@@ -38,41 +39,95 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
-bool timerTrigger;
 
-int main(void) // ToDo: Visualisierung über Oszilloskop
+/* declaration for the timer events to schedule the process (-es)
+*/
+bool timerTrigger = false;
+
+// Declaration  Timer1 = Main Prog
+// 				ST7725_Timer delay Counter
+uint32_t	Timer1 = 0UL;
+uint32_t    ST7735_Timer = 0UL;
+uint32_t    I2C_Timer = 0UL;
+uint32_t	Temperature_Timer = 0UL;
+
+// This is the Array, of all Timer-Variables
+uint32_t *timerList[] = { &I2C_Timer, &ST7735_Timer, &Temperature_Timer};
+// size of the array  are calculated
+size_t    arraySize = sizeof(timerList)/sizeof(timerList[0]);
+// StepTask Time for the main process with the period of xx ms
+#define StepTaskTime 6
+
+int main(void)
 {
-	initRotaryPushButton();
-	initRotaryPushButtonLED();
-	setRotaryColor(LED_BLACK);
-
-	/* I²C initialisieren */
-	i2cActivate();
-
+	uint32_t   	i2cTaskTime = 50UL;
+	uint32_t	temperature_refresh = (i2cTaskTime*0.2f);
+	uint8_t 	i = 0;
 	MPU6050_t MPU1;
-	int8_t testVal = MPU_init(&MPU1, I2C1, i2cAddr_MPU6050, 2, 3, MPU6050_LPBW_5, RESTART);
 	float anglefactor = 180/_pi;
+	float alphaBeta[2];
+	char output[10];
 
-	if (testVal >= 0) {
-		setRotaryColor(LED_GREEN);
-		/* Erfolgreiche Kommunikation */
-		for (;;) {
-			testVal = 	MPU_get_angle_from_acceleration(&MPU1);
-			testVal += 	MPU_get_temperature(&MPU1);
-			testVal += 	MPU_get_gyro(&MPU1);
-			// In Grad umrechnen, da besser greifbar
-			float alpha	= MPU1.alpha_beta[0]*anglefactor;
-			float beta	= MPU1.alpha_beta[1]*anglefactor;
-			if (testVal != 0) {
-				setRotaryColor(LED_RED);
+	BALOsetup();
+	LED_red_on;
+
+	// Inits needed for TFT Display
+	// Initialisiert den Systick-Timer
+	systickInit(SYSTICK_1MS);
+	spiInit();
+	tftInitR(INITR_REDTAB);
+
+	//display setup
+	tftSetRotation(LANDSCAPE_FLIP);
+	tftSetFont((uint8_t *)&SmallFont[0]);
+	tftFillScreen(tft_BLACK);
+
+	/* initialize the rotary push button module */
+	initRotaryPushButton();
+
+	systickSetMillis(&I2C_Timer, i2cTaskTime);
+	systickSetMillis(&Temperature_Timer, temperature_refresh);
+
+	LED_red_off;
+	tftPrintColor((char *)"MPU6050 Tmp.:",0,0,tft_MAGENTA);
+
+	/* Sensor initialisieren */
+
+	int8_t testVal = MPU_init(&MPU1, I2C1, i2cAddr_MPU6050, 2, 3, MPU6050_LPBW_5, NO_RESTART);
+
+
+	while (1)
+	{
+		if (true == timerTrigger && testVal >= 0)
+		{
+			systickUpdateTimerList((uint32_t *) timerList, arraySize);
+		}
+
+		if (isSystickExpired(I2C_Timer))
+		{
+			systickSetTicktime(&I2C_Timer, i2cTaskTime);
+			testVal = MPU_get_angle_from_acceleration(&MPU1);
+			alphaBeta[0] = MPU1.alpha_beta[0];
+			alphaBeta[1] = MPU1.alpha_beta[1];
+
+			if ((alphaBeta[0]*anglefactor < -10) || (alphaBeta[0]*anglefactor > 10) || (alphaBeta[1]*anglefactor < -10) || (alphaBeta[1]*anglefactor > 10))
+			{
+				setRotaryColor(LED_RED); // Bei Winkelabweichung von ±10° von Nulllage
 			}
-		}
-	}
-	else {
-		setRotaryColor(LED_RED);
-		/* Fehlgeschlagene Kommunikation */
-		for (;;) {
+			else
+			{
+				setRotaryColor(LED_GREEN);
+			}
+			AlBeOszi(alphaBeta);
+			i +=1;
+			if (i % temperature_refresh == 0) {
+				MPU_get_temperature(&MPU1);
+				sprintf(output, "%.1f C", MPU1.temperature_out);
+				tftPrintColor((char *)output,(ST7735_TFTWIDTH-20),0,tft_MAGENTA);
+				i = 0;
+			}
+		} // end if systickexp
 
-		}
-	}
+	} //end while
+	return 0;
 }

@@ -31,6 +31,7 @@ Hardware Configuration
 #define __VCP_HW_CONFIG__
 
 /***********************************************************/
+
 #ifdef PIGGYBAG
 	//Define Display Piggyback
 
@@ -64,14 +65,14 @@ Hardware Configuration
 #ifdef BALA2024
 //Define Display BALA2042_V2.0
 
-/****
+/***
  * RST - Reset 			PB4
  * DC  - Data/Command	PB5
  * CS  - ChipSelect		PA15
  * MOSI -				PA7
  * CLK					PA5
- *
  */
+
 
 	#define ST7735_SPI_PORT		GPIOA
 	#define ST7735_CLK			PIN5
