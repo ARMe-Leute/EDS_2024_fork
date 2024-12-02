@@ -192,11 +192,11 @@ void visualisationMenu(SCREEN_PAGES_t page, bool initedTOF, bool inited3DG)
 		// show if sensor is not connected
 		if(initedTOF == false)
 		{
-			tftPrint("(discon.)", 3 + tftGetWidth()/2, 39, 0);
+			tftPrint("Mode", 3 + tftGetWidth()/2, 39, 0);
 		}
 
 		// 3. Submenu
-		tftPrint("3DG", 28 + tftGetWidth()/2, 20 + tftGetHeight()/2, 0);
+		tftPrint("Ranging", 28 + tftGetWidth()/2, 20 + tftGetHeight()/2, 0);
 
 		// show if sensor is not connected
 		if(inited3DG == false)
@@ -221,16 +221,6 @@ void visualisationMenu(SCREEN_PAGES_t page, bool initedTOF, bool inited3DG)
 		break;
 	case SCREEN_PAGE3:
 		visualisationMenuGrid(GRID1, tft_WHITE);
-		tftPrint("Read rotation with", POS_SCREEN_LINE_1);
-		tftPrint("3DG Sensor:", POS_SCREEN_LINE_2);
-		tftPrint("Rot x:", POS_SCREEN_LINE_4);
-		tftPrint("Rot y:", POS_SCREEN_LINE_7);
-
-		tftDrawFastVLine(tftGetWidth()/2 - 2, (tftGetHeight()/2 + 8) - 28, 56, tft_WHITE);
-		tftDrawFastHLine(4, tftGetHeight()/2 + 8, tftGetWidth() - 9, tft_WHITE);
-
-		tftPrint("x", tftGetWidth()/2 - 13, tftGetHeight() - 35, 0);
-		tftPrint("y", tftGetWidth() - 10, tftGetHeight()/2 - 7, 0);
 
 		tftPrint("- PRESS TO GO BACK-", POS_SCREEN_LINE_10);
 		break;
@@ -281,7 +271,7 @@ void visualisationShowError(SCREEN_PAGES_t page)
 			tftPrint("TOF-sensor", 40, 40, 0);
 			break;
 		case SCREEN_PAGE2:
-			tftPrint("3DG-sensor", 40, 40, 0);
+			tftPrint("Ranging-Mode", 40, 40, 0);
 			break;
 		default:
 			break;
@@ -328,7 +318,9 @@ void visualisationTOF(TOFSensor_t* TOFSENS, uint16_t distance, uint16_t *olddist
 
 
 void visualisationRangingProfileTOF(TOFSensor_t* TOFSENS){
-	tftPrint("DEFAULT MODE", POS_SCREEN_LINE_4);
+	tftPrint("Current Mode", POS_SCREEN_LINE_3);
+
+	tftPrint("DEFAULT MODE", POS_SCREEN_LINE_6);
 
 
 

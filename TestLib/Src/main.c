@@ -101,18 +101,6 @@ int main(void)
 	uint16_t distance = 10;
 	uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
 
-	// variables to store values for 3DG communication
-	uint8_t getRawDataCounter = 0;
-	float XYZ_fastMean[3] = {0,0,0};
-	float XDataList[4] = {0,0,0,0};
-	float YDataList[4] = {0,0,0,0};
-	float ZDataList[4] = {0,0,0,0};
-	float XYZ_Mean[3] = {0,0,0};
-	float rotX = 0;
-
-
-	// orientation of the display, used to flip screen
-	ORIENTATION_SCREEN_t orientation = ORIENTATION_1;
 
 	// timer variables
 	uint32_t TimerExec = 0UL;
@@ -152,33 +140,6 @@ int main(void)
 			position = getRotaryPosition();
 			buttonPushed = getRotaryPushButton();
 
-			// calculate fast mean with four last values
-			XYZ_fastMean[0] = fastMean(XDataList, 4);
-			XYZ_fastMean[1] = fastMean(YDataList, 4);
-			XYZ_fastMean[2] = fastMean(ZDataList, 4);
-
-			// recursive mean calculation
-			XYZ_Mean[0] = 0.25 * XYZ_fastMean[0] + 0.75 * XYZ_Mean[0];
-			XYZ_Mean[1] = 0.25 * XYZ_fastMean[1] + 0.75 * XYZ_Mean[1];
-			XYZ_Mean[2] = 0.25 * XYZ_fastMean[2] + 0.75 * XYZ_Mean[2];
-
-			// get rotation angle
-			//getAngleFromAcc(XYZ_Mean, &rotX, &rotY);
-			//getAngleFromAcc(int16_t *xyz, float *AlphaBeta)
-
-			rotX = -1;
-			// check if display needs to be flipped
-			if(rotX < FLIP_THRESHHOLD_MIN && orientation == ORIENTATION_2)
-			{
-				orientation = ORIENTATION_1;
-				visualisationFlip(page, initedTOF, inited3DG, orientation);
-			}
-			else if(rotX > FLIP_THRESHHOLD_MAX && orientation == ORIENTATION_1)
-			{
-				orientation = ORIENTATION_2;
-				visualisationFlip(page, initedTOF, inited3DG, orientation);
-			}
-
 			// switch case for different screen pages
 			switch(page)
 			{
@@ -196,12 +157,7 @@ int main(void)
 
 						visualisationShowError(SCREEN_PAGE1);
 					}
-					else if(page == 3 && inited3DG == false)
-					{
-						page = 0;
 
-						visualisationShowError(SCREEN_PAGE2);
-					}
 
 
 					// change menu page
@@ -254,7 +210,7 @@ int main(void)
 			case SCREEN_PAGE3:
 				if(buttonPushed)
 				{
-
+					//execution code
 					exitMenu = EXIT_FROMSUB3;
 				}
 				break;
@@ -314,33 +270,8 @@ int main(void)
 			systickSetTicktime(&TimerLED, timeTimerLED);
 		}
 
-		// if timer 3DG is expired
-		if (isSystickExpired(Timer3DG) && inited3DG == true)
-		{
-			// store data in array. store the last 4 values
-			if (getRawDataCounter > 3)
-			{
-				getRawDataCounter = 0;
-			}
-			//getAccData(i2c_3dg, &XDataList[getRawDataCounter], &YDataList[getRawDataCounter], &ZDataList[getRawDataCounter]);
-			//getAccData(I2C_TypeDef *i2c, int16_t *xyz)
-			getRawDataCounter++;
-			gpioResetPin(GPIOC,PIN6);
-
-			systickSetTicktime(&Timer3DG, timeTimer3DG);
-		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
