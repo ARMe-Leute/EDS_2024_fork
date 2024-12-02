@@ -82,7 +82,7 @@ BluetoothATReplyBool_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule){
 			}
 
 		case -9:
-			status = -10 // Last step, make sure to reset the status, otherwise we can't use the funcction anymore
+			status = -10; // Last step, make sure to reset the status, otherwise we can't use the funcction anymore
 			BluetoothModule->ATInProgress = false;
 
 			if (BluetoothModule->available == 2
@@ -100,7 +100,7 @@ BluetoothATReplyBool_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule){
 		default: // Unknown status, should never be called
 			returnValue.status = 0x15;
 			returnValue.boolean = false;
-			return 0x18;
+			return returnValue;
 		}
 
 	}else{
