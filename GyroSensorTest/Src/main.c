@@ -38,29 +38,6 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
-/*void i2cActivate()
-{
-	I2C_TypeDef   *i2c  = I2C1;
-
-	GPIO_TypeDef  *portB = GPIOB;
-	// GPIOB-Bustakt aktivieren wegen der Verwendung von PB8/PB9 (I2C).
-	i2cSelectI2C(i2c);                           // I2C1: Bustakt aktivieren
-	//i2cDisableDevice(i2c);
-	gpioInitPort(portB);
-	gpioSelectPinMode(portB, PIN8, ALTFUNC);
-	gpioSelectAltFunc(portB, PIN8, AF4);         // PB8 : I2C1 SCL
-	gpioSelectPinMode(portB, PIN9, ALTFUNC);
-	gpioSelectAltFunc(portB, PIN9, AF4);         // PB9 : I2C1 SDA
-
-	 * Verwenden Sie auf keinen Fall die MCU-internen Pull-up-Widerstaende!
-	 * Widerstandswerte: jeweils 4k7 fuer SDA und SCL!
-
-	gpioSetOutputType(portB, PIN8, OPENDRAIN);   // Immer externe Pull-up-
-	gpioSetOutputType(portB, PIN9, OPENDRAIN);   // Widerstaende verwenden!!!
-	// Initialisierung des I2C-Controllers
-	i2cInitI2C(i2c, I2C_DUTY_CYCLE_2, 17, I2C_CLOCK_50);
-	i2cEnableDevice(i2c);   // MCAL I2C1 activ
-}*/
 bool timerTrigger;
 
 int main(void) // ToDo: Visualisierung über Oszilloskop
