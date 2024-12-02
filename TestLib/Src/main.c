@@ -136,6 +136,8 @@ int main(void)
 	// Konfigurieren und Aktivieren des Sensors
 	configureTOFSensor(&TOF_Sensor_1, DEFAULT_MODE_D, true); // Aktiviert den Sensor
 	// infinity loop to execute software
+
+
 	while (1)
 	{
 		if (true == timerTrigger)
@@ -203,7 +205,7 @@ int main(void)
 
 					// change menu page
 					visualisationMenu(page, initedTOF, inited3DG);
-					initSubMenu(page);
+					initSubMenu(page, &TOF_Sensor_1);
 				}
 
 				if(oldPosition != position)
@@ -379,7 +381,7 @@ void initBala(void)
  *
  * @parameters:	 SCREEN_PAGES_t page:	 page to be initialized
  */
-void initSubMenu(SCREEN_PAGES_t page)
+void initSubMenu(SCREEN_PAGES_t page, TOFSensor_t* TOFSENS)
 {
 	// switch case for menu pages
 	switch(page)
@@ -401,7 +403,7 @@ void initSubMenu(SCREEN_PAGES_t page)
 		inited3DG = false;
 			break;
 	case SCREEN_PAGE2:
-		//TOF_startContinuous(5);
+		TOF_start_continuous(TOFSENS, 5);
 			break;
 	case SCREEN_PAGE3:
 			break;

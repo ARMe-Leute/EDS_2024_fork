@@ -68,7 +68,7 @@ void initBala(void);
  *
  * @parameters:	 SCREEN_PAGES_t page:	 page to be initialized
  */
-void initSubMenu(SCREEN_PAGES_t page);
+void initSubMenu(SCREEN_PAGES_t page, TOFSensor_t* TOFSENS);
 
 /*
  * @function:	 i2cScanAndInit
