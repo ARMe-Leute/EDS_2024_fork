@@ -9,7 +9,7 @@
 
 int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, uint32_t baudRate) {
 
-
+if (usart == USART2){
 	switch (BluetoothModule->initStatus) {
 	case -10:
 		BluetoothModule->usart = usart;
@@ -59,6 +59,9 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 	default:
 		return 0;
 	}
+}else{
+	// Todo
+}
 }
 
 BluetoothATReplyBool_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule){
