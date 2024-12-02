@@ -326,6 +326,16 @@ void visualisationTOF(TOFSensor_t* TOFSENS, uint16_t distance, uint16_t *olddist
 	*olddistance = TOFSENS->distanceFromTOF;
 }
 
+
+void visualisationRangingProfileTOF(TOFSensor_t* TOFSENS){
+	tftPrint("DEFAULT MODE", POS_SCREEN_LINE_4);
+
+
+
+}
+
+
+
 /*
  * @function:	 visualisation3DG
  *
@@ -418,7 +428,6 @@ void visualisation3DG(float rotX, float rotY, float *oldrotX, float *oldrotY)
 		*oldrotY = rotY;
 	}
 }
-
 */
 
 

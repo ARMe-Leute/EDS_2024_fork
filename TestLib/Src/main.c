@@ -39,7 +39,7 @@
 
 // Time timer to check Button input, execute
 // Menu change, calculate 3DG rotation data
-#define timeTimerExec (50)
+uint16_t timeTimerExec = 50;
 
 // Time timer for visualization
 #define timeTimerVisu (100)
@@ -131,12 +131,13 @@ int main(void)
 	TOFSensor_t TOF_Sensor_1;
 
 	// Initialisieren des TOF-Sensors
-	initializeTOFSensor(&TOF_Sensor_1, TOF_ADDR_VL53LOX, 0x40005400, DEFAULT_MODE_D, distance);		//ToDo Wert noch richtig übergeben
+	initializeTOFSensor(&TOF_Sensor_1, TOF_ADDR_VL53LOX, I2C1, DEFAULT_MODE_D, distance);		//ToDo Wert noch richtig übergeben
 
 	// Konfigurieren und Aktivieren des Sensors
 	configureTOFSensor(&TOF_Sensor_1, DEFAULT_MODE_D, true); // Aktiviert den Sensor
 	// infinity loop to execute software
 
+	TOF_set_ranging_profile(&TOF_Sensor_1);
 
 	while (1)
 	{
@@ -253,6 +254,7 @@ int main(void)
 			case SCREEN_PAGE3:
 				if(buttonPushed)
 				{
+
 					exitMenu = EXIT_FROMSUB3;
 				}
 				break;
@@ -294,7 +296,7 @@ int main(void)
 				visualisationTOF(&TOF_Sensor_1, distance, &olddistance);
 				break;
 			case SCREEN_PAGE3:
-				//visualisation3DG(rotX, rotY, &oldrotX, &oldrotY);
+				visualisationRangingProfileTOF(&TOF_Sensor_1);
 				break;
 			case SCREEN_PAGE4:
 				break;
@@ -403,7 +405,7 @@ void initSubMenu(SCREEN_PAGES_t page, TOFSensor_t* TOFSENS)
 		inited3DG = false;
 			break;
 	case SCREEN_PAGE2:
-		TOF_start_continuous(TOFSENS, 5);
+		TOF_start_continuous(TOFSENS);
 			break;
 	case SCREEN_PAGE3:
 			break;

@@ -41,12 +41,22 @@
  * - Customizable for future sensors as per the interface and register mappings.
  ******************************************************************************
 
-
  ******************************************************************************
- * @datasheets
- * - VL53LOX Datasheet: [Insert link to VL53LOX datasheet here]
- * - STMicroelectronics Time-of-Flight Sensor Overview: [Insert link to overview here]
- * - API Documentation: [Insert link to official API documentation here]
+ * Datasheets and Resources
+ *
+ * 1. VL53L0X Datasheet:
+ *    World's Smallest Time-of-Flight Ranging and Gesture Detection Sensor -
+ *    Application Programming Interface (PDF)
+ *    Link: https://www.st.com/resource/en/user_manual/um2039-world-smallest-timeofflight-ranging-and-gesture-detection-sensor-application-programming-interface-stmicroelectronics.pdf
+ *
+ * 2. STMicroelectronics Time-of-Flight Sensor Overview:
+ *    Product Page
+ *    Link: https://estore.st.com/en/vl53l0cxv0dh-1-cpn.html
+ *
+ * 3. API Documentation:
+ *    VL53L0X Datasheet (PDF)
+ *    Link: https://www.st.com/resource/en/datasheet/vl53l0x.pdf
+ *
  ******************************************************************************
  */
 
@@ -178,12 +188,13 @@ typedef struct
 typedef struct TOFSensor TOFSensor_t;
 
 struct TOFSensor {
-	uint16_t TOF_address_used;         // The sensor's I2C address (e.g., 0x29 for VL53LOX)
+	uint16_t TOF_address_used;         // The sensor's I2C address (e.g., 0x29 for VL53LOX) 		//ToDO tauschen I2C Bus ganz oben
 	I2C_TypeDef *i2c_tof;              // Pointer to the I2C peripheral (e.g., I2C1, I2C2)
 	uint16_t Ranging_Profiles_t;       // The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
 	uint16_t distanceFromTOF;          // The current distance measurement (in mm)
 	uint16_t measuredRange;            // The maximum measurable range of the sensor
 	bool enableTOFSensor;              // Flag indicating if the sensor is enabled (true/false)
+	uint32_t Ranging_Profile_time;	   // Time for the execution for readcontinuos
 
 	// Function pointers for initializing, configuring, and retrieving measurements from the TOF sensor
 	void (*initialize)(TOFSensor_t*, uint16_t, I2C_TypeDef*, uint16_t, uint16_t);  // Function for initializing the sensor
@@ -526,7 +537,7 @@ bool TOF_init(TOFSensor_t* TOFSENS);
  *
  * @returns:     bool: true if continuous mode starts successfully, otherwise false.
  */
-bool TOF_start_continuous(TOFSensor_t* TOFSENS, uint32_t period_ms);
+bool TOF_start_continuous(TOFSensor_t* TOFSENS);
 
 
 /**

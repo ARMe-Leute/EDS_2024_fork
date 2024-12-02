@@ -149,6 +149,13 @@ void visualisationShowError(SCREEN_PAGES_t page);
  */
 void visualisationTOF(TOFSensor_t* TOFSENS, uint16_t distance, uint16_t *olddistance);
 
+
+
+void visualisationRangingProfileTOF(TOFSensor_t* TOFSENS);
+
+
+
+
 /*
  * @function:	 visualisation3DG
  *

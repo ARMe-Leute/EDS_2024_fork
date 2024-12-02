@@ -41,14 +41,25 @@
  * - Customizable for future sensors as per the interface and register mappings.
  ******************************************************************************
 
-
  ******************************************************************************
- * @datasheets
- * - VL53LOX Datasheet: [Insert link to VL53LOX datasheet here]
- * - STMicroelectronics Time-of-Flight Sensor Overview: [Insert link to overview here]
- * - API Documentation: [Insert link to official API documentation here]
+ * Datasheets and Resources
+ *
+ * 1. VL53L0X Datasheet:
+ *    World's Smallest Time-of-Flight Ranging and Gesture Detection Sensor -
+ *    Application Programming Interface (PDF)
+ *    Link: https://www.st.com/resource/en/user_manual/um2039-world-smallest-timeofflight-ranging-and-gesture-detection-sensor-application-programming-interface-stmicroelectronics.pdf
+ *
+ * 2. STMicroelectronics Time-of-Flight Sensor Overview:
+ *    Product Page
+ *    Link: https://estore.st.com/en/vl53l0cxv0dh-1-cpn.html
+ *
+ * 3. API Documentation:
+ *    VL53L0X Datasheet (PDF)
+ *    Link: https://www.st.com/resource/en/datasheet/vl53l0x.pdf
+ *
  ******************************************************************************
  */
+
 // standard includes
 #include <stdbool.h>
 
@@ -636,11 +647,12 @@ bool TOF_init(TOFSensor_t* TOFSENS)
 }
 
 
-bool TOF_start_continuous(TOFSensor_t* TOFSENS, uint32_t period_ms)
+bool TOF_start_continuous(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
 
+	uint32_t period_ms = TOFSENS->Ranging_Profile_time;
 	I2C_RETURN_CODE_t i2c_return;
 
 	//uint16_t TOF_i2caddress_used;
@@ -862,7 +874,7 @@ bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *rang
 }
 
 
-bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)
+bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)		//ToDo TOF_MODE_1 bis 4
 {
 
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -875,20 +887,23 @@ bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)
     	if(TOF_set_measurement_timing_budget(TOFSENS, 30000) == true)
     	{
     		TOFSENS->Ranging_Profiles_t = DEFAULT_MODE_D;
+    		TOFSENS->Ranging_Profile_time = 30;
     		value = true;
     		break;
     	}
     	else
     	{
         	TOFSENS->Ranging_Profiles_t = RANGINGPROFILE_ERROR;
+        	//ToDO return value = RANGINGPROFILE_ERROR
     		return false;
     		break;
     	}
 
     case HIGH_SPEED_MODE_S:
-        if(TOF_set_measurement_timing_budget(TOFSENS, 28000) == true)		//20ms
+        if(TOF_set_measurement_timing_budget(TOFSENS, 20000) == true)
         {
         	TOFSENS->Ranging_Profiles_t = HIGH_SPEED_MODE_S;
+        	TOFSENS->Ranging_Profile_time = 20;
         	value = true;
         	break;
         }
@@ -901,9 +916,10 @@ bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)
         }
 
     case HIGH_ACCURACY_MODE_A:
-        if(TOF_set_measurement_timing_budget(TOFSENS, 32000) == true)		//200ms
+        if(TOF_set_measurement_timing_budget(TOFSENS, 200) == true)
         {
         	TOFSENS->Ranging_Profiles_t = HIGH_ACCURACY_MODE_A;
+        	TOFSENS->Ranging_Profile_time = 200000;
         	value = true;
         	break;
         }
@@ -915,7 +931,7 @@ bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)
         }
 
     case LONG_RANGE_MODE_R:
-    	if(TOF_set_measurement_timing_budget(TOFSENS, 30000) == true)		//33ms
+    	if(TOF_set_measurement_timing_budget(TOFSENS, 33) == true)
     	        {
     	        	value = true;
     	        	break;
@@ -955,6 +971,7 @@ bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)
     	if(TOF_set_vcsel_pulse_period(TOFSENS, VcselPeriodFinalRange, 14) == true && prevalue == true)
     	{
         	TOFSENS->Ranging_Profiles_t = LONG_RANGE_MODE_R;
+        	TOFSENS->Ranging_Profile_time = 33000;
 
     		break;
     	}
