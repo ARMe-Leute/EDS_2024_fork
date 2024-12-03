@@ -577,7 +577,7 @@ bool TOF_init_device(TOFSensor_t* TOFSENS)
 }
 
 
-bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range)
+bool TOF_getMeasurement(uint16_t *range)
 {
 	I2C_RETURN_CODE_t i2c_return;
 
@@ -603,7 +603,6 @@ bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range)
 	}
 	*range = (readBuffer[0] << 8) + readBuffer[1];
 
-	TOFSENS->measuredRange = readBuffer;
 	i2c_return = i2cSendByteToSlaveReg(
 			TOF_i2c, TOF_address_used,
 			TOF_REG_SYSTEM_INTERRUPT_CLEAR, 0x01);
@@ -748,7 +747,7 @@ bool TOF_read_continuous_distance(TOFSensor_t* TOFSENS)
 		return false;
 	}
 
-	if(!TOF_getMeasurement(TOFSENS, &TOFSENS->distanceFromTOF))
+	if(!TOF_getMeasurement(&TOFSENS->distanceFromTOF))
 	{
 		return false;
 	}
@@ -797,7 +796,7 @@ bool TOF_read_single_distance(TOFSensor_t* TOFSENS)
 	{
 		return false;
 	}
-	TOF_getMeasurement(TOFSENS, &TOFSENS->distanceFromTOF);
+	TOF_getMeasurement(&TOFSENS->distanceFromTOF);
 
 
 	return true;
@@ -866,7 +865,7 @@ bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *rang
 			return false;
 		}
 
-	TOF_getMeasurement(TOFSENS, range);
+	TOF_getMeasurement(range);
 
 	return true;
 }
@@ -1411,6 +1410,9 @@ uint32_t timeout_microseconds_to_mclks(uint32_t timeout_period_us, uint8_t vcsel
     uint32_t return_value = (((timeout_period_us * 1000) + (macro_period_ns / 2)) / macro_period_ns);
     return return_value;
 }
+
+
+
 
 
 

@@ -192,9 +192,9 @@ struct TOFSensor {
 	uint16_t TOF_address_used;         // The sensor's I2C address (e.g., 0x29 for VL53LOX) 		//ToDO tauschen I2C Bus ganz oben
 	uint16_t Ranging_Profiles_t;       // The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
 	uint16_t distanceFromTOF;          // The current distance measurement (in mm)
-	uint32_t measuredRange;            // RAW Data of measured distance
+	uint16_t measuredRange;            // The maximum measurable range of the sensor
 	bool enableTOFSensor;              // Flag indicating if the sensor is enabled (true/false)
-	uint32_t Ranging_Profile_time;	   // Time for the execution for readcontinuos in dependence of RangingProfile
+	uint32_t Ranging_Profile_time;	   // Time for the execution for readcontinuos
 
 	// Function pointers for initializing, configuring, and retrieving measurements from the TOF sensor
 	void (*initialize)(TOFSensor_t*, I2C_TypeDef*, uint16_t, uint16_t, uint16_t);  // Function for initializing the sensor
@@ -488,7 +488,7 @@ bool TOF_init_device(TOFSensor_t* TOFSENS);
  *               - If the range is out of the sensor's measurable distance, the value returned is defined
  *                 as TOF_VL53L0X_OUT_OF_RANGE.
  */
-bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range);
+bool TOF_getMeasurement(uint16_t *range);
 
 
 //--------------------- EXTERNAL FUNCTIONS ---------------------
