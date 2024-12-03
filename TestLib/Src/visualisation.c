@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  * @file           : visualisation.c
- * @author         : Linus Blanke & Christoph Lederbogen
+ * @author         : Andreas Ladner & Philipp Röhlke
  * @brief          : In addition to the executable, this file is for all
  * 					 visualization parts and the communication with the
  * 					 TFT-display.
- * @date		   : April 11, 2024
+ * @date		   : December, 2024
  ******************************************************************************
  */
 
