@@ -6,7 +6,7 @@
  *                    Currently adapted to the VL53LOX sensor.
  *                    The library supports both single-shot and continuous measurement modes.
  *                    Configuration is managed via the appropriate register settings for the sensor.
- * @date           : December 2025
+ * @date           : December 2024
  ******************************************************************************
 
 
