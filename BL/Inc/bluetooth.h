@@ -28,6 +28,12 @@ typedef struct BluetoothModule {
 
 }BluetoothModule_t;
 
+typedef enum BluetoothError{
+	BluetoothFinish = 0,
+	BluetoothBusy,
+	BluetoothWrongParameter,
+	BluetoothRetryError
+}BluetoothError_t;
 
 
 
