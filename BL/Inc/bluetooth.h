@@ -25,6 +25,7 @@ typedef struct BluetoothModule {
 	uint16_t available;
 	uint8_t counter;
 	bool ATInProgress;
+	int16_t state;
 
 }BluetoothModule_t;
 
@@ -35,12 +36,20 @@ typedef enum BluetoothError{
 	BluetoothRetryError
 }BluetoothError_t;
 
+enum BluetoothState{
+	getStatus = -10,
+	getStatus_2,
+	getMacAddress = -20,
+	getMacAddress_2
+};
+
 
 
 int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART,
 		uint32_t baudRate);
 bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule);
 bool bluetoothGetStatus(BluetoothModule_t *BluetoothModule);
+int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
 
 extern volatile char usart2Buffer[];
 extern volatile uint16_t usart2BufferIndex;

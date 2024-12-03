@@ -57,7 +57,26 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 
 }
 
+int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state) {
 
+	if (BluetoothModule->state == 0) {
+		BluetoothModule->state = state;
+	} else if (BluetoothModule->state % 10 != 0) { // We don't start at the beginning of a procedure
+		return BluetoothWrongParameter;
+	}
+	if (!(BluetoothModule->state - state < 10)) { // We request a procedure, but are still in another one
+		return BluetoothBusy;
+	}
+	switch (BluetoothModule->state) {
+		case getStatus:
+			usartSendString(USART2, (char*) "AT");
+			return ++BluetoothModule->state;
+			break;
+		case getStatus_2:
+			break;
+		}
+
+}
 bool bluetoothGetStatus(BluetoothModule_t *BluetoothModule){
 
 	if (BluetoothModule->usart == USART2) {
