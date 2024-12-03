@@ -9,7 +9,7 @@
 
 int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, uint32_t baudRate) {
 
-if (usart == USART2){
+
 	switch (BluetoothModule->initStatus) {
 	case -10:
 		BluetoothModule->usart = usart;
@@ -38,55 +38,31 @@ if (usart == USART2){
 		if (BluetoothModule->counter > 10) { // after 10 attempts return negative acknowledge
 			return 0x15;
 		}
-		BluetoothATReplyBool_t reply;
+		bool reply;
 		reply = bluetoothGetStatus(BluetoothModule);
-		if(reply.status == 0 && reply.boolean == true){ // We are OK
+		if (reply) { // We are OK
 			return ++BluetoothModule->initStatus;
-		} else if (reply.status < 0){ // We have steps to do
+		} else if (reply){ // We have steps to do
 			return BluetoothModule->initStatus;
 		} else{ // Something went wrong, try again
 			BluetoothModule->counter++;
 			return --BluetoothModule->initStatus;
 		}
 
-		/*
-	case -9:
-		if (BluetoothModule->ATInProgress == false) {
-			BluetoothModule->ATInProgress = true;
-			usartSendString(USART2, (char*) "AT");
-			return ++BluetoothModule->initStatus;
-		} else {
-			return BluetoothModule->initStatus;
-		}
-	case -8:
-		BluetoothModule->ATInProgress=false;
-		if (BluetoothModule->counter > 10) { // after 10 attempts return negative acknowledge
-			return 0x15;
-		}
-		if (BluetoothModule->available == 2
-				&& strncmp(BluetoothModule->messageBuffer, "OK", 2) == 0) {
 
-			return ++BluetoothModule->initStatus;
-		}
-
-		else {
-			BluetoothModule->counter++;
-			return BluetoothModule->initStatus;
-		}*/
 	default:
 		 gpioTogglePin(GPIOA, PIN10);
 		return 0;
 	}
-}else{
-	// Todo
-}
+
 }
 
-BluetoothATReplyBool_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule){
 
-	if (BluetoothModule->usart == USART2){
+bool bluetoothGetStatus(BluetoothModule_t *BluetoothModule){
+
+	if (BluetoothModule->usart == USART2) {
 		static int8_t status = -10;
-		BluetoothATReplyBool_t returnValue = {status, false};
+		bool returnValue;
 		switch (status) {
 		case -10:
 
@@ -94,7 +70,7 @@ BluetoothATReplyBool_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule){
 			if (BluetoothModule->ATInProgress == false) {
 				BluetoothModule->ATInProgress = true;
 				usartSendString(USART2, (char*) "AT");
-				returnValue.status = status + 1; // We can go to the next step
+
 				return returnValue;
 			} else { // We couldn't send the command
 				 gpioTogglePin(GPIOA, PIN10);
@@ -109,23 +85,17 @@ BluetoothATReplyBool_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule){
 			if (BluetoothModule->available == 2
 					&& strncmp(BluetoothModule->messageBuffer, "OK", 2) == 0) {
 
-				returnValue.status = 0;
+
 				return returnValue;
 			}
 
 			else {
-				returnValue.status = 0x15;
+
 				return returnValue;
 			}
-		case -8: //MAC Anfragen
-		status=-7
-		case -7: //MAC auswerten
-			statu = 0
-		case -6: // Verbindung abfragen
 
 		default: // Unknown status, should never be called
-			returnValue.status = 0x15;
-			returnValue.boolean = false;
+
 			return returnValue;
 		}
 
