@@ -21,21 +21,21 @@ typedef struct BluetoothModule {
 	const USART_TypeDef *usart;
 	int8_t initStatus; //Todo: Defaultwert mitgeben
 	uint32_t baudRate;
-	char messageBuffer[USART2_BUFFER_SIZE+1];
+	char messageBuffer[USART2_BUFFER_SIZE + 1];
 	uint16_t available;
 	uint8_t counter;
 	bool ATInProgress;
 	int16_t state;
 
-}BluetoothModule_t;
+} BluetoothModule_t;
 
-typedef enum BluetoothError{
+typedef enum BluetoothError {
 	BluetoothFinish = 0,
 	BluetoothBusy,
 	BluetoothWrongParameter,
 	BluetoothRetryError,
 	BluetoothLengthError
-}BluetoothError_t;
+} BluetoothError_t;
 
 enum BluetoothState{
 	getStatus = -10,
@@ -44,12 +44,10 @@ enum BluetoothState{
 	getMacAddress_2
 };
 
-
-
 int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART,
 		uint32_t baudRate);
 bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule);
-int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool * isOK);
+int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK);
 int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
 
 extern volatile char usart2Buffer[];

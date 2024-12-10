@@ -7,14 +7,14 @@
 
 #include <bluetooth.h>
 
-int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, uint32_t baudRate) {
-
+int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
+		uint32_t baudRate) {
 
 	switch (BluetoothModule->initStatus) {
 	case -10:
 		BluetoothModule->usart = usart;
 		BluetoothModule->baudRate = baudRate;
-		BluetoothModule->available=0;
+		BluetoothModule->available = 0;
 		BluetoothModule->counter = 0;
 		RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; // GPIOA :Bustakt aktivieren
 		gpioSelectPinMode(GPIOA, PIN3, ALTFUNC); // PA2 :Modus = Alt. Funktion
@@ -43,16 +43,15 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 		status = bluetoothGetStatus(BluetoothModule, &reply);
 		if (status) { // We are OK
 			return ++BluetoothModule->initStatus;
-		} else if (status){ // We have steps to do
+		} else if (status) { // We have steps to do
 			return BluetoothModule->initStatus;
-		} else{ // Something went wrong, try again
+		} else { // Something went wrong, try again
 			BluetoothModule->counter++;
 			return --BluetoothModule->initStatus;
 		}
 
-
 	default:
-		 gpioTogglePin(GPIOA, PIN10);
+		gpioTogglePin(GPIOA, PIN10);
 		return 0;
 	}
 
@@ -78,7 +77,7 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 		BluetoothModule->state = BluetoothFinish; // In any case we are finished here
 		if (BluetoothModule->available > 2) { // We have more than two characters and are probably fine
 			return BluetoothFinish;
-		} else{ // Not enough characters to be ok
+		} else { // Not enough characters to be ok
 			return BluetoothLengthError;
 		}
 	default:
@@ -92,7 +91,7 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
  *
  * @warning: Only check what is in isOK if the returned status is equal to 0, otherwise it could be anything
  */
-int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool * isOK){
+int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK) {
 
 	int16_t reply = bluetoothStateHandler(BluetoothModule, getStatus);
 	if (reply == 0) { // do important stuff here
@@ -101,15 +100,14 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool * isOK){
 		} else {
 			*isOK = false;
 		}
-		BluetoothModule->available =0; // Reset the buffer
+		BluetoothModule->available = 0; // Reset the buffer
 		return BluetoothFinish;
 	} else if (reply < 0) {
 		return reply;
-	} else if(reply == BluetoothLengthError){ // Message to short
+	} else if (reply == BluetoothLengthError) { // Message to short
 		BluetoothModule->available = 0;
 		return reply;
-	}
-	else {
+	} else {
 		return reply; // We have an error, just pass it and let the parent function take care of it
 	}
 
@@ -148,7 +146,7 @@ void USART2_IRQHandler(void) {
 #warning USART2_BUFFER_SIZE not defined, using 1200 Bytes buffer. This may result in lost characters
 #define USART2_BUFFER_SIZE 1200 // One second at 9600 BAUD
 #endif
-		 usart2Buffer[usart2BufferIndex++]=USART2->DR & 0xFF;
+		usart2Buffer[usart2BufferIndex++] = USART2->DR & 0xFF;
 		// gpioTogglePin(GPIOA, PIN10);
 
 	}

@@ -41,8 +41,7 @@ bool timerTrigger;
 volatile char usart2Buffer[USART2_BUFFER_SIZE];
 volatile uint16_t usart2BufferIndex = 0;
 
-int main(void)
-{
+int main(void) {
 
 	/*
 	 * Für Testzwecke
@@ -66,7 +65,7 @@ int main(void)
 			bool setupFinished = false;
 
 			int8_t init1Status = -127;
-			HM17_1.initStatus=-10;
+			HM17_1.initStatus = -10;
 			while (setupFinished == false) {
 				if (timerTrigger == true) {
 					systickUpdateTimerList((uint32_t*) timerList, arraySize);
@@ -80,19 +79,20 @@ int main(void)
 				if (isSystickExpired(BluetoothFetchTimer)) {
 					bluetoothFetchBuffer(&HM17_1);
 
-					systickSetTicktime(&BluetoothFetchTimer, BLUETOOTH_FETCH_TIME);
+					systickSetTicktime(&BluetoothFetchTimer,
+							BLUETOOTH_FETCH_TIME);
 				}
 				if (init1Status == 0) {
 					setupFinished = true; // If all finished
 				}
 			}
 
-			mode=MAIN_LOOP; // After setup switch to main loop
-			 gpioTogglePin(GPIOA, PIN10);
+			mode = MAIN_LOOP; // After setup switch to main loop
+			gpioTogglePin(GPIOA, PIN10);
 
 			break; //case MAIN_INIT
 
-		// Loop forever
+			// Loop forever
 		case MAIN_LOOP:
 			break; // case MAIN_LOOP
 
