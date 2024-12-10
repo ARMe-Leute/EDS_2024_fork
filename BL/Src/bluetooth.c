@@ -76,6 +76,9 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 		case getStatus_2:
 			break;
 		}
+	default:
+		return BluetoothWrongParameter;
+	}
 
 }
 int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool * isOK){
