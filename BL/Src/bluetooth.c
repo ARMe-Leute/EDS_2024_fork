@@ -86,6 +86,12 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 	}
 
 }
+/**
+ * @brief
+ *
+ *
+ * @warning: Only check what is in isOK if the returned status is equal to 0, otherwise it could be anything
+ */
 int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool * isOK){
 
 	int16_t reply = bluetoothStateHandler(BluetoothModule, getStatus);
