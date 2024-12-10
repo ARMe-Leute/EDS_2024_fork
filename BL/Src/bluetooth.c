@@ -88,6 +88,29 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 }
 int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool * isOK){
 
+	int16_t reply = bluetoothStateHandler(BluetoothModule, getStatus);
+	if (reply == 0) { // do important stuff here
+		if (strncmp(BluetoothModule->messageBuffer, "OK", 2)) {
+			*isOK = true;
+		} else {
+			*isOK = false;
+		}
+		BluetoothModule->available =0; // Reset the buffer
+		return BluetoothFinish;
+	} else if (reply < 0) {
+		return reply;
+	} else if(reply == BluetoothLengthError){ // Message to short
+		BluetoothModule->available = 0;
+		return reply;
+	}
+	else {
+		return reply; // We have an error, just pass it and let the parent function take care of it
+	}
+
+
+
+
+
 
 
 
