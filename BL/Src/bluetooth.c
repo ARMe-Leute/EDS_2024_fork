@@ -79,27 +79,13 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 }
 int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool * isOK){
 
-	if (BluetoothModule->usart == USART2) {
-		static int8_t status = -10;
-		bool returnValue;
-		switch (status) {
-		case -10:
 
 
-			if (BluetoothModule->ATInProgress == false) {
-				BluetoothModule->ATInProgress = true;
-				usartSendString(USART2, (char*) "AT");
 
-				return returnValue;
-			} else { // We couldn't send the command
-				 gpioTogglePin(GPIOA, PIN10);
 
-				return returnValue;
-			}
 
-		case -9:
 			status = -10; // Last step, make sure to reset the status, otherwise we can't use the funcction anymore
-			BluetoothModule->ATInProgress = false;
+
 
 			if (BluetoothModule->available == 2
 					&& strncmp(BluetoothModule->messageBuffer, "OK", 2) == 0) {
@@ -113,14 +99,8 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool * isOK){
 				return returnValue;
 			}
 
-		default: // Unknown status, should never be called
 
-			return returnValue;
-		}
 
-	}else{
-		//Todo
-	}
 
 
 }
