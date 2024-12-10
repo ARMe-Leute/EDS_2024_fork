@@ -91,16 +91,16 @@ typedef struct MPU6050 {
 
 //--------------------------- Function Declarations ---------------------------
 
-int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddress, uint8_t gyroScale, uint8_t accelRange, uint8_t lPconfig, uint8_t restart);
+int8_t mpuInit(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddress, uint8_t gyroScale, uint8_t accelRange, uint8_t lPconfig, uint8_t restart);
 
-int16_t MPU_get_acceleration(MPU6050_t* sensor);
+int16_t mpuGetAcceleration(MPU6050_t* sensor);
 
-int16_t MPU_get_angle_from_acceleration(MPU6050_t* sensor);
+int16_t mpuGetAngleFromAcceleration(MPU6050_t* sensor);
 
-int16_t MPU_get_gyro(MPU6050_t* sensor);
+int16_t mpuGetGyro(MPU6050_t* sensor);
 
-int16_t MPU_get_temperature(MPU6050_t* sensor);
+int16_t mpuGetTemperature(MPU6050_t* sensor);
 
-void MPU_init_lowpass_filter(MPU6050_t* sensor);
+void mpuInitLowpassFilter(MPU6050_t* sensor);
 
 #endif /* MPU6050_H_ */

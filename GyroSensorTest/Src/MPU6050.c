@@ -14,7 +14,7 @@
 //--------------------------- Function Declarations ---------------------------
 
 /**
- * @function MPU_init
+ * @function mpuInit
  *
  * @brief Configures and initializes the MPU6050 sensor with specified settings.
  *
@@ -62,7 +62,7 @@
  * - Disabling both gyroscope and accelerometer may lead to an unusable sensor state.
  */
 
-int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t gyroScale, uint8_t accelRange, uint8_t lPconfig, uint8_t restart) {
+int8_t mpuInit(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t gyroScale, uint8_t accelRange, uint8_t lPconfig, uint8_t restart) {
 
 	sensor->i2c = i2cBus;
 
@@ -254,7 +254,7 @@ int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t
 			break;
 
 		case -1:	// LowPass Config
-			MPU_init_lowpass_filter(sensor);
+			mpuInitLowpassFilter(sensor);
 			step = 0;
 			break;
 
@@ -280,7 +280,7 @@ int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t
 }
 
 /**
- * @function MPU_get_acceleration
+ * @function mpuGetAcceleration
  *
  * @brief Reads the accelerometer data from the MPU6050 sensor, if enabled.
  *
@@ -311,7 +311,7 @@ int8_t MPU_init(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t
  * - Ensure the MPU6050 sensor has been properly initialized using `initMPU` before calling this function.
  * - This function assumes the accelerometer is properly configured during initialization.
  */
-int16_t MPU_get_acceleration(MPU6050_t* sensor) {
+int16_t mpuGetAcceleration(MPU6050_t* sensor) {
 	if (sensor->accel_range != (uint8_t) DISABLE) {
 		I2C_RETURN_CODE_t i2c_return;
 		uint8_t readBuffer[6];
@@ -333,7 +333,7 @@ int16_t MPU_get_acceleration(MPU6050_t* sensor) {
 }
 
 /**
- * @function MPU_get_angle_from_acceleration
+ * @function mpuGetAngleFromAcceleration
  *
  * @brief Computes the tilt angles (alpha and beta) of the MPU6050 sensor based on acceleration data.
  *
@@ -356,8 +356,8 @@ int16_t MPU_get_acceleration(MPU6050_t* sensor) {
  *    - `AlphaBeta[1]`: Tilt angle in the Y-Z plane (beta) using the formula `atan2(Y, Z)`.
  * 3. The calculated angles are stored in the `alpha_beta` array for further use.
  */
-int16_t MPU_get_angle_from_acceleration(MPU6050_t* sensor) {
-	int16_t returnValue = MPU_get_acceleration(sensor);
+int16_t mpuGetAngleFromAcceleration(MPU6050_t* sensor) {
+	int16_t returnValue = mpuGetAcceleration(sensor);
 
 	sensor->alpha_beta[0] = atan2(sensor->accel_xyz[0], sensor->accel_xyz[2]); // atan(X / Z)
 	sensor->alpha_beta[1] = atan2(sensor->accel_xyz[1], sensor->accel_xyz[2]); // atan(Y / Z)
@@ -366,7 +366,7 @@ int16_t MPU_get_angle_from_acceleration(MPU6050_t* sensor) {
 }
 
 /**
- * @function MPU_get_gyro
+ * @function mpuGetGyro
  *
  * @brief Reads the gyroscope data from the MPU6050 sensor, if enabled.
  *
@@ -398,7 +398,7 @@ int16_t MPU_get_angle_from_acceleration(MPU6050_t* sensor) {
  * - Ensure the MPU6050 sensor has been properly initialized using `initMPU` before calling this function.
  * - This function assumes the gyroscope is properly configured during initialization.
  */
-int16_t MPU_get_gyro(MPU6050_t* sensor) {
+int16_t mpuGetGyro(MPU6050_t* sensor) {
 	if (sensor->gyro_scale != (uint8_t) DISABLE) {
 		uint8_t readBuffer[6];
 		int16_t X, Y, Z;
@@ -419,7 +419,7 @@ int16_t MPU_get_gyro(MPU6050_t* sensor) {
 }
 
 /**
- * @function MPU_get_temperature
+ * @function mpuGetTemperature
  *
  * @brief Reads the temperature data from the MPU6050 sensor.
  *
@@ -441,18 +441,18 @@ int16_t MPU_get_gyro(MPU6050_t* sensor) {
  * - Ensure the MPU6050 sensor has been properly initialized using `MPU_init` before calling this function.
  * - The temperature measurement reflects the internal sensor temperature, which may not correspond to the ambient temperature.
  */
-int16_t MPU_get_temperature(MPU6050_t* sensor) {
+int16_t mpuGetTemperature(MPU6050_t* sensor) {
 	uint8_t readBuffer[2];
 	int16_t rawTemp;
-	I2C_RETURN_CODE_t i2c_return;
-	i2c_return = i2cBurstRegRead(sensor->i2c, sensor->i2c_address, MPU6050_Temp, readBuffer, 2);
+	I2C_RETURN_CODE_t i2cReturn;
+	i2cReturn = i2cBurstRegRead(sensor->i2c, sensor->i2c_address, MPU6050_Temp, readBuffer, 2);
 	rawTemp = (int16_t) (readBuffer[0]<<8) + readBuffer[1];
 	sensor->temperature_out = (float) rawTemp * sensor->temperature_factor + sensor->temperature_offset;
-	return (int16_t) i2c_return;
+	return (int16_t) i2cReturn;
 }
 
 /**
- * @function MPU_init_lowpass_filter
+ * @function mpuInitLowpassFilter
  *
  * @brief Initializes the low-pass filter settings for the MPU6050 sensor.
  *
@@ -473,6 +473,6 @@ int16_t MPU_get_temperature(MPU6050_t* sensor) {
  * - Ensure the MPU6050 sensor is properly initialized and powered before calling this function.
  * - Refer to the MPU6050 datasheet for valid DLPF configuration values and their corresponding cutoff frequencies.
  */
-void MPU_init_lowpass_filter(MPU6050_t* sensor) {
+void mpuInitLowpassFilter(MPU6050_t* sensor) {
 	i2cSendByteToSlaveReg(sensor->i2c, sensor->i2c_address, MPU6050_CONFIG, sensor->low_pass_filt_config);
 }
