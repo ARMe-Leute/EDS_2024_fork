@@ -77,7 +77,7 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 		}
 
 }
-bool bluetoothGetStatus(BluetoothModule_t *BluetoothModule){
+int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool * isOK){
 
 	if (BluetoothModule->usart == USART2) {
 		static int8_t status = -10;

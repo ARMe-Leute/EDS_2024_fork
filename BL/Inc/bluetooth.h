@@ -49,7 +49,7 @@ enum BluetoothState{
 int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART,
 		uint32_t baudRate);
 bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule);
-bool bluetoothGetStatus(BluetoothModule_t *BluetoothModule);
+int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool * isOK);
 int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
 
 extern volatile char usart2Buffer[];
