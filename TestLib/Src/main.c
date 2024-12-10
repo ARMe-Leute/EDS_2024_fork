@@ -119,7 +119,7 @@ int main(void)
 	TOFSensor_t TOF_Sensor_1;
 
 	// Initialisieren des TOF-Sensors
-	initializeTOFSensor(&TOF_Sensor_1, I2C1, TOF_ADDR_VL53LOX, TOF_DEFAULT_MODE_D, distance);		//ToDo Wert noch richtig übergeben
+	initializeTOFSensor(&TOF_Sensor_1, I2C1, TOF_ADDR_VL53LOX, TOF_DEFAULT_MODE_D, distance);
 
 	// Konfigurieren und Aktivieren des Sensors
 	configureTOFSensor(&TOF_Sensor_1, TOF_DEFAULT_MODE_D, true); // Aktiviert den Sensor
