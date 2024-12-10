@@ -113,34 +113,6 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool * isOK){
 		return reply; // We have an error, just pass it and let the parent function take care of it
 	}
 
-
-
-
-
-
-
-
-
-
-			status = -10; // Last step, make sure to reset the status, otherwise we can't use the funcction anymore
-
-
-			if (BluetoothModule->available == 2
-					&& strncmp(BluetoothModule->messageBuffer, "OK", 2) == 0) {
-
-
-				return returnValue;
-			}
-
-			else {
-
-				return returnValue;
-			}
-
-
-
-
-
 }
 
 bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule) {
