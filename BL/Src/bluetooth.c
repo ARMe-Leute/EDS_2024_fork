@@ -39,10 +39,11 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 			return 0x15;
 		}
 		bool reply;
-		reply = bluetoothGetStatus(BluetoothModule);
-		if (reply) { // We are OK
+		int16_t status;
+		status = bluetoothGetStatus(BluetoothModule, &reply);
+		if (status) { // We are OK
 			return ++BluetoothModule->initStatus;
-		} else if (reply){ // We have steps to do
+		} else if (status){ // We have steps to do
 			return BluetoothModule->initStatus;
 		} else{ // Something went wrong, try again
 			BluetoothModule->counter++;
