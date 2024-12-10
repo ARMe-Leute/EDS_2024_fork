@@ -33,7 +33,8 @@ typedef enum BluetoothError{
 	BluetoothFinish = 0,
 	BluetoothBusy,
 	BluetoothWrongParameter,
-	BluetoothRetryError
+	BluetoothRetryError,
+	BluetoothLengthError
 }BluetoothError_t;
 
 enum BluetoothState{
