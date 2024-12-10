@@ -47,14 +47,13 @@ uint16_t timeTimerExec = 30;
 // Time timer for LED toggle
 #define timeTimerLED (250)
 
-// Time timer to get 3DG Data
-#define timeTimer3DG (10)
-
 // Variable needed for display
 uint32_t ST7735_Timer = 0UL;
 
 // flags, if sensors are initialized
 bool inited3DG = false;
+// Mark TOF as initialized for compatibility with dependent functions
+
 bool initedTOF = false;
 
 // current page to be loaded and executed
@@ -64,8 +63,7 @@ SCREEN_PAGES_t page = SCREEN_MAIN;
 // not necessary to use TOF library. There it is located here
 ENABLE_TOF_SENSOR_t enableTOFSensor = ENABLE_TOF_FALSE;
 
-// I2C bus used for each sensor.
-I2C_TypeDef *i2c_3dg;
+// I2C bus used for TOF sensor.
 I2C_TypeDef *i2c_tof;
 
 // TOF address in use
@@ -122,8 +120,7 @@ int main(void)
 	initializeTOFSensor(&TOF_Sensor_1, I2C1, TOF_ADDR_VL53LOX, TOF_DEFAULT_MODE_D, distance);
 
 	// Konfigurieren und Aktivieren des Sensors
-	configureTOFSensor(&TOF_Sensor_1, TOF_DEFAULT_MODE_D, true); // Aktiviert den Sensor
-
+	configureTOFSensor(&TOF_Sensor_1, TOF_DEFAULT_MODE_D, true);
 	TOF_set_ranging_profile(&TOF_Sensor_1);
 
 	while (1)
@@ -236,6 +233,7 @@ int main(void)
 					TimerVisu = 0UL;
 					TimerLED = 0UL;
 					Timer3DG = 0UL;
+					//ST7735_Timer = 0UL;
 
 					exitMenu = EXIT_FROMSUB3;
 				}
@@ -439,37 +437,8 @@ void i2cScanAndInit(TOFSensor_t* TOFSENS, I2C_TypeDef   *i2c)
 		scanAddr -= 1;
 	}
 
-	// initialize 3DG sensor if one is found
-	if (enable3DGSensor == true)
-	{
-		// Sensor initialization
-		visualisationSensorInit(SENSOR_INIT_RUNNING);
-
-		i2c_3dg = i2c;
-
-		// do 3DG sensor initialization
-		int8_t returnValue = sensor_init(i2c, 0);
-
-		// check if initialization was successful
-		if (returnValue == 1)
-		{
-			// if init failed
-		}
-		else
-		{
-			// show if init was successful
-			visualisationSensorInit(SENSOR_INIT_DONE);
-			inited3DG = true;
-
-			// give chance to read success-massage
-			delayms(500);
-
-			exitMenu = EXIT_FROMSUB1;
-		}
-	}
-
 	// initialize TOF sensor if one is found
-	else if(enableTOFSensor != ENABLE_TOF_FALSE && enableTOFSensor == (ENABLE_TOF_SENSOR_t)i2cInitPort)
+	if(enableTOFSensor != ENABLE_TOF_FALSE && enableTOFSensor == (ENABLE_TOF_SENSOR_t)i2cInitPort)
 	{
 		// do TOF sensor initialization
 		visualisationSensorInit(SENSOR_INIT_RUNNING);
