@@ -69,12 +69,17 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 		return BluetoothBusy;
 	}
 	switch (BluetoothModule->state) {
-		case getStatus:
-			usartSendString(USART2, (char*) "AT");
-			return ++BluetoothModule->state;
-			break;
-		case getStatus_2:
-			break;
+
+	case getStatus:
+		usartSendString(USART2, (char*) "AT");
+		return ++BluetoothModule->state;
+
+	case getStatus_2:
+		BluetoothModule->state = BluetoothFinish; // In any case we are finished here
+		if (BluetoothModule->available > 2) { // We have more than two characters and are probably fine
+			return BluetoothFinish;
+		} else{ // Not enough characters to be ok
+			return BluetoothLengthError;
 		}
 	default:
 		return BluetoothWrongParameter;
