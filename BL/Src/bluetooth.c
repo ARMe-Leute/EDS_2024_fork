@@ -42,9 +42,9 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
 		bool reply;
 		int16_t status;
 		status = bluetoothGetStatus(BluetoothModule, &reply);
-		if (status) { // We are OK
-			return ++BluetoothModule->initStatus;
-		} else if (status) { // We have steps to do
+		if (status == 0) { // We are OK
+			return BluetoothModule->initStatus = 0;
+		} else if (status < 0) { // We have steps to do
 			return BluetoothModule->initStatus;
 		} else { // Something went wrong, try again
 
