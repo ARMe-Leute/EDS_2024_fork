@@ -29,7 +29,7 @@
 
 
 
-typedef enum{
+typedef enum {
 	MAIN_INIT=0,
 	MAIN_LOOP
 }MAIN_MODE;
@@ -80,7 +80,7 @@ int main(void) {
 					bluetoothFetchBuffer(&HM17_1);
 
 					systickSetTicktime(&BluetoothFetchTimer,
-							BLUETOOTH_FETCH_TIME);
+					BLUETOOTH_FETCH_TIME);
 				}
 				if (init1Status == 0) {
 					setupFinished = true; // If all finished

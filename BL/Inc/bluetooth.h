@@ -37,7 +37,7 @@ typedef enum BluetoothError {
 	BluetoothLengthError
 } BluetoothError_t;
 
-enum BluetoothState{
+enum BluetoothState {
 	getStatus = -10,
 	getStatus_2,
 	getMacAddress = -20,

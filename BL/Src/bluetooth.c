@@ -65,7 +65,7 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 	}
 	if (BluetoothModule->state == 0) {
 		BluetoothModule->state = state;
-	} else if (!(BluetoothModule->state - state < 10)){ // We request a procedure, but are still in another one
+	} else if (!(BluetoothModule->state - state < 10)) { // We request a procedure, but are still in another one
 		return BluetoothBusy;
 	}
 	switch (BluetoothModule->state) {
