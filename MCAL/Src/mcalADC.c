@@ -15,8 +15,8 @@
  * @brief       mcalADC.c is part of the MCAL library for STM32F4xx.
  * @author      Dipl.-Ing. Ralf Jesse (embedded@ralf-jesse.de)
  * @date        December 18, 2020
- *
- * @version     0.2
+ * edited by	Tobias Flämig
+ * @version     0.3
  * @copyright   GNU Public License Version 3 (GPLv3)
  *
  * The STM32F4xx micro controllers support up to three different timer classes:
