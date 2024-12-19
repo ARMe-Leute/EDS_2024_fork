@@ -47,8 +47,8 @@ int main(void) {
 	/*
 	 * Für Testzwecke
 	 */
-	gpioSelectPort(GPIOA);
-	gpioSelectPinMode(GPIOA, PIN10, OUTPUT);
+	//gpioSelectPort(GPIOA);
+	//gpioSelectPinMode(GPIOA, PIN10, OUTPUT);
 
 	uint32_t BluetoothTimer = 0UL; //Unsigned Long to set all bits to zero
 	uint32_t BluetoothFetchTimer = 0UL;
@@ -82,7 +82,6 @@ int main(void) {
 				}
 				if (isSystickExpired(BluetoothTimer)) {
 					init1Status = bluetoothInit(&HM17_1, USART2, 9600);
-					//gpioTogglePin(GPIOA, PIN10);
 					systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
 				}
 				if (isSystickExpired(BluetoothFetchTimer)) {
@@ -91,6 +90,7 @@ int main(void) {
 					systickSetTicktime(&BluetoothFetchTimer,
 					BLUETOOTH_FETCH_TIME);
 				}
+
 				if (init1Status == 0) {
 					setupFinished = true; // If all finished
 				}
@@ -100,7 +100,7 @@ int main(void) {
 			}
 
 			mode = MAIN_LOOP; // After setup switch to main loop
-			gpioTogglePin(GPIOA, PIN10);
+
 
 			break; //case MAIN_INIT
 

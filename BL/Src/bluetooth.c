@@ -57,7 +57,6 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
 		}
 
 	default:
-		gpioTogglePin(GPIOA, PIN10);
 		return 0;
 	}
 
@@ -155,7 +154,6 @@ bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule) {
 			BluetoothModule->messageBuffer[BluetoothModule->available] = '\0';
 			usart2BufferIndex = 0;
 			NVIC_EnableIRQ(USART2_IRQn);
-			usartSendString(USART2, &BluetoothModule->messageBuffer);
 			return true;
 		} else {
 			lastIndex = usart2BufferIndex;
@@ -177,7 +175,6 @@ void USART2_IRQHandler(void) {
 #ifndef debugMode
 	if (USART2->SR & USART_SR_RXNE) {
 		usart2Buffer[usart2BufferIndex++] = USART2->DR & 0xFF;
-		// gpioTogglePin(GPIOA, PIN10);
 	}
 #endif
 
