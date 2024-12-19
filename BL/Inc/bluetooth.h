@@ -16,6 +16,22 @@
 #define BLUETOOTH_FETCH_TIME 50//ms
 #define USART2_BUFFER_SIZE (2*1200*BLUETOOTH_FETCH_TIME)/1000
 
+#define debugMode
+
+#ifdef debugMode
+
+// Let bluetoothGetStatus() directly return OK without running anything
+//#define BLUETOOTH_GET_STATUS_RETURN_OK
+
+// Let bluetoothGetStatus() directly fail without running anything
+//#define BLUETOOTH_GET_STATUS_RETURN_ERROR BluetoothLengthError
+
+
+#endif //debugMode
+
+
+
+
 typedef struct BluetoothModule {
 
 	const USART_TypeDef *usart;

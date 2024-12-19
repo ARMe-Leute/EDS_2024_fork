@@ -98,6 +98,14 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
  * @warning: Only check what is in isOK if the returned status is equal to 0, otherwise it could be anything
  */
 int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK) {
+#ifdef BLUETOOTH_GET_STATUS_RETURN_OK
+	*isOK = true;
+	return 0;
+#endif //BLUETOOTH_GET_STATUS_RETURN_OK
+#ifdef BLUETOOTH_GET_STATUS_RETURN_ERROR
+	*isOK = false;
+	return BLUETOOTH_GET_STATUS_RETURN_ERROR;
+#endif //BLUETOOTH_GET_STATUS_RETURN_ERROR
 
 	int16_t reply = bluetoothStateHandler(BluetoothModule, getStatus);
 	if (reply == 0) { // do important stuff here
