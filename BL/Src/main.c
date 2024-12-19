@@ -28,14 +28,10 @@
 
 #define BLUETOOTH_SETUP_TIME 500 //ms
 
-
-
 typedef enum {
 	MAIN_INIT=0,
 	MAIN_LOOP
 }MAIN_MODE;
-
-
 
 bool timerTrigger;
 
@@ -49,12 +45,12 @@ int main(void) {
 	 */
 	//gpioSelectPort(GPIOA);
 	//gpioSelectPinMode(GPIOA, PIN10, OUTPUT);
-
 	uint32_t BluetoothTimer = 0UL; //Unsigned Long to set all bits to zero
 	uint32_t BluetoothFetchTimer = 0UL;
-	uint32_t Button=0UL;
-	uint32_t ButtonLEDOff=0UL;
-	uint32_t *timerList[] = { &BluetoothTimer, &BluetoothFetchTimer, &Button , &ButtonLEDOff};
+	uint32_t Button = 0UL;
+	uint32_t ButtonLEDOff = 0UL;
+	uint32_t *timerList[] = { &BluetoothTimer, &BluetoothFetchTimer, &Button,
+			&ButtonLEDOff };
 	uint8_t arraySize = sizeof(timerList) / sizeof(timerList[0]);
 
 	BluetoothModule_t HM17_1;
@@ -94,13 +90,12 @@ int main(void) {
 				if (init1Status == 0) {
 					setupFinished = true; // If all finished
 				}
-				if (init1Status > 0){
+				if (init1Status > 0) {
 					setRotaryColor(LED_YELLOW);
 				}
 			}
 
 			mode = MAIN_LOOP; // After setup switch to main loop
-
 
 			break; //case MAIN_INIT
 
@@ -119,10 +114,10 @@ int main(void) {
 					if (status == 0) { // We are OK
 						buttonPressed = false;
 						systickSetTicktime(&ButtonLEDOff, 2000);
-						if(reply == true){
+						if (reply == true) {
 							setRotaryColor(LED_GREEN);
 
-						}else{
+						} else {
 							setRotaryColor(LED_RED);
 						}
 					} else if (status > 0) {

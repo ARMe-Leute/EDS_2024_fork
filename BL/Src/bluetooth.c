@@ -17,7 +17,7 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
 		BluetoothModule->available = 0;
 		BluetoothModule->counter = 0;
 		BluetoothModule->state = 0;
-		for (uint32_t i = 0; i < USART2_BUFFER_SIZE; i++){
+		for (uint32_t i = 0; i < USART2_BUFFER_SIZE; i++) {
 			BluetoothModule->messageBuffer[i] = '\0';
 		}
 		RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; // GPIOA :Bustakt aktivieren
@@ -177,6 +177,5 @@ void USART2_IRQHandler(void) {
 		usart2Buffer[usart2BufferIndex++] = USART2->DR & 0xFF;
 	}
 #endif
-
 
 }

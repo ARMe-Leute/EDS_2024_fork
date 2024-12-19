@@ -32,15 +32,10 @@
 //Emulates a received ERROR, which is then handled by bluetoothFetchBuffer()
 //#define BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR
 
-
-
 #if !(defined(BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK) || defined(BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR))
 #warning "You don't receive any reply, expect the program to be stuck"
 #endif // !(defined(BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK) || defined(BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR))
 #endif //debugMode
-
-
-
 
 typedef struct BluetoothModule {
 
