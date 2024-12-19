@@ -156,8 +156,8 @@ void USART2_IRQHandler(void) {
 	if (USART2->SR & USART_SR_RXNE) {
 		usart2Buffer[usart2BufferIndex++] = USART2->DR & 0xFF;
 		// gpioTogglePin(GPIOA, PIN10);
+	}
 #endif
-}
 
 
 }
