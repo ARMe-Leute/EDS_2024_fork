@@ -24,6 +24,7 @@
 #include <mcalGPIO.h>
 
 #include <bluetooth.h>
+#include <RotaryPushButton.h>
 
 #define BLUETOOTH_SETUP_TIME 500 //ms
 
