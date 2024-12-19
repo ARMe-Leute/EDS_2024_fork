@@ -52,7 +52,9 @@ int main(void) {
 
 	uint32_t BluetoothTimer = 0UL; //Unsigned Long to set all bits to zero
 	uint32_t BluetoothFetchTimer = 0UL;
-	uint32_t *timerList[] = { &BluetoothTimer, &BluetoothFetchTimer };
+	uint32_t Button=0UL;
+	uint32_t ButtonLEDOff=0UL;
+	uint32_t *timerList[] = { &BluetoothTimer, &BluetoothFetchTimer, &Button , &ButtonLEDOff};
 	uint8_t arraySize = sizeof(timerList) / sizeof(timerList[0]);
 
 	BluetoothModule_t HM17_1;
