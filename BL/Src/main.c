@@ -71,6 +71,10 @@ int main(void) {
 
 			int8_t init1Status = -127;
 			HM17_1.initStatus = -10;
+
+			initRotaryPushButton();
+			initRotaryPushButtonLED();
+			systickSetTicktime(&Button, 20);
 			while (setupFinished == false) {
 				if (timerTrigger == true) {
 					systickUpdateTimerList((uint32_t*) timerList, arraySize);
@@ -86,11 +90,6 @@ int main(void) {
 
 					systickSetTicktime(&BluetoothFetchTimer,
 					BLUETOOTH_FETCH_TIME);
-				}
-				if(isSystickExpired(Button)){
-					initRotaryPushButton();
-					initRotaryPushButtonLED();
-					systickSetTicktime(&Button, 20);
 				}
 				if (init1Status == 0) {
 					setupFinished = true; // If all finished
