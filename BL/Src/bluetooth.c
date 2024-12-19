@@ -101,7 +101,7 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK) {
 
 	int16_t reply = bluetoothStateHandler(BluetoothModule, getStatus);
 	if (reply == 0) { // do important stuff here
-		if (strncmp(BluetoothModule->messageBuffer, "OK", 2)) {
+		if (strncmp(BluetoothModule->messageBuffer, "OK", 2) == 0) {
 			*isOK = true;
 		} else {
 			*isOK = false;
