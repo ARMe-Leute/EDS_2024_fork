@@ -42,7 +42,7 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
 
 	case -9:
 		if (BluetoothModule->counter > 10) { // after 10 attempts return negative acknowledge
-			return 0x15;
+			return BluetoothRetryError;
 		}
 		bool reply;
 		int16_t status;
