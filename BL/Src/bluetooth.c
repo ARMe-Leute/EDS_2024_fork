@@ -47,13 +47,13 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
 		bool reply;
 		int16_t status;
 		status = bluetoothGetStatus(BluetoothModule, &reply);
-		if (status == 0) { // We are OK
+		if (status == 0 && reply == true) { // We are OK
 			return BluetoothModule->initStatus = 0;
 		} else if (status < 0) { // We have steps to do
 			return BluetoothModule->initStatus;
 		} else { // Something went wrong, try again
-
-			return BluetoothModule->initStatus = status;
+			BluetoothModule->counter++;
+			return BluetoothModule->initStatus - 9;
 		}
 
 	default:
