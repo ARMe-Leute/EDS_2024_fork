@@ -94,6 +94,9 @@ int main(void) {
 				if (init1Status == 0) {
 					setupFinished = true; // If all finished
 				}
+				if (init1Status > 0){
+					setRotaryColor(LED_YELLOW);
+				}
 			}
 
 			mode = MAIN_LOOP; // After setup switch to main loop
