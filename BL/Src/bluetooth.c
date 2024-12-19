@@ -77,6 +77,20 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 
 	case getStatus:
 		usartSendString(USART2, (char*) "AT");
+
+#ifdef BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK
+		usart2Buffer[usart2BufferIndex++] = 'O';
+		usart2Buffer[usart2BufferIndex++] = 'K';
+#endif //BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK
+
+#ifdef BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR
+		usart2Buffer[usart2BufferIndex++] = 'E';
+		usart2Buffer[usart2BufferIndex++] = 'R';
+		usart2Buffer[usart2BufferIndex++] = 'R';
+		usart2Buffer[usart2BufferIndex++] = 'O';
+		usart2Buffer[usart2BufferIndex++] = 'R';
+#endif //BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR
+
 		return ++BluetoothModule->state;
 
 	case getStatus_2:
