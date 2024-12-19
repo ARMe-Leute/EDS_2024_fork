@@ -28,14 +28,16 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
 		usartSelectUsart(usart);
 		usartEnableUsart(usart);
 		usartSetCommParams(usart, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);
-		usartEnableIrq(usart, USART_IRQ_RXNEIE);
 
+#ifndef debugMode
+		usartEnableIrq(usart, USART_IRQ_RXNEIE);
 		if (BluetoothModule->usart == USART2) {
 			NVIC_EnableIRQ(USART2_IRQn);
 		} else {
 			//Todo
 		}
 		__enable_irq();
+#endif
 		return ++BluetoothModule->initStatus;
 
 	case -9:
@@ -144,15 +146,18 @@ bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule) {
 	}
 }
 
-void USART2_IRQHandler(void) {
-	if (USART2->SR & USART_SR_RXNE) {
 #ifndef USART2_BUFFER_SIZE
 #warning USART2_BUFFER_SIZE not defined, using 1200 Bytes buffer. This may result in lost characters
 #define USART2_BUFFER_SIZE 1200 // One second at 9600 BAUD
 #endif
+
+void USART2_IRQHandler(void) {
+#ifndef debugMode
+	if (USART2->SR & USART_SR_RXNE) {
 		usart2Buffer[usart2BufferIndex++] = USART2->DR & 0xFF;
 		// gpioTogglePin(GPIOA, PIN10);
+#endif
+}
 
-	}
 
 }
