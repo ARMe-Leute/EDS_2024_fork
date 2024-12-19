@@ -60,6 +60,8 @@ int main(void) {
 	BluetoothModule_t HM17_1;
 
 	MAIN_MODE mode = MAIN_INIT;
+
+	bool buttonPressed = false;
 	for (;;) {
 		switch (mode) {
 		// Initialize
@@ -102,6 +104,55 @@ int main(void) {
 
 			// Loop forever
 		case MAIN_LOOP:
+			if (timerTrigger == true) {
+				systickUpdateTimerList((uint32_t*) timerList, arraySize);
+
+			}
+			if (isSystickExpired(BluetoothTimer)) {
+
+				if (buttonPressed == true) {
+					bool reply;
+					int16_t status;
+					status = bluetoothGetStatus(&HM17_1, &reply);
+					if (status == 0) { // We are OK
+						buttonPressed = false;
+						systickSetTicktime(&ButtonLEDOff, 2000);
+						if(reply == true){
+							setRotaryColor(LED_GREEN);
+
+						}else{
+							setRotaryColor(LED_RED);
+						}
+					} else if (status > 0) {
+						systickSetTicktime(&ButtonLEDOff, 2000);
+						buttonPressed = false;
+						setRotaryColor(LED_RED);
+					}
+				}
+
+				systickSetTicktime(&BluetoothTimer, 200);
+			}
+			if (isSystickExpired(BluetoothFetchTimer)) {
+				bluetoothFetchBuffer(&HM17_1);
+
+				systickSetTicktime(&BluetoothFetchTimer,
+				BLUETOOTH_FETCH_TIME);
+			}
+			if (isSystickExpired(Button)) {
+
+				if (getRotaryPushButton() == true) {
+					buttonPressed = true;
+					setRotaryColor(LED_BLUE);
+				}
+
+				systickSetTicktime(&Button, 20);
+			}
+			if (isSystickExpired(ButtonLEDOff)) {
+
+				setRotaryColor(LED_BLACK);
+
+			}
+
 			break; // case MAIN_LOOP
 
 		}
