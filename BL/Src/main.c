@@ -85,6 +85,11 @@ int main(void) {
 					systickSetTicktime(&BluetoothFetchTimer,
 					BLUETOOTH_FETCH_TIME);
 				}
+				if(isSystickExpired(Button)){
+					initRotaryPushButton();
+					initRotaryPushButtonLED();
+					systickSetTicktime(&Button, 20);
+				}
 				if (init1Status == 0) {
 					setupFinished = true; // If all finished
 				}
