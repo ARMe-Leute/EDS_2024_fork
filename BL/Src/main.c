@@ -40,11 +40,7 @@ volatile uint16_t usart2BufferIndex = 0;
 
 int main(void) {
 
-	/*
-	 * Für Testzwecke
-	 */
-	//gpioSelectPort(GPIOA);
-	//gpioSelectPinMode(GPIOA, PIN10, OUTPUT);
+
 	uint32_t BluetoothTimer = 0UL; //Unsigned Long to set all bits to zero
 	uint32_t BluetoothFetchTimer = 0UL;
 	uint32_t Button = 0UL;
