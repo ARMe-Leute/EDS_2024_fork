@@ -162,7 +162,7 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK) {
 	int16_t reply = bluetoothStateHandler(BluetoothModule, getStatus);
 	BluetoothModule->available = 0; // Reset buffer
 	if (reply == 0) { // We can look for an OK
-		*isOk = (strncmp(BluetoothModule->messageBuffer, "OK", 2) == 0);
+		*isOK = (strncmp(BluetoothModule->messageBuffer, "OK", 2) == 0);
 		return BluetoothFinish;
 	} else if (reply < 0) {
 		return reply; // Continue
