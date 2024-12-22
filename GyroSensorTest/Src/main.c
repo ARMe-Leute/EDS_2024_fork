@@ -156,6 +156,6 @@ int main(void)
         }
     }
 
-    return 0; // Program end (never reached in this loop)
+    return 0; // Program end
 }
 

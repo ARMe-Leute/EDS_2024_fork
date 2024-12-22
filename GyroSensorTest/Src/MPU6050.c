@@ -73,7 +73,7 @@ int8_t mpuInit(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 		/**
 		 * To change I2C Address of the MPU6050, the AD0-Pin of the sensor must be set high
 		 * This pin is not connected to the board
-		 * therefore, the standard address is always used
+		 * therefore, the standard address is always used to prevent communication errors.
 		 */
 		sensor->i2c_address = (uint8_t) i2cAddr_MPU6050;
 	}
@@ -212,7 +212,7 @@ int8_t mpuInit(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 			step = -4;
 			break;
 
-		case -4: // ToDo: Bitmasken für Sleep-Modi überprüfen
+		case -4:
 			// PWR Mngt
 			if (sensor->accel_range == (uint8_t) DISABLE) { // Disable acceleration measurement
 				i2cSendByteToSlaveReg(sensor->i2c, sensor->i2c_address, MPU6050_PWR_MGMT_1, (MPU6050_PWR1_CLKSEL));
@@ -248,7 +248,7 @@ int8_t mpuInit(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 				step = -1;
 			}
 			else {
-				i2cSendByteToSlaveReg(sensor->i2c, sensor->i2c_address, MPU6050_ACCEL_CONFIG, sensor->accel_range); 	// set scale range of accelerometer
+				i2cSendByteToSlaveReg(sensor->i2c, sensor->i2c_address, MPU6050_ACCEL_CONFIG, sensor->accel_range);	// set scale range of accelerometer
 				step = -1;
 			}
 			break;
@@ -285,7 +285,7 @@ int8_t mpuInit(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
  * @brief Reads the accelerometer data from the MPU6050 sensor, if enabled.
  *
  * This function retrieves acceleration values along the X, Y, and Z axes from the MPU6050 sensor, converts them to
- * physical units in terms of g (gravitational acceleration), and stores them in the `AccelXYZ` array of the provided
+ * physical units in terms of g (gravitational acceleration), and stores them in the `accel_xyz` array of the provided
  * sensor instance. If the accelerometer is disabled, the function skips the I2C read and returns an error code.
  *
  * @param sensor       Pointer to an instance of the `MPU6050_t` structure containing the sensor configuration and state.
@@ -293,7 +293,7 @@ int8_t mpuInit(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
  * @return int16_t
  * - Returns the result of the I2C transaction (`I2C_RETURN_CODE_t`) if the accelerometer is enabled.
  *   A value of `I2C_SUCCESS` (0) indicates successful data retrieval.
- * - Returns `1` if the accelerometer is disabled (`AccelRange` set to `DISABLE`).
+ * - Returns `1` if the accelerometer is disabled (`accel_range` set to `DISABLE`).
  *
  * @details
  * 1. Checks if the accelerometer is enabled by verifying the `AccelRange` parameter in the sensor instance.
@@ -305,7 +305,7 @@ int8_t mpuInit(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
  *    - `4`: ±4g, scaling factor = 8192 LSB/g
  *    - `8`: ±8g, scaling factor = 4096 LSB/g
  *    - `16`: ±16g, scaling factor = 2048 LSB/g
- * 5. The converted values are stored in the `AccelXYZ` array of the `sensor` instance.
+ * 5. The converted values are stored in the `accel_xyz` array of the `sensor` instance.
  *
  * @note
  * - Ensure the MPU6050 sensor has been properly initialized using `initMPU` before calling this function.
@@ -359,8 +359,8 @@ int16_t mpuGetAcceleration(MPU6050_t* sensor) {
 int16_t mpuGetAngleFromAcceleration(MPU6050_t* sensor) {
 	int16_t returnValue = mpuGetAcceleration(sensor);
 
-	sensor->alpha_beta[0] = atan2(sensor->accel_xyz[0], sensor->accel_xyz[2]); // atan(X / Z)
-	sensor->alpha_beta[1] = atan2(sensor->accel_xyz[1], sensor->accel_xyz[2]); // atan(Y / Z)
+	sensor->alpha_beta[0] = atan2(sensor->accel_xyz[0], sensor->accel_xyz[2]);
+	sensor->alpha_beta[1] = atan2(sensor->accel_xyz[1], sensor->accel_xyz[2]);
 
 	return returnValue;
 }
@@ -371,7 +371,7 @@ int16_t mpuGetAngleFromAcceleration(MPU6050_t* sensor) {
  * @brief Reads the gyroscope data from the MPU6050 sensor, if enabled.
  *
  * This function retrieves the rotational velocity values for the X, Y, and Z axes from the MPU6050 sensor,
- * converts them to physical values in degrees per second (°/s), and stores them in the `GyroXYZ` array
+ * converts them to physical values in degrees per second (°/s), and stores them in the `gyro_xyz` array
  * of the provided sensor instance. If the gyroscope is disabled, the function skips the I2C read and
  * returns an error code.
  *
@@ -383,7 +383,7 @@ int16_t mpuGetAngleFromAcceleration(MPU6050_t* sensor) {
  * - Returns `1` if the gyroscope is disabled (`GyroScale` set to `DISABLE`).
  *
  * @details
- * 1. Checks if the gyroscope is enabled by verifying the `GyroScale` parameter in the sensor instance.
+ * 1. Checks if the gyroscope is enabled by verifying the `gyro_scale` parameter in the sensor instance.
  *    If disabled, the function immediately returns `1`.
  * 2. Reads 6 bytes of gyroscope data from the MPU6050 registers via I2C communication.
  * 3. Combines the bytes to form 16-bit signed values representing the rotational velocity for each axis (X, Y, Z).
@@ -392,7 +392,7 @@ int16_t mpuGetAngleFromAcceleration(MPU6050_t* sensor) {
  *    - `2`: ±500°/s, scaling factor = 65.5 LSB/°/s
  *    - `3`: ±1000°/s, scaling factor = 32.8 LSB/°/s
  *    - `4`: ±2000°/s, scaling factor = 16.4 LSB/°/s
- * 5. The converted values are stored in the `GyroXYZ` array of the `sensor` instance.
+ * 5. The converted values are stored in the `gyro_xyz` array of the `sensor` instance.
  *
  * @note
  * - Ensure the MPU6050 sensor has been properly initialized using `initMPU` before calling this function.
