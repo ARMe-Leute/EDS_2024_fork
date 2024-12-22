@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @file           : SensorTOF.c
+ * @file           : SensorTOF.h
  * @author         : Andreas Ladner & Philipp Röhlke
  * @brief          : This library file handles communication with a Time-of-Flight (TOF) sensor.
  *                    Currently adapted to the VL53LOX sensor.
@@ -189,7 +189,7 @@ typedef struct TOFSensor TOFSensor_t;
 
 struct TOFSensor {
 	I2C_TypeDef *i2c_tof;              // Pointer to the I2C peripheral (e.g., I2C1, I2C2)
-	uint16_t TOF_address_used;         // The sensor's I2C address (e.g., 0x29 for VL53LOX) 		//ToDO tauschen I2C Bus ganz oben
+	uint16_t TOF_address_used;         // The sensor's I2C address (e.g., 0x29 for VL53LOX)
 	uint16_t Ranging_Profiles_t;       // The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
 	uint16_t distanceFromTOF;          // The current distance measurement (in mm)
 	uint32_t measuredRange;            // RAW Data of measured distance
@@ -651,7 +651,7 @@ bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t newAddr);
  *
  * @returns:     bool: true if the distance was successfully read, false otherwise.
  *
- * @warning: 	NOT FULL IMPLEMENTED YET
+ * @warning: 	NOT IMPLEMENTED YET
  *
  *
  */
@@ -696,7 +696,7 @@ bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS);
  *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
  *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
  *
- * @param[in]:   vcselPeriodType type						Specifies whether to configure the pre-range (VcselPeriodPreRange) or final-range (VcselPeriodFinalRange) phase.
+ * 				vcselPeriodType type						Specifies whether to configure the pre-range (VcselPeriodPreRange) or final-range (VcselPeriodFinalRange) phase.
  * 				 uint8_t period_pclks						The new VCSEL pulse period in PCLKs. Acceptable values vary for pre-range and final-range types:
  *                   - Pre-Range: 12, 14, 16, 18.
  *                   - Final-Range: 8, 10, 12, 14.
@@ -751,7 +751,7 @@ bool TOF_set_signal_rate_limit(TOFSensor_t* TOFSENS, float signalRateLimit);
  * @details:     This function calculates the timeout values for different steps in the ranging sequence (MSRC, pre-range, and final-range) based on the current sensor configuration. The timeouts are adjusted according to the VCSEL (Vertical Cavity Surface Emitting Laser) pulse periods for the pre-range and final-range modes. The timeouts are expressed in microseconds.
  *
  * @param[in]:   TOFSENS - Pointer to the `TOFSensor_t` structure containing the sensor's configuration and state.
- * @param[in]:   enables - Pointer to a `SequenceStepEnables` structure containing the enables for each step in the sequence.
+ * 				 enables - Pointer to a `SequenceStepEnables` structure containing the enables for each step in the sequence.
  * @param[out]:  timeouts - Pointer to a `SequenceStepTimeouts` structure that will hold the calculated timeout values for each sequence step.
  *
  * @returns:     bool: true if the timeouts were successfully retrieved and calculated, false if there was an error in the process.
@@ -923,7 +923,6 @@ uint16_t encode_timeOut(uint16_t final_range_timeout_mclks);
  * @limitations:
  *               - The function assumes that the input register value (reg_val) is a valid 16-bit encoded timeout.
  *
- *
  * @notes:
  *               - This function is used to decode the timeout value from the format used by the TOF sensor's registers.
  *               - The formula used to calculate the timeout ensures that the timeout is a value greater than or equal to 1.
@@ -945,7 +944,7 @@ uint16_t decode_timeout(uint16_t reg_val);
  *
  * @param[in]:   timeout_period_mclks - The timeout period in macro clocks (MCLKs).
  *               This is the raw value obtained from the sensor's registers.
- * @param[in]:   vcsel_period_pclks  - The VCSEL period in photon clocks (PCLKs).
+ *				 vcsel_period_pclks  - The VCSEL period in photon clocks (PCLKs).
  *               This is the period in photon clocks used for the light emission cycle.
  *
  * @returns:     uint32_t: The timeout period converted to microseconds (µs).
@@ -970,7 +969,7 @@ uint32_t timeout_mclks_to_microseconds(uint16_t timeout_period_mclks, uint8_t vc
  *
  * @param[in]:   timeout_period_us - The timeout period in microseconds (µs).
  *               This value is usually obtained from the sensor configuration or measurement timing budget.
- * @param[in]:   vcsel_period_pclks  - The VCSEL period in photon clocks (PCLKs).
+ *				 vcsel_period_pclks  - The VCSEL period in photon clocks (PCLKs).
  *               This is the period used for the light emission cycle, which affects the macro clock timing.
  *
  * @returns:     uint32_t: The timeout period converted to macro clocks (MCLKs).

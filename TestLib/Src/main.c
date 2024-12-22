@@ -82,7 +82,6 @@ bool timerTrigger = false;
  * @function:	 main
  *
  * @brief: 		 executable function, timing control and trigger
- * 				 point for all functionality
  */
 int main(void)
 {

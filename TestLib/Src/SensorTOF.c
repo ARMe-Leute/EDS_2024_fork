@@ -826,14 +826,12 @@ bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t new_Addr)
 
 bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *range)
 {
-
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
 
 	delayms(time);
 
 	I2C_RETURN_CODE_t i2c_return;
-
 
 	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x01);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x01);
@@ -874,7 +872,6 @@ bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *rang
 
 bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)
 {
-
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
 
@@ -1411,7 +1408,3 @@ uint32_t timeout_microseconds_to_mclks(uint32_t timeout_period_us, uint8_t vcsel
     uint32_t return_value = (((timeout_period_us * 1000) + (macro_period_ns / 2)) / macro_period_ns);
     return return_value;
 }
-
-
-
-
