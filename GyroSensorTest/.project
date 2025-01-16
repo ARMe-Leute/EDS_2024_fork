@@ -3,8 +3,11 @@
 	<name>GyroSensorTest</name>
 	<comment></comment>
 	<projects>
+<<<<<<< HEAD
 		<project>CMSIS</project>
 		<project>MCAL</project>
+=======
+>>>>>>> remotes/upstream/main
 	</projects>
 	<buildSpec>
 		<buildCommand>

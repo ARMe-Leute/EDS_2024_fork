@@ -2,8 +2,13 @@
 #define BALO_H_
 
 // use define BALA2024 for HW DemoBoard Balancer V1.0
+<<<<<<< HEAD
 //#define BALA2024
 #define PIGGYBAG
+=======
+#define BALA2024
+//#define PIGGYBAG
+>>>>>>> remotes/upstream/main
 
 #define DELAY_red      (900)
 #define DELAY_green    (1500)
