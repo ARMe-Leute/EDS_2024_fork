@@ -21,11 +21,7 @@
 #include <mcalEXTI.h>
 #include <mcalTimer.h>
 #include <mcalRCC.h>
-<<<<<<< HEAD
-
-=======
 #include "BALO.h"
->>>>>>> remotes/upstream/main
 #include "RotaryPushButton.h"
 
 

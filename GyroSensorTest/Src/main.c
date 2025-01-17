@@ -85,11 +85,7 @@ int main(void)
     float anglefactor = 180 / _pi; // Conversion factor from radians to degrees
     float alphaBeta[2];            // Array to store angle data
     char output[10];               // Buffer for temperature output string
-<<<<<<< HEAD
-
-=======
     int8_t ReturnVal=-1;
->>>>>>> remotes/upstream/main
     // Initialize display and peripherals
     BALOsetup();
     LED_red_on;
@@ -109,18 +105,6 @@ int main(void)
     systickSetMillis(&I2C_Timer, i2cTaskTime);
 
     // Initial display message
-<<<<<<< HEAD
-    LED_red_off;
-    tftPrintColor((char *)"MPU6050 Tmp.:", 0, 0, tft_MAGENTA);
-
-    // Initialize MPU6050 sensor
-    int8_t testVal = mpuInit(&MPU1, I2C1, i2cAddr_MPU6050, 2, 3, MPU6050_LPBW_5, NO_RESTART);
-
-    while (1)
-    {
-        // Update timers if the trigger is set
-        if (timerTrigger && testVal >= 0)
-=======
 
     tftPrintColor((char *)"MPU6050 Tmp.:", 0, 0, tft_MAGENTA);
 
@@ -157,7 +141,6 @@ int main(void)
         // Update timers if the trigger is set
         //TF if (timerTrigger && testVal >= 0)
     	if (timerTrigger == true)
->>>>>>> remotes/upstream/main
         {
             systickUpdateTimerList((uint32_t *)timerList, arraySize);
         }
@@ -165,13 +148,6 @@ int main(void)
         // Check if I2C task is due
         if (isSystickExpired(I2C_Timer))
         {
-<<<<<<< HEAD
-            // Reset I2C timer
-            systickSetTicktime(&I2C_Timer, i2cTaskTime);
-
-            // Read angles from MPU6050
-            testVal = mpuGetAngleFromAcceleration(&MPU1);
-=======
 
         	// Reset I2C timer
             systickSetTicktime(&I2C_Timer, i2cTaskTime);
@@ -179,7 +155,6 @@ int main(void)
 
             // Read angles from MPU6050
             ReturnVal = mpuGetAngleFromAcceleration(&MPU1);
->>>>>>> remotes/upstream/main
             alphaBeta[0] = MPU1.alpha_beta[0];
             alphaBeta[1] = MPU1.alpha_beta[1];
 

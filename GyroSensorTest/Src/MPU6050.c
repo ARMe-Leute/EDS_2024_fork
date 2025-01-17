@@ -6,11 +6,7 @@
  */
 #include <mcalGPIO.h>
 #include <mcalI2C.h>
-<<<<<<< HEAD
-#include <mcalSysTick.h>
-=======
 //#include <mcalSysTick.h>
->>>>>>> remotes/upstream/main
 #include <math.h>
 
 #include <MPU6050.h>
@@ -197,18 +193,6 @@ int8_t mpuInit(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 	sensor->temperature_factor = (float) 1 / 340;
 	sensor->temperature_offset = (float) 36.35;
 
-<<<<<<< HEAD
-	static int8_t step = -5;
-	if ((restart != 0) && (step == -5)) {
-		step = step-1;
-	}
-
-	for (int8_t i = step; i < 0; i++) {
-
-		switch (step) {
-		case -6:		// CLK Speed von I2C auf 400kHz
-			i2cSetClkSpd(sensor->i2c, I2C_CLOCK_1Mz); //set I2C Clock 1000kHz
-=======
 	static int8_t step = -6;
 
 	//TF for (int8_t i = step; i < 0; i++) {
@@ -216,21 +200,15 @@ int8_t mpuInit(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 		switch (step) {
 		case -6:		// CLK Speed von I2C auf 400kHz
 			i2cSetClkSpd(sensor->i2c, I2C_CLOCK_1Mz); //set I2C Clock 1Mz
->>>>>>> remotes/upstream/main
 			step = -5;
 			break;
 
 		case -5:		// SW Reset
-<<<<<<< HEAD
-			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2c_address, MPU6050_PWR_MGMT_1, (MPU6050_SWRESET)); // reboot memory content
-			i2cSendByteToSlaveReg(sensor->i2c, sensor->i2c_address, MPU6050_MST_CTRL, (MPU6050_MST_P_NSR));
-=======
 			if (restart != 0)
 			{
 				i2cSendByteToSlaveReg(sensor->i2c, sensor->i2c_address, MPU6050_PWR_MGMT_1, (MPU6050_SWRESET)); // reboot memory content
 				//i2cSendByteToSlaveReg(sensor->i2c, sensor->i2c_address, MPU6050_MST_CTRL, (MPU6050_MST_P_NSR));
 			}
->>>>>>> remotes/upstream/main
 			step = -4;
 			break;
 
@@ -283,11 +261,7 @@ int8_t mpuInit(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
 		default:
 			step = -5;
 		}
-<<<<<<< HEAD
-	}
-=======
 	//TF }
->>>>>>> remotes/upstream/main
 
 	int8_t returnValue = 0;
 	if(step != 0) {
@@ -338,9 +312,6 @@ int8_t mpuInit(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, uint8_t 
  * - This function assumes the accelerometer is properly configured during initialization.
  */
 int16_t mpuGetAcceleration(MPU6050_t* sensor) {
-<<<<<<< HEAD
-	if (sensor->accel_range != (uint8_t) DISABLE) {
-=======
 	I2C_RETURN_CODE_t i2c_return;
 	uint8_t readBuffer[6];
 	int16_t XYZ[3], *xyz;
@@ -357,7 +328,6 @@ int16_t mpuGetAcceleration(MPU6050_t* sensor) {
 
 	/*
 
->>>>>>> remotes/upstream/main
 		I2C_RETURN_CODE_t i2c_return;
 		uint8_t readBuffer[6];
 		int16_t X, Y, Z;
@@ -366,17 +336,6 @@ int16_t mpuGetAcceleration(MPU6050_t* sensor) {
 		X = ((readBuffer[0]<<8) | readBuffer[1]);
 		Y = ((readBuffer[2]<<8) | readBuffer[3]);
 		Z = ((readBuffer[4]<<8) | readBuffer[5]);
-<<<<<<< HEAD
-
-		sensor->accel_xyz[0] = (float) X * sensor->accel_range_factor;
-		sensor->accel_xyz[1] = (float) Y * sensor->accel_range_factor;
-		sensor->accel_xyz[2] = (float) Z * sensor->accel_range_factor;
-		return (int16_t) i2c_return;
-	}
-	else {
-		return (int16_t) 1;
-	}
-=======
 */
 		sensor->accel_xyz[0] = (float) XYZ[0] * sensor->accel_range_factor;
 		sensor->accel_xyz[1] = (float) XYZ[1] * sensor->accel_range_factor;
@@ -387,7 +346,6 @@ int16_t mpuGetAcceleration(MPU6050_t* sensor) {
 		i2c_return = 1;
 	}
 	return (int16_t)i2c_return;
->>>>>>> remotes/upstream/main
 }
 
 /**
