@@ -3,6 +3,7 @@
 	<name>GyroSensorTest</name>
 	<comment></comment>
 	<projects>
+		<project>BALO</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

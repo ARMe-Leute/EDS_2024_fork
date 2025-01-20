@@ -39,7 +39,7 @@
  * corresponding documentation.
  ******************************************************************************
  */
-
+#define Oszi
 // Include necessary header files
 #include <stdint.h>
 #include <stdbool.h>
@@ -54,42 +54,59 @@
 #include <RotaryPushButton.h>
 #include <BALO.h>
 #include <ST7735.h>
-#include <MPU6050.h>
-
+#include <i2cMPU.h>
+/*
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized. Initialize the FPU before using floating-point operations."
 #endif
+*/
+#ifdef BALA2024
+// MPU6050 I2C Bus
+	#define 	MPUi2c		I2C2
+#else
+	#define 	MPUi2c 		I2C1
+#endif
+// this is the Init run
+
+
+
+
 
 // Flags and timers for task scheduling
 bool timerTrigger = false;
+
 uint32_t Timer1 = 0UL;          // Main program timer
 uint32_t ST7735_Timer = 0UL;    // TFT display-related timer
 uint32_t I2C_Timer = 0UL;       // I2C communication timer
 
-// Array for managing multiple timers
-uint32_t *timerList[] = { &I2C_Timer, &ST7735_Timer };
-size_t arraySize = sizeof(timerList) / sizeof(timerList[0]);
 
-// Step task time in milliseconds
-#define StepTaskTime 6
 
 int main(void)
 {
     // Task scheduling parameters
-    uint32_t i2cTaskTime = 50UL; // I2C task period
-    uint32_t temperatureRefresh = (i2cTaskTime * 0.2f);
-    uint8_t i = 0;
+	uint32_t DispTaskTime = 70UL; // Display task period  statt:   uint32_t temperatureRefresh = (i2cTaskTime * 0.2f);
+    uint32_t i2cTaskTime = 2UL; // I2C task period
+
+    // Array for managing multiple timers
+    uint32_t *timerList[] = {&Timer1, &I2C_Timer, &ST7735_Timer };
+    size_t arraySize = sizeof(timerList) / sizeof(timerList[0]);
 
     // Sensor data structure and other variables
     MPU6050_t MPU1;
-    float anglefactor = 180 / _pi; // Conversion factor from radians to degrees
-    float alphaBeta[2];            // Array to store angle data
-    char output[10];               // Buffer for temperature output string
-    int8_t ReturnVal=-1;
+    float const _rad2deg = 180.0 / _pi; // Conversion factor from radians to degrees
+
+    float AlphaBeta[2];            // Array to store angle data
+    char outStr[32];               // Buffer for temperature output string
+    int8_t ReturnVal=-1;			//  Return of Init mpu routine
+
+    float temp;
+
     // Initialize display and peripherals
     BALOsetup();
-    LED_red_on;
-    systickInit(SYSTICK_1MS);      // Initialize SysTick timer
+
+    LED_red_on;						//start mpu init
+
+    systickInit(SYSTICK_10MS);      // Initialize SysTick timer
     spiInit();                     // Initialize SPI
     tftInitR(INITR_REDTAB);        // Initialize TFT display
 
@@ -102,38 +119,62 @@ int main(void)
     initRotaryPushButton();
 
     // Set timer interval
+    systickSetMillis(&Timer1, DispTaskTime);
     systickSetMillis(&I2C_Timer, i2cTaskTime);
 
     // Initial display message
 
-    tftPrintColor((char *)"MPU6050 Tmp.:", 0, 0, tft_MAGENTA);
+    tftPrintColor((char *)"MPU6050 Tmp.:", 0, 0, tft_GREEN);
 
     // Initialize MPU6050 sensor
 
-#ifdef BALA2024
-// MPU6050 I2C Bus
-	#define 	MPUi2c		I2C2
-#else
-	#define 	MPUi2c 		I2C1
-#endif
-// this is the Init run
+
 	do
 	{
 		if (timerTrigger == true)
-	        {
-	            systickUpdateTimerList((uint32_t *)timerList, arraySize);
-	        }
+		{
+			systickUpdateTimerList((uint32_t *)timerList, arraySize);
+		}
 
-	        // Check if I2C task is due
-	        if (isSystickExpired(I2C_Timer))
-	        {
+		// Check if I2C task is due
+		if (isSystickExpired(I2C_Timer))
+		{
 
-	        	// Reset I2C timer
-				systickSetTicktime(&I2C_Timer, i2cTaskTime);
-				ReturnVal = mpuInit(&MPU1, MPUi2c, i2cAddr_MPU6050, 2, 3, MPU6050_LPBW_5, RESTART);
-	        }
+			// Reset I2C timer
+			systickSetTicktime(&I2C_Timer, i2cTaskTime);
+			ReturnVal = mpuInit(&MPU1, MPUi2c, i2cAddr_MPU6050, FSCALE_250, ACCEL_2g, LPBW_184, RESTART);
+		}
 	} while (ReturnVal < 0);
+	// Sensor Init finished
+
+
+/*
+ * Assemble Orientation of Sensor Modell Axis are Roll, Pitch,Yaw
+ * Sensor Axis X = 1, Y =2, Z = 3 , negative Value are opposite Direction
+ */
+#ifdef BALA2024
+	MPU1.RPY[0]= 2;				// MPU y Axis goes to the front
+	MPU1.RPY[1]= 3;				// MPU z-Axis goes to the left side
+	MPU1.RPY[2]= -1;			// MPU x-Axis goes down
+#else
+	// used default
+
+#endif
+
+
+
+
+#ifdef Oszi
+	MPU1.timebase = (float) i2cTaskTime* 10e-3;  // CycleTime for calc from Gyro to angle
+#else
+	MPU1.timebase = (float) DispTaskTime * 10e-3;  // CycleTime for calc from Gyro to angle
+#endif
+
+
+
 	LED_red_off;
+
+
 	// Reset I2C timer
 	systickSetTicktime(&I2C_Timer, i2cTaskTime);
     while (1)
@@ -154,13 +195,16 @@ int main(void)
 
 
             // Read angles from MPU6050
-            ReturnVal = mpuGetAngleFromAcceleration(&MPU1);
-            alphaBeta[0] = MPU1.alpha_beta[0];
-            alphaBeta[1] = MPU1.alpha_beta[1];
+            //ReturnVal = mpuGetRPfromAccel(&MPU1);
+            ReturnVal = mpuGetPitch(&MPU1);
+            AlphaBeta[0] = MPU1.pitch;
+
+            AlphaBeta[1] = MPU1.pitchAccel;
+
 
             // Update LED color based on angle thresholds
-            if ((alphaBeta[0] * anglefactor < -10) || (alphaBeta[0] * anglefactor > 10) ||
-                (alphaBeta[1] * anglefactor < -10) || (alphaBeta[1] * anglefactor > 10))
+            if ((MPU1.pitch * _rad2deg < -10) || (MPU1.pitch * _rad2deg > 10) ||
+                (MPU1.roll * _rad2deg < -10) || (MPU1.roll * _rad2deg > 10))
             {
                 setRotaryColor(LED_CYAN); // Deviations greater than ±10° trigger cyan
             }
@@ -169,18 +213,30 @@ int main(void)
                 setRotaryColor(LED_GREEN); // Otherwise, set green
             }
 
+#ifdef Oszi
             // Display angle values on the oscilloscope
-            AlBeOszi(alphaBeta);
+            AlBeOszi(AlphaBeta);
+#endif
+        }
+        // Check if Timer1 task is due
+        if (isSystickExpired(Timer1))
+        {
+        	// Reset Disp timer
+        	systickSetTicktime(&Timer1, DispTaskTime);
+        	temp = mpuTemp(&MPU1);
+			sprintf(outStr, "%.1f C", temp);
+			tftPrintColor((char *)outStr, (ST7735_TFTWIDTH - 20), 0, tft_GREEN);
+#ifndef Oszi
+			sprintf(outStr, "%3.2f %3.2f %3.2f", MPU1.accel[0], MPU1.accel[1],MPU1.accel[2]);
+			tftPrintColor((char *)outStr, 0, 30, tft_YELLOW);
+			sprintf(outStr, "%3.2f %3.2f %3.2f", MPU1.gyro[0], MPU1.gyro[1],MPU1.gyro[2]);
+			tftPrintColor((char *)outStr, 0, 42, tft_RED);
+			sprintf(outStr, "P: %3.2f R: %3.2f ", MPU1.pitch, MPU1.pitchAccel);
+			tftPrintColor((char *)outStr, 0, 54, tft_GREEN);
 
-            // Update temperature periodically
-            i++;
-            if (i % temperatureRefresh == 0)
-            {
-                mpuGetTemperature(&MPU1);
-                sprintf(output, "%.1f C", MPU1.temperature_out);
-                tftPrintColor((char *)output, (ST7735_TFTWIDTH - 20), 0, tft_MAGENTA);
-                i = 0;
-            }
+#endif
+
+
         }
     }
 
