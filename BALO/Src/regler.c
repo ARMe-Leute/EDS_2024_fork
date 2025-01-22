@@ -74,7 +74,14 @@ void initPID(PIDContr_t* PIDParam, float KP, float KI, float KD, float TA)
 
 float runPID(PIDContr_t* PID, float Diff)
 {
-	PID->ISUM += Diff;
+	if (PID->KI == 0)
+	{
+		PID->ISUM = 0;
+	}
+	else
+	{
+		PID->ISUM += Diff;
+	}
 	float result = (PID->KP * Diff) + (PID->KI * PID->ISUM *PID->TA) + (PID->KD / PID->TA)*(Diff - PID->InpOld);
 	PID->InpOld = Diff;
 	return result;
@@ -87,8 +94,8 @@ float runPID(PIDContr_t* PID, float Diff)
  *
  float PID_PosOut, PID_VeloOut;
  int main() {
- 	struct PIDRegler PID_Pos, PID_Velo;
- 	const uint8_t iHold = 5;
+ 	PIDRegler_t PID_Pos, PID_Velo;
+
 
 	// PID_Pos.init(... 	KP, KI, KD)
  	initPID(&PID_Pos, 0.5,    0, 0.2);

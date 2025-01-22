@@ -8,7 +8,7 @@ typedef struct PIDContr PIDContr_t;
 
 struct PIDContr
 {
-	float KP;				// Proportional Coefficient eg [steps/phi]
+	float KP;				// Proportional Coefficient
 	float KI;				// Integral Coeff.
 	float KD;				// Differential Coeff
 	float ISUM;				// Integral Sum
