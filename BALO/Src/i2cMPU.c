@@ -81,9 +81,9 @@ int8_t mpuInit(MPU6050_t* sensor, I2C_TypeDef* i2cBus, uint8_t i2cAddr, MPUfscal
 	sensor->RPY[1] = 2;
 	sensor->RPY[2] = -3;					// -3 means Sensor Y-Axis goes into top direction
 	sensor->pitchZero = 0;					// assemble offset MPU vs chassis
-	sensor->pitchFilt = 0.98;				// weight of Gyro for Pitch Calc in combination to Accel-Angle Calc (Static Bias)
+	sensor->pitchFilt = 0.9;				// weight of Gyro for Pitch Calc in combination to Accel-Angle Calc (Static Bias)
 	sensor->pitch = 0;						// assemble offset MPU vs chassis
-	sensor-> swLowPassFilt =0.8;			// Accel Filter koeffizent
+	sensor->swLowPassFilt =0.5;			// Accel Filter koeffizent
 	sensor->accel[0] = 0;
 	sensor->accel[1] = 0;
 	sensor->accel[2] = 0;
@@ -437,8 +437,11 @@ int16_t mpuGetPitch(MPU6050_t* sensor) {
 	sensor->pitchAccel = atan2(longAxis, yawAxis)-sensor->pitchZero;
 
 	float gyroPitch =  _deg2rad * sensor->gyro[sensor->RPY[1]-1];			// rad/s
-	sensor->pitch = (sensor->pitchFilt * (sensor->pitch + gyroPitch * sensor->timebase)) + ((1- sensor->pitchFilt) * sensor->pitchAccel);
-
+	if (sensor->pitch == 0)
+	{
+		sensor->pitch = sensor->pitchAccel;  // first run initialize value;
+	}
+	sensor->pitch = (sensor->pitchFilt * (gyroPitch * sensor->timebase + sensor->pitch)) + ((1- sensor->pitchFilt) * sensor->pitchAccel);
 
 	return i2c_return;
 

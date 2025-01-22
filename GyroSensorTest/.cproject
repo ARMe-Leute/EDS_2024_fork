@@ -56,7 +56,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/CMSIS/Device/ST/STM32F4xx/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MCAL/Inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/MCAL/Inc/mcalTimer}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/GyroSensorTest/Inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BALO/Inc}&quot;"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.747118880" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
