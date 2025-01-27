@@ -20,11 +20,20 @@ struct PIDContr
 	float (*run)(PIDContr_t*, float);   // run PID Control with in: difference end out: result
 };
 
+typedef struct MeanVal MeanVal_t;
+struct MeanVal
+{
+	float sto_mw;				// Proportional Coefficient
+	float wight;
+};
+extern float runMeanVal(MeanVal_t* mVal, float Inp);
+extern void clrMeanVal(MeanVal_t* mVal, float wight);
+
 extern PIDContr_t* getPID(PIDContr_t* PIDContr);
 extern void setPID(PIDContr_t* Source, PIDContr_t* Desti);
 extern void initPID(PIDContr_t* PIDParam, float KP, float KI, float KD, float TA);
 extern float runPID(PIDContr_t* PID, float Diff);
-
+extern void clearPID(PIDContr_t* PIDParam);
 
 
 

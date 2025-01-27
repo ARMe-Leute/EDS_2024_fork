@@ -71,6 +71,13 @@ void initPID(PIDContr_t* PIDParam, float KP, float KI, float KD, float TA)
 	PIDParam->InpOld =0;
 };
 
+void clearPID(PIDContr_t* PIDParam)
+{
+	PIDParam->ISUM = 0;
+	PIDParam->InpOld =0;
+};
+
+
 
 float runPID(PIDContr_t* PID, float Diff)
 {
@@ -114,7 +121,31 @@ float runPID(PIDContr_t* PID, float Diff)
 
 **/
 
+// define prototype structure for the MeanVal
+const MeanVal_t MV = {
+	.sto_mw =0,
+	.wight = 0,
+};
 
+float runMeanVal(MeanVal_t* mVal, float Inp)
+{
+	float mwData;
+	/*
+	 *
+	 *mwData = (mVal->sto_mw)/(mVal->wight);
+	(mVal->sto_mw) += Inp - mwData;
+	*/
+
+	mwData = Inp* mVal->wight + (1-mVal->wight)*mVal->sto_mw;
+	mVal->sto_mw =mwData;
+	return mwData;
+}
+
+void clrMeanVal(MeanVal_t* mVal, float wight)
+{
+	mVal->sto_mw = (float) 0;
+	mVal->wight = wight;
+}
 
 // Tiefpassfilterung der drei Richtungsvektoren xyz
 void LowPassFilt(int16_t raw_data[3], int16_t filt_data[3], int16_t _tp)
