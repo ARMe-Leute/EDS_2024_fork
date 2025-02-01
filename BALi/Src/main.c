@@ -1,10 +1,23 @@
+
 /**
- * I2C Device Scan
- * ST7735 TFT Display
- * ===========================
+ ******************************************************************************
+ * @file           : main.c
+ * @author         : Prof Flaemig
+ * @brief          : Balancer main Function
+ ******************************************************************************
+ * @attention
+ * Functions for Closed Loop Control for balancing two wheel demo
+ * Copyright (c) 2025 Prof T Flämig.
+ * All rights reserved.
  *
- * Ansteuerung eines TFT Display ueber SPI.
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+
  */
+#define SwVersion "DHBW Bala V1.0 (c)Fl"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -81,7 +94,7 @@ const int16_t rad2step =  520;		// Ratio step-counts (200 Full-Steps div 1/16 St
 
 #define StepPaCount 5
 char StepPaTitle[StepPaCount][5] = {"iRun", "iHold",	"vMin",	 "vMax",	"accel"};
-uint8_t StepPaValue[StepPaCount] =  { 15, 		6, 		1, 		6,  	5 };		//Parameterset for DEKI Motor 35mm length
+uint8_t StepPaValue[StepPaCount] =  { 15, 		7, 		2, 		5,  	4 };		//Parameterset for DEKI Motor 35mm length
 const uint8_t stepMode = 3;
 const bool stepRotDir = true;
 
@@ -116,7 +129,21 @@ void StepperIHold(bool OnSwitch)
  *
  */
 
-#define ParamCount 11
+#define ParamCount 13
+
+enum
+{
+							a_Cour =0,	a_DEBG, a_posTol,a_phiZ,	a_GyAc,	a_HwLP,	a_LP,	a_piKP,	a_piKI,	a_piKD,	a_raRo,	a_maRo,	a_raTr
+} argParam;
+
+
+
+char ParamTitle[ParamCount][5] ={"Cour", "DEBG", "poTo", "phiZ","GyAc",	"HwLP",		"LP  ",	"piKP",	"piKI",	"piKD", "raRo",		"maRo",		"raTr"};
+float ParamValue[ParamCount] =  {0,  	0,			0.0, 	0,		0.98, 		5, 		0.36,  	0.75, 	0.058, 	0.27, 		0.004, 		12, 		0.01};
+//								{1, 	0, 			0.0, 	0,		0.98, 		5, 		0.36,  	0.5, 	0.056, 	0.27, 		0.01, 		0.02, 		0.0)   //
+float ParamScale[ParamCount] = 	{1,  	1, 			0.2,   	100, 	100, 		1,		500, 	100, 	500,  	100,		500, 		1,  		500};			//  increment stepsize is 1/Value
+
+
 struct Parameter
 {
 	char Title[5];
@@ -137,33 +164,27 @@ struct RegPameter
 PIDContr_t 	PID_phi; 		// Pitch controll
 
 
-char ParamTitle[ParamCount][7] = {"phiZ","GyAc",	"HwLP",		"LP  ",	"piKP",	"piKI",	"piKD", "poKP",		"poKI",		"poTP",	"Rot "};
-float ParamValue[ParamCount] =  { 0.0, 		0.98, 		5, 		0.36,  	0.75, 	0.058, 	0.27, 		0, 		0.01, 		0.01,		0};
-//								{ 0.0, 		0.98, 		5, 		0.36,  	0.5, 	0.056, 	0.27, 		0.01, 	0.02, 		0.0,		1)   //
-float ParamScale[ParamCount] = 	 { 100,   	100, 		1,		500, 	100, 	500,  	100,		10, 	200,  		100, 		1};			//  increment stepsize is 1/Value
-
-
-
 
 void SetRegParameter(MPU6050_t* MPUa)
 {
 	MPUlpbw tableLPFValue[7] = { LPBW_260, LPBW_184, LPBW_94, LPBW_44, LPBW_21, LPBW_10, LPBW_5};
-	MPUa->pitchZero = ParamValue[0];
-	MPUa->swLowPassFilt = ParamValue[3];
-	MPUa->pitchFilt = ParamValue[1];
-	initPID(&PID_phi, ParamValue[4],ParamValue[5],ParamValue[6], 1);
+	MPUa->pitchZero = ParamValue[a_phiZ];
+	MPUa->swLowPassFilt = ParamValue[a_LP];
+	MPUa->pitchFilt = ParamValue[a_GyAc];
+	initPID(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
 	/*
 	PID_phi.KP = ParamValue[4];
 	PID_phi.KI = ParamValue[5];
 	PID_phi.KD = ParamValue[6];
 	 */
-	if (ParamValue[2] <0 ) { ParamValue[2] =0;}
-	if (ParamValue[2] >6 ) { ParamValue[2] =6;}
-	MPUa->LowPassFilt = tableLPFValue[(uint)ParamValue[2]];
+	if (ParamValue[a_HwLP] <0 ) { ParamValue[a_HwLP] =0;}
+	if (ParamValue[a_HwLP] >6 ) { ParamValue[a_HwLP] =6;}
+	MPUa->LowPassFilt = tableLPFValue[(uint)ParamValue[a_HwLP]];
 	mpuSetLpFilt(MPUa);
-	if (ParamValue[ParamCount-1] <0 ) { ParamValue[ParamCount-1] =0;}
-	if (ParamValue[ParamCount-1] > routeNumMax-1) { ParamValue[ParamCount-1] = routeNumMax-1;}
-	routeNum = ParamValue[ParamCount-1];
+	if (ParamValue[a_Cour] <0 ) { ParamValue[a_Cour] =0;}
+	if (ParamValue[a_Cour] > routeNumMax-1) { ParamValue[a_Cour] = routeNumMax-1;}
+	routeNum = ParamValue[a_Cour];
+	posTol = ParamValue[a_posTol];
 }
 
 
@@ -238,12 +259,12 @@ int main(void)
 		 resetStepR = true;
 
 
-	const float DivTimeTask= 0.01;
+	const float DivTimeTask= 0.01;   // StepTask div PosTask
 
     uint8_t MotionVar = 0;
 
 	char strX[8],strY[8],strZ[8],strT[32];
-
+	char strV[20] ={SwVersion};
 
 
 /**	Menue for the Filter
@@ -256,7 +277,8 @@ int main(void)
 
 	float 	tarPosL, tarPosR,
 			targetTra, targetRot,
-			incTra =0, incRot =0;
+			incRot =0,
+			rampRot = 0;		// Ramp to increase speed for translation and rotation of the Balancer
 
 	int pxPos, pyPos;
 	bool activeMove = false;
@@ -333,7 +355,7 @@ int main(void)
 							   tftPrint((char *)"<-Left STEP\0",0,110,0);
 								//StepL.init(... 						iRun,	iHold, 	vMin,  	vMax, 	stepMode, 							rotDir, acceleration, securePosition)
 							    StepperInit(&StepL, i2c, i2cAddr_motL,StepPaValue[0], StepPaValue[1], StepPaValue[2],StepPaValue[3],stepMode,(uint8_t)!stepRotDir,StepPaValue[4], 0);
-							    stepper.pwmFrequency.set(&StepL, 1);
+							    stepper.pwmFrequency.set(&StepL, 0);
 
 						   }
 						   break;
@@ -343,7 +365,7 @@ int main(void)
 							   tftPrint((char *)"Right->\0",94,110,0);
 								//StepL.init(... 						iRun,	iHold, 	vMin,  	vMax, 	stepMode, 							rotDir, acceleration, securePosition)
 							   StepperInit(&StepR, i2c, i2cAddr_motR,StepPaValue[0], StepPaValue[1], StepPaValue[2],StepPaValue[3],stepMode,(uint8_t)stepRotDir, StepPaValue[4], 0);
-							   stepper.pwmFrequency.set(&StepR, 1);
+							   stepper.pwmFrequency.set(&StepR, 0);
 
 						   }
 						   break;
@@ -459,7 +481,8 @@ int main(void)
 					{
 						tftFillScreen(tft_BLACK);
 						tftSetColor(tft_RED, tft_WHITE);
-						tftPrint("DHBW BALANCER (c)Fl\0",0,0,0);
+						tftPrint(SwVersion,0,0,0);
+						//tftPrint("DHBW BALA %s (c)Fl\0",0,0,0);
 						tftSetColor(tft_GREEN, tft_BLACK);
 						StepperIHold(true);										//IHold switched on
 						StepperResetPosition(&StepL);  		//resetPosition
@@ -472,7 +495,7 @@ int main(void)
 						MPU1.RPY[1]= 3;				// MPU z-Axis goes to the left side
 						MPU1.RPY[2]= -1;			// MPU x-Axis goes down
 						MPU1.timebase = (float) (StepTaskTime+1) * 10e-4;  			// CycleTime for calc from Gyro to angle  fitting statt 10-3 wird 10-4 gesetzt
-						initPID(&PID_phi, ParamValue[4],ParamValue[5],ParamValue[6], 1);
+						initPID(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
 						RunInit = false;
 					}
 					gpioResetPin(LED_RED_ADR);
@@ -490,19 +513,17 @@ int main(void)
 					if (fabs(AlphaBeta[1]) > 0.35)  // tilt angle more than  0.2 pi/4 = 30deg  -shut off Stepper control and reduce the IHold current and power consumption -> save the planet ;-)
 					{
 						activeMove = false;
-						initPID(&PID_phi, ParamValue[4],ParamValue[5],ParamValue[6], 1);
-						//initPID(&PID_PosL, ParamValue[7],ParamValue[8],ParamValue[9], 1);
-						//initPID(&PID_PosR, ParamValue[7],ParamValue[8],ParamValue[9], 1);
+						initPID(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
 						StepperIHold(false);
-						//StepperSoftStop(&StepR);
-						//StepperSoftStop(&StepL);			//softStop
 						incRot = 0;
 						tarPosR = 0;
+						tarPosL = 0;
 					    resetStepL = true;
 					    resetStepR = true;
-						routeNum = ParamValue[ParamCount-1];
+						routeNum = ParamValue[a_Cour];
 						routeStep = 0;
 						MotionVar = 0;
+						rampRot = 0;
 
 					}
 					else
@@ -517,11 +538,19 @@ int main(void)
 							setRotaryColor(LED_YELLOW);
 							StepperIHold(true);
 						}
-
-						//BalaRot = ParamValue[ParamCount-1];
 						if (activeMove == true)
 						{
 							float setPitch = (rad2step)* runPID(&PID_phi, MPU1.pitch);
+							if (rampRot < 1)
+							{
+								rampRot += ParamValue[a_raRo];
+							}
+						/*	Translation has to be controlled by pitch
+						 * if (rampTra < 1)
+							{
+								rampTra += ParamValue[a_raTr];
+							}
+						*/
 							//setPitch = 0;
 							if (StepRenable)
 							{
@@ -536,7 +565,7 @@ int main(void)
 									StepperResetPosition(&StepR);
 									resetStepR = false;
 								}
-								tarPosR = curMotR + incRot + incTra;
+								tarPosR = curMotR + incRot*rampRot;
 								posMotR = (int16_t)(setPitch + tarPosR);
 								StepperSetPos(&StepR, posMotR); //setPosition;
 								StepRenable = false;
@@ -555,8 +584,7 @@ int main(void)
 									StepperResetPosition(&StepL);
 									resetStepL = false;
 								}
-								//curMotL = (float)StepperGetPos(&StepL);
-								tarPosL = curMotL - incRot + incTra;
+								tarPosL = curMotL - incRot*rampRot;
 								posMotL = (int16_t)(setPitch + tarPosL);
 								StepperSetPos(&StepL, posMotL); //setPosition;
 								StepRenable = true;
@@ -594,14 +622,15 @@ int main(void)
 					{
 					  targetTra = route[routeNum][routeStep][0];
 					  targetRot = route[routeNum][routeStep][1];
-					  //StepperResetPosition(&StepL);
-					  //StepperResetPosition(&StepR);
+					  rampRot = 0;
+					  //rampTra = 0;
 					  resetStepL = true;
 					  resetStepR = true;
-					  incTra = targetTra * DivTimeTask;
+					  //incTra = targetTra * DivTimeTask;
 					  incRot = targetRot * DivTimeTask;
-					  if (incRot > incRotMax) { incRot = incRotMax;}
-					  if (incRot < -incRotMax) { incRot = -incRotMax;}
+					  if (incRot > ParamValue[a_maRo]) { incRot = ParamValue[a_maRo];}
+					  if (incRot < -ParamValue[a_maRo]) { incRot = -ParamValue[a_maRo];}
+
 
 					  MotionVar = 1;
 					  sprintf(strT, "N%2i,%+5.0f,%+5.0f",routeNum, targetRot, targetTra);
@@ -616,8 +645,8 @@ int main(void)
 					{
 
 					  if (
-							 //((fabs(((posMotL+posMotR)/2)- route[routeNum][routeStep][0]) < routeTol)) &&
-							 ((fabs((posMotR-posMotL) - route[routeNum][routeStep][1]) < rotTol))
+							 ((fabs((float)((posMotL+posMotR)/2)- route[routeNum][routeStep][0]) < posTol)||(posTol <= 0)) &&
+							 ((fabs((float)(posMotR-posMotL) - route[routeNum][routeStep][1]) < rotTol))
 						 )
 					  {
 						 if (++routeStep >= routeStepMax)
@@ -631,17 +660,22 @@ int main(void)
 					  {
 
 						  deltaTra = (+targetTra - ((posMotL + posMotR))/2);
-						  incTra = (float)deltaTra * DivTimeTask;
-						  deltaRot = (+targetRot - (posMotR - posMotL));
+						  //incTra = (float)deltaTra * DivTimeTask;
+						  deltaRot = (+targetRot - (curMotR - curMotL));		// changed to curMotX
 						  incRot = (float)deltaRot  * DivTimeTask;
-						  if (incRot > incRotMax) { incRot = incRotMax;}
-						  if (incRot < -incRotMax) { incRot = -incRotMax;}
+						  if (incRot > ParamValue[a_maRo])
+						  { incRot = ParamValue[a_maRo];}
+						  if (incRot < -ParamValue[a_maRo])
+						  { incRot = -ParamValue[a_maRo];}
 					  }
 
-					  //sprintf(strT, "S%2i,R%+5i,T+5%i",routeStep,deltaRot, deltaTra);
-					  sprintf(strT, "S%2i,%+5i",routeStep,deltaRot);
+					  sprintf(strT, "S%2i,%+6i,%+6i  ",routeStep,deltaRot, deltaTra);
+					  //sprintf(strT, "S%2i,%+5i",routeStep,deltaRot);
 					  pxPos = 4;   pyPos = 60;	  tft_color = tft_WHITE;
-					  //tftPrintColor((char *)strT, pxPos, pyPos, tft_color);
+					  if (ParamValue[a_DEBG] >0)
+					  {
+						  tftPrintColor((char *)strT, pxPos, pyPos, tft_color);
+					  }
 					}
 					break;
 					default:
