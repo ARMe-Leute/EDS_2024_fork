@@ -1,10 +1,11 @@
 /*
- * MPU6050.h
- * Version: 1.1
+ * i2cMPU.h
+ * Version: 2.0
  *
  *  Created on: Nov 25, 2024
- *      Author: Müller, Berenspöhler
- *      updated: T Flaemig
+ *      Author:	T Flaemig
+ *      based on workfrom Müller, Berenspöhler
+ *  only for lessons
  */
 
 #ifndef I2CMPU_H_
