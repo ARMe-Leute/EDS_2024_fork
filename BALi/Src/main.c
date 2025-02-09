@@ -17,7 +17,7 @@
  ******************************************************************************
 
  */
-#define SwVersion "DHBW Bala V1.0 (c)Fl"
+#define SwVersion "DHBW Bala V1.1 (c)Fl"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -57,7 +57,7 @@ uint32_t    I2C_Timer = 0UL;
 #ifdef Oszi
 	#define StepTaskTime 20
 #else
-	#define StepTaskTime 6			// the communicatin to stepper takes 2,3ms therfor one ms in addition; in total StepTaskTime + 1 = 7ms
+	#define StepTaskTime 7			// the communicatin to stepper takes <1ms therefore total StepTaskTime = 7ms
 #endif
 #define DispTaskTime 700			// Task for Postion control and Display Status
 
@@ -138,10 +138,10 @@ enum
 
 
 
-char ParamTitle[ParamCount][5] ={"Cour", "DEBG", "poTo", "phiZ","GyAc",	"HwLP",		"LP  ",	"piKP",	"piKI",	"piKD", "raRo",		"maRo",		"raTr"};
-float ParamValue[ParamCount] =  {0,  	0,			0.0, 	0,		0.98, 		5, 		0.36,  	0.75, 	0.058, 	0.27, 		0.004, 		12, 		0.01};
+char ParamTitle[ParamCount][5] ={"Cour", "DEBG", "poTo", "phiZ","GyAc",	"HwLP",		"LP  ",	"piKP",	"piKI",	"piKD", 			"raRo",		"maRo",		"raTr"};
+float ParamValue[ParamCount] =  {0,  	0,			0.0, 	-0.004,		0.98, 		5, 		0.36,  	0.75, 	0.058, 	0.27, 		0.002, 		10, 		0.01};
 //								{1, 	0, 			0.0, 	0,		0.98, 		5, 		0.36,  	0.5, 	0.056, 	0.27, 		0.01, 		0.02, 		0.0)   //
-float ParamScale[ParamCount] = 	{1,  	1, 			0.2,   	100, 	100, 		1,		500, 	100, 	500,  	100,		500, 		1,  		500};			//  increment stepsize is 1/Value
+float ParamScale[ParamCount] = 	{1,  	1, 			0.2,   	500, 	100, 		1,		500, 	100, 	500,  	100,		500, 		1,  		500};			//  increment stepsize is 1/Value
 
 
 struct Parameter
@@ -243,7 +243,7 @@ int main(void)
 
 	uint8_t        scanAddr = 0x7F;  //7Bit Adresse
 	I2C_TypeDef   *i2c  = I2C1;
-	I2C_TypeDef   *i2c2  = I2C2;
+	//I2C_TypeDef   *i2c2  = I2C2;
 
 /**
 *	MPU6050 parameter */
@@ -259,12 +259,12 @@ int main(void)
 		 resetStepR = true;
 
 
-	const float DivTimeTask= 0.01;   // StepTask div PosTask
+	const float DivTimeTask= 0.01;   // StepTask div PosTask 7ms / 700ms
 
     uint8_t MotionVar = 0;
 
 	char strX[8],strY[8],strZ[8],strT[32];
-	char strV[20] ={SwVersion};
+
 
 
 /**	Menue for the Filter
@@ -295,7 +295,10 @@ int main(void)
        size_t    arraySize = sizeof(timerList)/sizeof(timerList[0]);
 
 
-    BALOsetup();
+    //BALOsetup();
+
+    ledActivate();		// at BALO.c
+    i2cActivate();		// at BALO.c
     LED_red_on;
 
 	//Inits needed for TFT Display
@@ -305,7 +308,7 @@ int main(void)
 	tftInitR(INITR_REDTAB);
 
 	//display setup
-    tftSetRotation(LANDSCAPE_FLIP);
+    tftSetRotation(LANDSCAPE);
     tftSetFont((uint8_t *)&SmallFont[0]);
     tftFillScreen(tft_BLACK);
 
@@ -337,10 +340,13 @@ int main(void)
 		   {
 		   	   case 0:  //I2C Scan
 		   	   {
-		   		   i2cSetClkSpd(i2c,  I2C_CLOCK_1Mz);  // for RFID Reader reduced to 100KHz AMIS also clock streching down to 100kHz
-		   		   i2cSetClkSpd(i2c2,  I2C_CLOCK_1Mz);  // Sensor runs fast
+
+		   		   //setting at BALO.c BALOsetup() --> i2cActive
+		   		   //i2cSetClkSpd(i2c,  I2C_CLOCK_400);  // for RFID Reader reduced to 200KHz AMIS 400kHz
+		   		   //i2cSetClkSpd(i2c2,  I2C_CLOCK_1Mz);  // Sensor runs fast
 		   		   RunMode  = 1;
 		   	   }
+		   	   break;
 		   	   case 1:  //I2C Scan
 		   	   {
 		   		setRotaryColor(LED_MAGENTA);
@@ -417,8 +423,8 @@ int main(void)
 				   {
 					   scanAddr -=1;
 				   }
-				   break;
 				}
+		   	    break;
 	// 3DG Sensor function
 		   	 	case 4:  // 3DGInit Init
 		   	 	{
@@ -473,12 +479,14 @@ int main(void)
 						LED_blue_off;
 
 					}*/
-				break;
 				}
+		   		break;
 		   		case 8:  // Stepper Closed loop Control
 				{
 					if (RunInit)
 					{
+
+						tftSetRotation(LANDSCAPE_FLIP);
 						tftFillScreen(tft_BLACK);
 						tftSetColor(tft_RED, tft_WHITE);
 						tftPrint(SwVersion,0,0,0);
@@ -524,6 +532,11 @@ int main(void)
 						routeStep = 0;
 						MotionVar = 0;
 						rampRot = 0;
+						/*if (AlphaBeta[1] > 0)
+						{  tftSetRotation(LANDSCAPE_FLIP);	}
+						else
+						{  tftSetRotation(LANDSCAPE); }
+						*/
 
 					}
 					else

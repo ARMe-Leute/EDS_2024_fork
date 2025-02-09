@@ -207,7 +207,8 @@ I2C_RETURN_CODE_t i2cSetClkSpd(I2C_TypeDef *i2c, I2C_CLOCKSPEED_t spd)
     			}
     		case I2C_CLOCK_400:
     		{
-     			i2c->CCR |= 0x0014;				// Select 400 kHz bus clock
+    			//i2c->CCR |= I2C_CCR_FS; 	    // fast Mode
+    			i2c->CCR |= 0x0014;				// Select 400 kHz bus clock
     			break;
     		}
     		case I2C_CLOCK_1Mz:
@@ -223,6 +224,7 @@ I2C_RETURN_CODE_t i2cSetClkSpd(I2C_TypeDef *i2c, I2C_CLOCKSPEED_t spd)
     			break;
     		}
     	}
+    	 i2c->CR1 |= I2C_CR1_PE;            // Re-renable I2C component
     	return I2C_OK;
     }
     return I2C_INVALID_CLOCK_SPEED;
@@ -243,14 +245,14 @@ I2C_RETURN_CODE_t i2cInitI2C(I2C_TypeDef *i2c, I2C_DUTY_CYCLE_t duty, uint8_t tr
     pclock = rccGetPclk1Freq();
     i2c->CR2 = pclock / 1000000;		//
 
-    i2c->TRISE = 0x0011;                // Set max. rise time
+    i2c->TRISE = trise;                // Set max. rise time
 
     i2c->OAR1 |= (0x00 << 1);			 // set own address to 00 - not really used in master mode
     i2c->OAR1 |= (1 << 14); 			// bit 14 should be kept at 1 according to the datasheet
 
     i2cSetClkSpd(i2c, clock);			// set I2C Clockrate
 
-    i2c->CR1 |= I2C_CR1_PE;            // Re-renable I2C component
+    //i2c->CR1 |= I2C_CR1_PE;            // Re-renable I2C component
 
     return I2C_OK;
 }
