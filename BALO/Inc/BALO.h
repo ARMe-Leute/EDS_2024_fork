@@ -33,6 +33,7 @@
 
 extern void BALOsetup(void);
 extern void i2cActivate(void);
+extern void ledActivate(void);
 
 extern uint16_t AlBeOszi(float *AlphaBeta);
 
