@@ -35,7 +35,6 @@
  */
 #define USART2_BUFFER_SIZE (2*1200*BLUETOOTH_FETCH_TIME)/1000
 
-
 /**
  * @brief Enable debug mode for the library.
  *
@@ -68,7 +67,6 @@
  */
 #define BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR
 
-
 #if !(defined(BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK) || defined(BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR))
 /**
  * @warning If no reply simulation is defined, the program may hang.
@@ -80,45 +78,46 @@
 /**
  * @brief Structure representing a Bluetooth module instance.
  */
-typedef struct BluetoothModule {
-	const USART_TypeDef *usart; 				/**< USART instance for communication. */
-	int8_t initStatus; 							/**< Initialization status of the module. */
-	uint32_t baudRate; 							/**< Baud rate for the USART. */
+typedef struct BluetoothModule
+    {
+	const USART_TypeDef *usart; /**< USART instance for communication. */
+	int8_t initStatus; /**< Initialization status of the module. */
+	uint32_t baudRate; /**< Baud rate for the USART. */
 	char messageBuffer[USART2_BUFFER_SIZE + 1]; /**< Buffer for received messages. */
-	uint16_t available; 						/**< Number of available characters in the buffer. */
-	uint8_t counter; 							/**< Counter for internal operations, e.g., retry count. */
-	int16_t state; 								/**< Current state of the state machine. */
+	uint16_t available; /**< Number of available characters in the buffer. */
+	uint8_t counter; /**< Counter for internal operations, e.g., retry count. */
+	int16_t state; /**< Current state of the state machine. */
 
-} BluetoothModule_t;
+    } BluetoothModule_t;
 
 /**
  * @brief Enum representing possible Bluetooth errors and status codes.
  */
-typedef enum BluetoothError {
-	BluetoothFinish = 0,		/**< Operation completed successfully. */
-	BluetoothBusy,				/**< Module is busy with another command. */
-	BluetoothWrongParameter,	/**< Invalid parameter provided. */
-	BluetoothRetryError,		/**< Retry operation error. */
-	BluetoothLengthError		/**< Reply length error length error. */
-} BluetoothError_t;
-
+typedef enum BluetoothError
+    {
+    BluetoothFinish = 0, /**< Operation completed successfully. */
+    BluetoothBusy, /**< Module is busy with another command. */
+    BluetoothWrongParameter, /**< Invalid parameter provided. */
+    BluetoothRetryError, /**< Retry operation error. */
+    BluetoothLengthError /**< Reply length error length error. */
+    } BluetoothError_t;
 
 /**
  * @brief Enum defining states for the Bluetooth state machine.
  */
-enum BluetoothState {
-	getStatus = -10, 		/**< Initial state for getStatus command. */
-	getStatus_2,			/**< Secondary state for getStatus command. */
-	getMacAddress = -20,	/**< Initial state for getMacAddress command. */
-	getMacAddress_2			/**< Secondary state for getMacAddress command. */
-};
+enum BluetoothState
+    {
+    getStatus = -10, /**< Initial state for getStatus command. */
+    getStatus_2, /**< Secondary state for getStatus command. */
+    getMacAddress = -20, /**< Initial state for getMacAddress command. */
+    getMacAddress_2 /**< Secondary state for getMacAddress command. */
+    };
 
 int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART,
-		uint32_t baudRate);
+	uint32_t baudRate);
 bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule);
 int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK);
 int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
-
 
 /**
  * @brief Global buffer for USART2 communication.
