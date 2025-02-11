@@ -18,24 +18,27 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
+
+
+
+#include <stdint.h>
+#include <stdbool.h>
 #include <regler.h>
 
-
-
-// ******************** Predeclare PID_Control Type ********************
-typedef struct PIDContr PIDContr_t;
-
-struct PIDContr
-{
-	float KP;				// Proportional Coefficient eg [steps/phi]
-	float KI;				// Integral Coeff.
-	float KD;				// Differential Coeff
-	float ISUM;				// Integral Sum
-	PIDContr_t* (*get)(PIDContr_t*);		// get PID Referenze
-	void (*set)(PIDContr_t*, PIDContr_t*);	// Copy PID Parameter
-	void (*init)(PIDContr_t*, float, float, float);  // Initialize PID with Parameters KP KI KD
-	float (*run)(PIDContr_t*, float);   // run PID Control with in: difference end out: result
+// define prototype structure for the PIDContr
+const PIDContr_t PID = {
+	.KP =0,
+	.KI = 0,
+	.KD = 0,
+	.ISUM = 0,
+	.TA = 0,
+	.InpOld = 0,
+	.get = getPID,
+	.set = setPID,
+	.init = initPID,
+	.run = runPID,
 };
+
 
 /**
  * get the PID Coeffizent
@@ -58,18 +61,37 @@ void setPID(PIDContr_t* Source, PIDContr_t* Desti)
 
 
 
-void initPID(PIDContr_t* PIDParam, float KP, float KI, float KD)
+void initPID(PIDContr_t* PIDParam, float KP, float KI, float KD, float TA)
 {
 	PIDParam->ISUM = 0;
 	PIDParam->KP = KP;
 	PIDParam->KI = KI;
 	PIDParam->KD = KD;
+	PIDParam->TA = TA;
+	PIDParam->InpOld =0;
 };
+
+void clearPID(PIDContr_t* PIDParam)
+{
+	PIDParam->ISUM = 0;
+	PIDParam->InpOld =0;
+};
+
 
 
 float runPID(PIDContr_t* PID, float Diff)
 {
-return PID->KP;
+	if (PID->KI == 0)
+	{
+		PID->ISUM = 0;
+	}
+	else
+	{
+		PID->ISUM += Diff;
+	}
+	float result = (PID->KP * Diff) + (PID->KI * PID->ISUM *PID->TA) + (PID->KD / PID->TA)*(Diff - PID->InpOld);
+	PID->InpOld = Diff;
+	return result;
 };
 
 
@@ -79,14 +101,14 @@ return PID->KP;
  *
  float PID_PosOut, PID_VeloOut;
  int main() {
- 	struct PIDRegler PID_Pos, PID_Velo;
- 	const uint8_t iHold = 5;
+ 	PIDRegler_t PID_Pos, PID_Velo;
+
 
 	// PID_Pos.init(... 	KP, KI, KD)
- 	PID_Init(&PID_Pos, 0.5,    0, 0.2);
-	PID_Init(&PID_Velo, 0.1, 0.2, 0.1);
+ 	initPID(&PID_Pos, 0.5,    0, 0.2);
+	initPID(&PID_Velo, 0.1, 0.2, 0.1);
 
-	PID_PosOut= PID.run(PID_Pos, ePos);
+	PID_PosOut= runPID(&PID_Pos, ePos);
 
    
     StepperSetPos(StepL, PID_PosOut);
@@ -99,20 +121,46 @@ return PID->KP;
 
 **/
 
-
-// define prototype structure for the PIDContr
-const PIDContr_t PID = {
-	.KP =0,
-	.KI = 0,
-	.KD = 0,
-	.get = getPID,
-	.set = setPID,
-	.init = initPID,
-	.run = runPID,
+// define prototype structure for the MeanVal
+const MeanVal_t MV = {
+	.sto_mw =0,
+	.wight = 0,
 };
 
+float runMeanVal(MeanVal_t* mVal, float Inp)
+{
+	float mwData;
+	/*
+	 *
+	 *mwData = (mVal->sto_mw)/(mVal->wight);
+	(mVal->sto_mw) += Inp - mwData;
+	*/
 
+	mwData = Inp* mVal->wight + (1-mVal->wight)*mVal->sto_mw;
+	mVal->sto_mw =mwData;
+	return mwData;
+}
+
+void clrMeanVal(MeanVal_t* mVal, float wight)
+{
+	mVal->sto_mw = (float) 0;
+	mVal->wight = wight;
+}
+
+// Tiefpassfilterung der drei Richtungsvektoren xyz
+void LowPassFilt(int16_t raw_data[3], int16_t filt_data[3], int16_t _tp)
+{
+	static long _sto_xyz[3];
+	uint8_t i;
+	for (i=1;i<=3;i++)
+	{
+  	 	_sto_xyz[i] += (long) raw_data[i] - (filt_data[i] = _sto_xyz[i]/_tp);
+	}
+}
+
+/*
 struct LPFilter
 {
 
 };
+*/
