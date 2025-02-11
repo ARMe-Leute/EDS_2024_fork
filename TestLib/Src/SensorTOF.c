@@ -584,6 +584,7 @@ bool TOF_init_device(TOFSensor_t* TOFSENS)
 bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range)
 {
 	I2C_RETURN_CODE_t i2c_return;
+	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
 	uint8_t interrupt_status[1];
 	do
@@ -607,7 +608,7 @@ bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range)
 	}
 	*range = (readBuffer[0] << 8) + readBuffer[1];
 
-	TOFSENS->measuredRange = readBuffer;
+	TOFSENS->measuredRange = (uint32_t)readBuffer;
 	i2c_return = i2cSendByteToSlaveReg(
 			TOF_i2c, TOF_address_used,
 			TOF_REG_SYSTEM_INTERRUPT_CLEAR, 0x01);
