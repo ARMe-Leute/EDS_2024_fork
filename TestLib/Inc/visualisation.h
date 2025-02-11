@@ -160,7 +160,7 @@ void visualisationShowError(SCREEN_PAGES_t page);
  * @parameters:	 uint16_t distance:		current distance
  * 				 uint16_t *olddistance: old distance
  */
-void visualisationTOF(TOFSensor_t* TOFSENS, uint16_t distance, uint16_t *olddistance);
+void visualisationTOF(TOFSensor_t* TOFSENS);
 
 
 

@@ -109,6 +109,10 @@ void initializeTOFSensor(TOFSensor_t* sensor, I2C_TypeDef *i2c_tof, uint16_t TOF
 void configureTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t, bool enable) {
     sensor->Ranging_Profiles_t = Ranging_Profiles_t;  // Set the new ranging profile
     sensor->enableTOFSensor = enable;                  // Enable or disable the TOF sensor
+    if(sensor->enableTOFSensor == true)
+    {
+    	TOF_set_ranging_profile(sensor);
+    }
 }
 
 
@@ -580,7 +584,7 @@ bool TOF_init_device(TOFSensor_t* TOFSENS)
 bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range)
 {
 	I2C_RETURN_CODE_t i2c_return;
-
+	TOF_i2c = TOFSENS->i2c_tof;
 	uint8_t interrupt_status[1];
 	do
 	{
