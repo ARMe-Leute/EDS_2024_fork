@@ -52,6 +52,8 @@ bool timerTrigger;
 volatile char usart2Buffer[USART2_BUFFER_SIZE];
 volatile uint16_t usart2BufferIndex = 0;
 
+uint32_t ST7735_Timer = 0UL;
+
 int main(void)
     {
 
@@ -59,9 +61,10 @@ int main(void)
     uint32_t BluetoothFetchTimer = 0UL; // Timer for calling bluetoothFetchBuffer().
     uint32_t Button = 0UL;// Timer for button polling, helps with debouncing.
     uint32_t ButtonLEDOff = 0UL;	// Timer for turning off the button LED.
+
     uint32_t *timerList[] =
 	{
-	&BluetoothTimer, &BluetoothFetchTimer, &Button, &ButtonLEDOff
+	&BluetoothTimer, &BluetoothFetchTimer, &Button, &ButtonLEDOff, &ST7735_Timer
 	};
     uint8_t arraySize = sizeof(timerList) / sizeof(timerList[0]);
 
@@ -85,6 +88,25 @@ int main(void)
 	    initRotaryPushButton();
 	    initRotaryPushButtonLED();
 	    systickSetTicktime(&Button, 20);
+
+		spiInit();
+		tftInitR(INITR_REDTAB);
+
+		//display setup
+	    tftSetRotation(LANDSCAPE);
+	    tftSetFont((uint8_t *)&SmallFont[0]);
+	    tftFillScreen(tft_BLACK);
+
+	    /* initialize the rotary push button module */
+	    initRotaryPushButton();
+
+
+
+
+	    LED_red_off;
+
+	    tftPrintColor((char *)"Bluetooth Test",0,0,tft_MAGENTA);
+
 
 	    while (setupFinished == false)
 		{
