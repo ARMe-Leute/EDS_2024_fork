@@ -19,6 +19,7 @@
 
 #include <bluetooth.h>
 #include <RotaryPushButton.h>
+#include <ST7735.h>
 
 /**
  * @brief Time interval for Bluetooth setup steps (in milliseconds).
