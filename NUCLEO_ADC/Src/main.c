@@ -13,7 +13,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <RotaryPushButton.h>
+
+/**
+ * Kommentar in der naechsten Zeile entfernen, wenn Sie die ADC_MCAL testen möchten.
+ */
+#define MCAL_ADC
+
 #include <mcalGPIO.h>
 #include <mcalADC.h>
 #include <stdio.h>

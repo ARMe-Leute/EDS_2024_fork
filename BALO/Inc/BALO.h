@@ -35,6 +35,34 @@ extern void BALOsetup(void);
 extern void i2cActivate(void);
 extern void ledActivate(void);
 
+
+#define halfBatVolt  (float)14
+#define emptyBatVolt (float)13
+
+
+typedef enum
+{
+	okBat = 0,
+	halfBat,
+	emptyBat,
+	underVolt,
+	overVolt
+} BatStat_t;
+
+typedef struct analogCh
+{
+	ADC_TypeDef *adc;
+	float BatVolt;
+	BatStat_t BatStatus;
+	float ratioBatVolt;
+	float CpuTemp;
+} analogCh_t;
+
+
+
+extern void adcActivate(void);
+extern BatStat_t getBatVolt(analogCh_t* pADChn);
+
 extern uint16_t AlBeOszi(float *AlphaBeta);
 
 #endif /* BALO_H_ */
