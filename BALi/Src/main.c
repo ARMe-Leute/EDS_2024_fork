@@ -17,7 +17,7 @@
  ******************************************************************************
 
  */
-#define SwVersion "DHBW Bala V1.1 (c)Fl"
+#define SwVersion "DHBW Bala-V1.2a(c)Fl"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -28,6 +28,7 @@
 #include <mcalGPIO.h>
 #include <mcalSPI.h>
 #include <mcalI2C.h>
+#include <mcalADC.h>
 #include <ST7735.h>
 #include <RotaryPushButton.h>
 #include <BALO.h>
@@ -66,7 +67,7 @@ uint32_t    I2C_Timer = 0UL;
 void test_ascii_screen(void);
 void test_graphics(void);
 void StepperFollowsPitch(bool StepLenable, bool StepRenable);
-void dispMPUTemp(MPU6050_t* MPU1);
+void dispMPUBat(MPU6050_t* MPU1, analogCh_t* pADChn);
 
 
 uint8_t I2C_SCAN(I2C_TypeDef *i2c, uint8_t scanAddr);
@@ -264,8 +265,18 @@ int main(void)
     uint8_t MotionVar = 0;
 
 	char strX[8],strY[8],strZ[8],strT[32];
+/**
+ * ADC Measure Battery Voltage
+ */
+	/*------------ ADC Channels  -----------------*/
+
+	analogCh_t adChn;
+	BatStat_t BatStatus;
+	adChn.adc = ADC1;
 
 
+
+	//float BatVolt = 0;
 
 /**	Menue for the Filter
  *
@@ -300,6 +311,7 @@ int main(void)
     ledActivate();		// at BALO.c
     i2cActivate();		// at BALO.c
     LED_red_on;
+    adcActivate();
 
 	//Inits needed for TFT Display
     // Initialisiert den Systick-Timer
@@ -344,6 +356,17 @@ int main(void)
 		   		   //setting at BALO.c BALOsetup() --> i2cActive
 		   		   //i2cSetClkSpd(i2c,  I2C_CLOCK_400);  // for RFID Reader reduced to 200KHz AMIS 400kHz
 		   		   //i2cSetClkSpd(i2c2,  I2C_CLOCK_1Mz);  // Sensor runs fast
+		   		   BatStatus = getBatVolt(&adChn);
+		   		   if (okBat == BatStatus)
+		   		   {
+		   			   tft_color  = tft_GREEN;
+		   		   }
+		   		   else
+		   		   {
+		   			   tft_color  = tft_YELLOW;
+		   		   }
+		   		   sprintf(strT, "Battery: %3.1f V", adChn.BatVolt);
+		   		   tftPrintColor((char *)strT, 0 , 0, tft_color);
 		   		   RunMode  = 1;
 		   	   }
 		   	   break;
@@ -470,7 +493,10 @@ int main(void)
 		   			tftPrint((char *)strY,20,60,0);
 		   			sprintf(strZ, "%+6.3f", MPU1.accel[2]);
 		   			tftPrint((char *)strZ,20,70,0);
+
+		   		 dispMPUBat(&MPU1,&adChn);
 					/*if ((timeTMode5--) > 0)
+
 					{
 						RunMode = 8;
 						tftFillScreen(tft_BLACK);
@@ -492,6 +518,7 @@ int main(void)
 						tftPrint(SwVersion,0,0,0);
 						//tftPrint("DHBW BALA %s (c)Fl\0",0,0,0);
 						tftSetColor(tft_GREEN, tft_BLACK);
+						dispMPUBat(&MPU1,&adChn);
 						StepperIHold(true);										//IHold switched on
 						StepperResetPosition(&StepL);  		//resetPosition
 						StepperResetPosition(&StepR);
@@ -648,7 +675,8 @@ int main(void)
 					  MotionVar = 1;
 					  sprintf(strT, "N%2i,%+5.0f,%+5.0f",routeNum, targetRot, targetTra);
 					  pxPos = 4;   pyPos = 40;	  tft_color = tft_YELLOW;
-					  tftPrintColor((char *)strT, pxPos, pyPos, tft_color);
+					  tftSetColor(tft_GREEN, tft_BLACK);
+					  tftPrint((char *)strT, pxPos, pyPos, 0);
 
 
 					}
@@ -665,7 +693,8 @@ int main(void)
 						 if (++routeStep >= routeStepMax)
 						 {
 							 routeStep = 0;
-							 dispMPUTemp(&MPU1);
+							 dispMPUBat(&MPU1, &adChn);
+
 						 }
 						 MotionVar = 0;
 					  }  		// End position reached
@@ -699,6 +728,11 @@ int main(void)
 			}  //end if ((activeMove == true) && (RunMode == 8 ))
 
 			//if ((activeMove == false) && (RunMode == 8 ))
+
+			if ((RunMode == 5)|| ((RunMode == 8)&&(activeMove != true)))
+			{
+				 dispMPUBat(&MPU1,&adChn);
+			}
 			if ((MotionVar == 0) && (RunMode == 8 ))
 			{
 /*
@@ -722,15 +756,31 @@ int main(void)
 }
 
 
-void dispMPUTemp(MPU6050_t* pMPU1)
+void dispMPUBat(MPU6050_t* pMPU1, analogCh_t* pADChn)
 {
-	char strT[10];
-	float Temp = mpuTemp(pMPU1);
-	sprintf(strT, "%+3.1f", Temp);
+	//ADC_TypeDef   *adc= ADC1;
+	char strT[20];
+	float Temp = mpuGetTemp(pMPU1);
+	BatStat_t BatStatus;
+	BatStatus = getBatVolt(pADChn);
+
+    if (BatStatus == halfBat)
+    {
+    	tftSetColor(tft_BLACK, tft_YELLOW);
+    }
+	else
+    {
+	   //tft_color  = tft_YELLOW;
+	   tftSetColor(tft_WHITE, tft_RED);
+    }
+    if (BatStatus == okBat)
+	{
+	   tftSetColor(tft_GREEN, tft_BLACK);
+	}
+	sprintf(strT, "T:%+3.1f Bat:%3.1fV", Temp,pADChn->BatVolt);
 	int pxPos = 10;// ST7735_TFTWIDTH/2-10;
 	int pyPos = 110;
-	uint16_t tft_color = tft_GREEN;
-	tftPrintColor((char *)strT, pxPos, pyPos, tft_color);
+	tftPrint((char *)strT, pxPos, pyPos,0);
 }
 
 

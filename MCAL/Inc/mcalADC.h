@@ -63,7 +63,7 @@ typedef enum
     ADC_CHN_13,
     ADC_CHN_14,
     ADC_CHN_15,
-    ADC_CHN_16,
+    ADC_CHN_16,		// cpuTemp
     ADC_CHN_17,
     ADC_CHN_18,
 } ADC_CHANNEL_t;
