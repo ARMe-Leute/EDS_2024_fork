@@ -127,7 +127,7 @@ int main(void)
       submenu1.TR = &feld4;
 
       submenu2.TL = &feldBack;
-      submenu2.BL = &feld2;
+      submenu2.BL = &subfeld1;
       submenu2.BR = &feld3;
       submenu2.TR = &feld4;
 
@@ -183,22 +183,20 @@ int main(void)
 
                   if (isSystickExpired(Button))
                      {
-                        if (getMenuRotaryPosition(getRotaryPosition()) != menuManager_1.currentPosition)
+                        switch (menuManager_1.activeMode)
                            {
-                              menuManager_1.currentPosition = getMenuRotaryPosition(getRotaryPosition());
-                              lastRotaryPosition = getMenuRotaryPosition(getRotaryPosition());
-                              drawGrid();
-                              higlightEntry(menuManager_1.currentPosition);
-                           }
-                        if (getRotaryPushButton() == true)
-                           {
-
-                              switch (menuManager_1.activeMode)
+                           case Page:
+                              if (getMenuRotaryPosition(getRotaryPosition())
+                                    != menuManager_1.currentPosition)
                                  {
-                                 case Entry:
-                                    menuManager_1.activeMode = Page;
-                                    break;
-                                 case Page:
+                                    menuManager_1.currentPosition = getMenuRotaryPosition(
+                                          getRotaryPosition());
+                                    lastRotaryPosition = getMenuRotaryPosition(getRotaryPosition());
+                                    drawGrid();
+                                    higlightEntry(menuManager_1.currentPosition);
+                                 }
+                              if (getRotaryPushButton() == true)
+                                 {
                                     if (getEntryFromPosition(&menuManager_1,
                                           menuManager_1.currentPosition)->type == Page)
                                        {
@@ -221,11 +219,31 @@ int main(void)
                                           menuManager_1.activePage =
                                                 menuManager_1.activePage->lastMenu;
                                        }
-                                    break;
+                                    showMenuPage(&menuManager_1, menuManager_1.currentPosition);
                                  }
-                              showMenuPage(&menuManager_1, menuManager_1.currentPosition);
+                              break;
+                           case Entry:
+                              if (menuManager_1.activeEntry == &feld2)
+                                 {
+                                    tftPrint((char*) "sdofihv", 50, 50, 0);
+                                    if (getRotaryPushButton() == true)
+                                       {
+                                          menuManager_1.activeMode = Page;
+                                          showMenuPage(&menuManager_1, menuManager_1.currentPosition);
 
+                                       }
+                                 }
+                              else
+                                 {
+                                    if (getRotaryPushButton() == true)
+                                       {
+                                          menuManager_1.activeMode = Page;
+                                          showMenuPage(&menuManager_1, menuManager_1.currentPosition);
+                                       }
+                                 }
+                              break;
                            }
+
                         systickSetTicktime(&Button, 20);
 
                      }
