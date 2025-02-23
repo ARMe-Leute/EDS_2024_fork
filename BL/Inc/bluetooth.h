@@ -41,14 +41,14 @@
  * This allows you to inject messages and run the debugger.
  */
 // Uncomment to enable debug mode
-#define debugMode
+//#define debugMode
 
 #ifdef debugMode
 
 /**
  * @brief Forces bluetoothGetStatus() to always return OK.
  */
-#define BLUETOOTH_GET_STATUS_RETURN_OK
+//#define BLUETOOTH_GET_STATUS_RETURN_OK
 
 /**
  * @brief Forces bluetoothGetStatus() to fail with a specific error.
@@ -59,13 +59,13 @@
  * @brief Simulates receiving "OK" in the buffer when calling bluetoothGetStatus().
  * This is then handled by bluetoothFetchBuffer().
  */
-#define BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK
+//#define BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK
 
 /**
  * @brief Simulates receiving "ERROR" in the buffer when calling bluetoothGetStatus().
  * This is then handled by bluetoothFetchBuffer().
  */
-#define BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR
+//#define BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR
 
 #if !(defined(BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK) || defined(BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR))
 /**
