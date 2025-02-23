@@ -111,7 +111,7 @@ int main(void)
     uint8_t arraySize = sizeof(timerList) / sizeof(timerList[0]);
 
         BluetoothModule_t HM17_1;   // Bluetooth module instance.
-
+int initStatus = -100;
 
 
       int lastRotaryPosition;
@@ -156,6 +156,7 @@ int main(void)
                case MAIN_INIT:
                   systickInit(SYSTICK_1MS); // Configure SysTick with a 1 ms interval.
 
+                  HM17_1.initStatus = -10;
                   initRotaryPushButton();
                   initRotaryPushButtonLED();
                   systickSetTicktime(&Button, 20);
@@ -167,7 +168,32 @@ int main(void)
                   tftSetRotation(LANDSCAPE);
                   tftSetFont((uint8_t*) &SmallFont[0]);
                   tftFillScreen(tft_BLACK);
-                  tftPrintColor((char*) "Bluetooth Test", 0, 0, tft_MAGENTA);
+                  tftSetColor(tft_WHITE, tft_BLACK);
+                  tftPrint((char*) "Bluetooth Test", 0, 0, 0);
+
+                  while (initStatus < 0)
+                     {
+                        if (timerTrigger == true)
+                           {
+                              systickUpdateTimerList((uint32_t*) timerList, arraySize);
+
+                           }
+                        if (isSystickExpired(BluetoothFetchTimer))
+                           {
+                              bluetoothFetchBuffer(&HM17_1);
+
+                              systickSetTicktime(&BluetoothFetchTimer,
+                              BLUETOOTH_FETCH_TIME);
+                           }
+                        if (isSystickExpired(BluetoothTimer))
+                           {
+                              initStatus = bluetoothInit(&HM17_1, USART2, 9600);
+                              systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
+                           }
+                     }
+
+
+
 
                   mode = MAIN_LOOP; // Transition to main loop
                   showMenuPage(&menuManager_1, (MenuPosition_t)0);
@@ -179,6 +205,13 @@ int main(void)
                      {
                         systickUpdateTimerList((uint32_t*) timerList, arraySize);
 
+                     }
+                  if (isSystickExpired(BluetoothFetchTimer))
+                     {
+                        bluetoothFetchBuffer(&HM17_1);
+
+                        systickSetTicktime(&BluetoothFetchTimer,
+                        BLUETOOTH_FETCH_TIME);
                      }
 
                   if (isSystickExpired(Button))
@@ -221,6 +254,7 @@ int main(void)
                                        }
                                     showMenuPage(&menuManager_1, menuManager_1.currentPosition);
                                  }
+                              systickSetTicktime(&Button, 20);
                               break;
                            case Entry:
                               if (menuManager_1.activeEntry == &feld2)
@@ -229,22 +263,84 @@ int main(void)
                                     if (getRotaryPushButton() == true)
                                        {
                                           menuManager_1.activeMode = Page;
-                                          showMenuPage(&menuManager_1, menuManager_1.currentPosition);
+                                          showMenuPage(&menuManager_1,
+                                                menuManager_1.currentPosition);
 
                                        }
+                                    systickSetTicktime(&Button, 20);
+                                 }
+                              else if (menuManager_1.activeEntry == &feld3)
+                                 {
+                                    tftPrintInt(getRotaryPosition(), 50, 50, 0);
+                                    if (getRotaryPushButton() == true)
+                                       {
+                                          menuManager_1.activeMode = Page;
+                                          showMenuPage(&menuManager_1,
+                                                menuManager_1.currentPosition);
+
+                                       }
+                                    systickSetTicktime(&Button, 20);
+                                 }
+                              else if (menuManager_1.activeEntry == &feld4)
+                                 {
+                                    static int status = -127;
+                                    static bool reply;
+                                    static bool active = false;
+
+                                    if (getRotaryPushButton() == true)
+                                       {
+                                          if (status >= 0)
+                                             {
+                                                status = -127;
+                                                active = false;
+                                                menuManager_1.activeMode = Page;
+                                                showMenuPage(&menuManager_1,
+                                                      menuManager_1.currentPosition);
+                                             }
+                                          else
+                                             {
+                                                active = true;
+                                                tftPrint((char*) "Getting Status...", 0, 50, 0);
+                                             }
+
+                                       }
+                                    if (active == true)
+                                       {
+                                          status = bluetoothGetStatus(&HM17_1, &reply);
+                                          if (status == BluetoothFinish)
+                                             {
+                                                if (reply == true)
+                                                   {
+                                                      tftPrintColor((char*) "OK", 0, 60, tft_GREEN);
+                                                   }
+                                                else
+                                                   {
+                                                      tftPrintColor((char*) "Unknown Error", 0, 60,
+                                                      tft_RED);
+                                                   }
+                                                active = false;
+                                             }
+                                          else if (status > 0)
+                                             {
+                                                tftPrintColor((char*) "Error:", 0, 60, tft_RED);
+                                                tftPrintInt(status, 0, 70, 0);
+                                                active = false;
+                                             }
+                                       }
+                                    systickSetTicktime(&Button, 100);
                                  }
                               else
                                  {
                                     if (getRotaryPushButton() == true)
                                        {
                                           menuManager_1.activeMode = Page;
-                                          showMenuPage(&menuManager_1, menuManager_1.currentPosition);
+                                          showMenuPage(&menuManager_1,
+                                                menuManager_1.currentPosition);
                                        }
+                                    systickSetTicktime(&Button, 20);
                                  }
                               break;
                            }
-
-                        systickSetTicktime(&Button, 20);
 
                      }
 
