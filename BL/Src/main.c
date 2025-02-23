@@ -67,11 +67,11 @@ MenuEntry_t feldBack =
    };
 MenuEntry_t subfeld1 =
    {
-   .color = tft_WHITE, .title = "submenu_1_", .type = Page, .page = &submenu1
+   .color = tft_WHITE, .title = "Features", .type = Page, .page = &submenu1
    };
 MenuEntry_t subfeld2 =
    {
-   .color = tft_WHITE, .title = "submenu_2_", .type = Page, .page = &submenu2
+   .color = tft_WHITE, .title = "Nested", .type = Page, .page = &submenu2
    };
 MenuEntry_t subfeld3 =
    {
@@ -83,15 +83,15 @@ MenuEntry_t subfeld4 =
    };
 MenuEntry_t feld2 =
    {
-   .color = tft_BLUE, .title = "feld2", .type = Entry, .page = NULL
+   .color = tft_BLUE, .title = "Text", .type = Entry, .page = NULL
    };
 MenuEntry_t feld3 =
    {
-   .color = tft_RED, .title = "feld3", .type = Entry, .page = NULL
+   .color = tft_RED, .title = "Counter", .type = Entry, .page = NULL
    };
 MenuEntry_t feld4 =
    {
-   .color = tft_GREEN, .title = "feld4", .type = Entry, .page = NULL
+   .color = tft_GREEN, .title = "GetStatus", .type = Entry, .page = NULL
    };
 
 MenuPage_t menuPage1;
