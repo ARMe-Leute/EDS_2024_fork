@@ -597,7 +597,7 @@ int main(void)
 								gpioSetPin(LED_RED_ADR);									// RED LED OFF
 								if (!resetStepR)
 								{
-									curMotR = (float)StepperGetPos(&StepR);							// 1,177ms
+									curMotR = (float)StepperGetPos(&StepR);					// 0.3 ms
 								}
 								else
 								{
@@ -607,7 +607,7 @@ int main(void)
 								}
 								tarPosR = curMotR + incRot*rampRot;
 								posMotR = (int16_t)(setPitch + tarPosR);
-								StepperSetPos(&StepR, posMotR); //setPosition;
+								StepperSetPos(&StepR, posMotR); 							//setPosition 0.4 ms
 								StepRenable = false;
 
 								gpioResetPin(LED_RED_ADR);									//RED LED ON
@@ -616,7 +616,7 @@ int main(void)
 							{
 								if (!resetStepL)
 								{
-									curMotL = (float)StepperGetPos(&StepL);							// 1,177ms
+									curMotL = (float)StepperGetPos(&StepL);					// 0.3ms
 								}
 								else
 								{
@@ -626,7 +626,7 @@ int main(void)
 								}
 								tarPosL = curMotL - incRot*rampRot;
 								posMotL = (int16_t)(setPitch + tarPosL);
-								StepperSetPos(&StepL, posMotL); //setPosition;
+								StepperSetPos(&StepL, posMotL); 							//setPosition;
 								StepRenable = true;
 							}
 						}
