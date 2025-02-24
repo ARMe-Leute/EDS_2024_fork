@@ -216,6 +216,7 @@ int initStatus = -100;
 
                   if (isSystickExpired(Button))
                      {
+                        systickSetTicktime(&Button, 200);
                         switch (menuManager_1.activeMode)
                            {
                            case Page:
@@ -254,7 +255,6 @@ int initStatus = -100;
                                        }
                                     showMenuPage(&menuManager_1, menuManager_1.currentPosition);
                                  }
-                              systickSetTicktime(&Button, 20);
                               break;
                            case Entry:
                               if (menuManager_1.activeEntry == &feld2)
@@ -267,7 +267,6 @@ int initStatus = -100;
                                                 menuManager_1.currentPosition);
 
                                        }
-                                    systickSetTicktime(&Button, 20);
                                  }
                               else if (menuManager_1.activeEntry == &feld3)
                                  {
@@ -279,7 +278,6 @@ int initStatus = -100;
                                                 menuManager_1.currentPosition);
 
                                        }
-                                    systickSetTicktime(&Button, 20);
                                  }
                               else if (menuManager_1.activeEntry == &feld4)
                                  {
@@ -327,7 +325,6 @@ int initStatus = -100;
                                                 active = false;
                                              }
                                        }
-                                    systickSetTicktime(&Button, 100);
                                  }
                               else
                                  {
@@ -337,7 +334,6 @@ int initStatus = -100;
                                           showMenuPage(&menuManager_1,
                                                 menuManager_1.currentPosition);
                                        }
-                                    systickSetTicktime(&Button, 20);
                                  }
                               break;
                            }
