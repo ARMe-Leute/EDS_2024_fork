@@ -12,16 +12,16 @@
 
 #include <ST7735.h>
 
-#define TL_OFFSET_X (0)
+#define TL_OFFSET_X (0+1)
 #define TL_OFFSET_Y (0)
 
-#define TR_OFFSET_X (tftGetWidth() /2)
+#define TR_OFFSET_X ((tftGetWidth() /2)+1)
 #define TR_OFFSET_Y (0)
 
-#define BL_OFFSET_X (0)
+#define BL_OFFSET_X (0+1)
 #define BL_OFFSET_Y (tftGetHeight() /2)
 
-#define BR_OFFSET_X (tftGetWidth() /2)
+#define BR_OFFSET_X ((tftGetWidth() /2)+1)
 #define BR_OFFSET_Y (tftGetHeight() /2)
 
 
