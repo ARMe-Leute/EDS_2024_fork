@@ -17,7 +17,7 @@
  ******************************************************************************
 
  */
-#define SwVersion "DHBW Bala-V1.2a(c)Fl"
+#define SwVersion "DHBW Bala-V1.2b(c)Fl"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -139,7 +139,7 @@ enum
 
 
 
-char ParamTitle[ParamCount][5] ={"Cour", "DEBG", "poTo", "phiZ","GyAc",	"HwLP",		"LP  ",	"piKP",	"piKI",	"piKD", 			"raRo",		"maRo",		"raTr"};
+char ParamTitle[ParamCount][5] ={"Cour", "DEBG", "poTo", 	"phiZ",		"GyAc",		"HwLP",	"LP  ",	"piKP",	"piKI",	"piKD", 		"raRo",		"maRo",		"raTr"};
 float ParamValue[ParamCount] =  {0,  	0,			0.0, 	-0.004,		0.98, 		5, 		0.36,  	0.75, 	0.058, 	0.27, 		0.002, 		10, 		0.01};
 //								{1, 	0, 			0.0, 	0,		0.98, 		5, 		0.36,  	0.5, 	0.056, 	0.27, 		0.01, 		0.02, 		0.0)   //
 float ParamScale[ParamCount] = 	{1,  	1, 			0.2,   	500, 	100, 		1,		500, 	100, 	500,  	100,		500, 		1,  		500};			//  increment stepsize is 1/Value
@@ -173,11 +173,6 @@ void SetRegParameter(MPU6050_t* MPUa)
 	MPUa->swLowPassFilt = ParamValue[a_LP];
 	MPUa->pitchFilt = ParamValue[a_GyAc];
 	initPID(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
-	/*
-	PID_phi.KP = ParamValue[4];
-	PID_phi.KI = ParamValue[5];
-	PID_phi.KD = ParamValue[6];
-	 */
 	if (ParamValue[a_HwLP] <0 ) { ParamValue[a_HwLP] =0;}
 	if (ParamValue[a_HwLP] >6 ) { ParamValue[a_HwLP] =6;}
 	MPUa->LowPassFilt = tableLPFValue[(uint)ParamValue[a_HwLP]];

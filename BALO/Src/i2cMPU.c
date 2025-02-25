@@ -370,7 +370,8 @@ int16_t mpuGetRPfromAccel(MPU6050_t* sensor) {
  * - Ensure the MPU6050 sensor has been properly initialized using `initMPU` before calling this function.
  * - This function assumes the gyroscope is properly configured during initialization.
  */
-int16_t mpuGetGyro(MPU6050_t* sensor) {
+int16_t mpuGetGyro(MPU6050_t* sensor)
+{
 	if (sensor->gyro_scale != (uint8_t) DISABLE) {
 		uint8_t readBuffer[6];
 
@@ -390,7 +391,8 @@ int16_t mpuGetGyro(MPU6050_t* sensor) {
 	}
 }
 
-int16_t mpuGetPitch(MPU6050_t* sensor) {
+int16_t mpuGetPitch(MPU6050_t* sensor)
+{
 	I2C_RETURN_CODE_t i2c_return;
 	int16_t *XYZ;
 	float *XYZFiltert;
