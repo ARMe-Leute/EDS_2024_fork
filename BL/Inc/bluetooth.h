@@ -85,7 +85,7 @@ typedef struct BluetoothModule
 	const USART_TypeDef *usart; /**< USART instance for communication. */
 	int8_t initStatus; /**< Initialization status of the module. */
 	uint32_t baudRate; /**< Baud rate for the USART. */
-	char messageBuffer[USART2_BUFFER_SIZE + 1]; /**< Buffer for received messages. */
+	char messageBufferRX[USART2_BUFFER_SIZE + 1]; /**< Buffer for received messages. */
 	volatile char *messageBufferTX;
 	uint16_t available; /**< Number of available characters in the buffer. */
 	uint8_t counter; /**< Counter for internal operations, e.g., retry count. */
@@ -127,7 +127,7 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
  *
  * This buffer is used by the USART2_IRQHandler() to store incoming characters
  */
-extern volatile char usart2Buffer[];
+extern volatile char usart2BufferRX[];
 extern volatile char usart2BufferTX[];
 
 /**

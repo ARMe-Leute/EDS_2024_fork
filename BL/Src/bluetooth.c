@@ -150,16 +150,16 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 	usartSendString(USART2, (char*) "AT");
 
 #ifdef BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK
-	usart2Buffer[usart2BufferIndex++] = 'O';
-	usart2Buffer[usart2BufferIndex++] = 'K';
+	usart2BufferRX[usart2BufferIndex++] = 'O';
+	usart2BufferRX[usart2BufferIndex++] = 'K';
 #endif //BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK
 
 #ifdef BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR
-	usart2Buffer[usart2BufferIndex++] = 'E';
-	usart2Buffer[usart2BufferIndex++] = 'R';
-	usart2Buffer[usart2BufferIndex++] = 'R';
-	usart2Buffer[usart2BufferIndex++] = 'O';
-	usart2Buffer[usart2BufferIndex++] = 'R';
+	usart2BufferRX[usart2BufferIndex++] = 'E';
+	usart2BufferRX[usart2BufferIndex++] = 'R';
+	usart2BufferRX[usart2BufferIndex++] = 'R';
+	usart2BufferRX[usart2BufferIndex++] = 'O';
+	usart2BufferRX[usart2BufferIndex++] = 'R';
 #endif //BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR
 
 	return ++BluetoothModule->state;
@@ -204,7 +204,7 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK)
     BluetoothModule->available = 0; // Reset buffer
     if (reply == 0)
 	{ // We can look for an OK
-	*isOK = (strncmp(BluetoothModule->messageBuffer, "OK", 2) == 0);
+	*isOK = (strncmp(BluetoothModule->messageBufferRX, "OK", 2) == 0);
 	return BluetoothFinish;
 	}
     else if (reply < 0)
@@ -235,11 +235,11 @@ bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule)
 	    for (uint16_t x = 0; x < usart2BufferIndex; x++)
 		{
 
-		BluetoothModule->messageBuffer[BluetoothModule->available] =
-			usart2Buffer[x];
+		BluetoothModule->messageBufferRX[BluetoothModule->available] =
+			usart2BufferRX[x];
 		BluetoothModule->available++;
 		}
-	    BluetoothModule->messageBuffer[BluetoothModule->available] = '\0';
+	    BluetoothModule->messageBufferRX[BluetoothModule->available] = '\0';
 	    usart2BufferIndex = 0;
 	    NVIC_EnableIRQ(USART2_IRQn);
 	    return true;
@@ -286,7 +286,7 @@ void USART2_IRQHandler(void)
     {
 #ifndef debugMode
 	if (USART2->SR & USART_SR_RXNE) {
-		usart2Buffer[usart2BufferIndex++] = USART2->DR & 0xFF; // Ensure 8-bit data
+		usart2BufferRX[usart2BufferIndex++] = USART2->DR & 0xFF; // Ensure 8-bit data
 	}
 #endif
 
