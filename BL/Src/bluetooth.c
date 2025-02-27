@@ -28,9 +28,8 @@
  *  @return 0 on successful initialization, negative value if not finished,
  *  or positive value if there is an error.
  */
-int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
-	uint32_t baudRate)
-    {
+int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, uint32_t baudRate, volatile char* txMessageBuffer)
+   {
 
     switch (BluetoothModule->initStatus)
 	{
@@ -54,6 +53,30 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
 	usartSelectUsart(usart);
 	usartEnableUsart(usart);
 	usartSetCommParams(usart, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);
+
+            usartSetDmaTxMode(USART2, DMA_TRANSMIT_ON);
+            usartResetIrqFlag(USART2, USART_TC_FLG);
+
+            dmacSelectDMAC(DMA1);
+            dmacDisableStream(DMA1_Stream6);
+            dmacAssignStreamAndChannel(DMA1_Stream6, DMA_CHN_4);
+            dmacSetMemoryAddress(DMA1_Stream6, MEM_0, (uint32_t) BluetoothModule->messageBufferTX);
+            dmacSetPeripheralAddress(DMA1_Stream6, (uint32_t) &USART2->DR);
+            dmacSetDataFlowDirection(DMA1_Stream6, MEM_2_PER);
+            dmacSetNumData(DMA1_Stream6, strlen(BluetoothModule->messageBufferTX));
+
+            // Configure data format and increment modes
+            dmacSetMemoryDataFormat(DMA1_Stream6, BYTE);
+            dmacSetPeripheralDataFormat(DMA1_Stream6, BYTE);
+            dmacSetMemoryIncrementMode(DMA1_Stream6, INCR_ENABLE);
+            dmacSetPeripheralIncrementMode(DMA1_Stream6, INCR_DISABLE);
+
+            // Set priority and enable transfer complete interrupt
+            dmacSetPriorityLevel(DMA1_Stream6, PRIO_MEDIUM);
+            dmacEnableInterrupt(DMA1_Stream6, TX_COMPLETE);
+
+            // Clear any pending flags before enabling the stream
+            dmacClearAllStreamIrqFlags(DMA1, DMA1_Stream6);
 
 #ifndef debugMode
 		usartEnableIrq(usart, USART_IRQ_RXNEIE);
@@ -239,6 +262,20 @@ bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule)
 #warning USART2_BUFFER_SIZE not defined, using 120 Bytes buffer. This may result in lost characters
 #define USART2_BUFFER_SIZE 120
 #endif
+
+
+DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart)
+   {
+      if (usart == USART2)
+         {
+
+            return DMA1_Stream6;
+         }
+      else
+         {
+            return NULL;
+         }
+   }
 
 /**
  * @brief USART2 interrupt handler for receiving data.

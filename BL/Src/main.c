@@ -17,6 +17,7 @@
 #include <mcalSysTick.h>
 #include <mcalUsart.h>
 #include <mcalGPIO.h>
+#include <mcalDMAC.h>
 
 #include <bluetooth.h>
 #include <RotaryPushButton.h>
@@ -51,7 +52,8 @@ typedef enum
  */
 bool timerTrigger;
 
-volatile char usart2Buffer[USART2_BUFFER_SIZE];
+volatile char usart2BufferRX[USART2_BUFFER_SIZE];
+volatile char usart2BufferTX[USART2_BUFFER_SIZE];
 volatile uint16_t usart2BufferIndex = 0;
 
 uint32_t ST7735_Timer = 0UL;
@@ -187,7 +189,7 @@ int initStatus = -100;
                            }
                         if (isSystickExpired(BluetoothTimer))
                            {
-                              initStatus = bluetoothInit(&HM17_1, USART2, 9600);
+                              initStatus = bluetoothInit(&HM17_1, USART2, 9600, usart2BufferTX );
                               systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
                            }
                      }

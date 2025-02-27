@@ -20,6 +20,8 @@
 
 #include <mcalUsart.h>
 #include <mcalGPIO.h>
+#include <mcalDMAC.h>
+
 
 /**
  * @brief Interval at which the buffer is fetched, in milliseconds.
@@ -84,6 +86,7 @@ typedef struct BluetoothModule
 	int8_t initStatus; /**< Initialization status of the module. */
 	uint32_t baudRate; /**< Baud rate for the USART. */
 	char messageBuffer[USART2_BUFFER_SIZE + 1]; /**< Buffer for received messages. */
+	volatile char *messageBufferTX;
 	uint16_t available; /**< Number of available characters in the buffer. */
 	uint8_t counter; /**< Counter for internal operations, e.g., retry count. */
 	int16_t state; /**< Current state of the state machine. */
@@ -114,7 +117,7 @@ enum BluetoothState
     };
 
 int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART,
-	uint32_t baudRate);
+	uint32_t baudRate, volatile char txMessageBuffer[] );
 bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule);
 int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK);
 int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
@@ -125,6 +128,7 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
  * This buffer is used by the USART2_IRQHandler() to store incoming characters
  */
 extern volatile char usart2Buffer[];
+extern volatile char usart2BufferTX[];
 
 /**
  * @brief Index for the USART2 buffer.
