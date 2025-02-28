@@ -120,6 +120,7 @@ int main(void)
 	configureTOFSensor(&TOF_Sensor_1, TOF_DEFAULT_MODE_D, true);
 	//TOF_set_ranging_profile(&TOF_Sensor_1);
 
+
 	while (1)
 	{
 		if (true == timerTrigger)
@@ -266,7 +267,37 @@ int main(void)
 			case SCREEN_PAGE1:
 				break;
 			case SCREEN_PAGE2:
+		//------------------------------
+/*
+				i2cSendByteToSlaveReg(I2C1, 0x29, 0x80, 0x01);
+				i2cSendByteToSlaveReg(I2C1, 0x29, 0xFF, 0x01);
+				i2cSendByteToSlaveReg(I2C1, 0x29, 0x00, 0x00);
+				i2cSendByteToSlaveReg(I2C1, 0x29, 0x91, 0);
+				i2cSendByteToSlaveReg(I2C1, 0x29, 0x00, 0x01);
+				i2cSendByteToSlaveReg(I2C1, 0x29, 0xFF, 0x00);
+				i2cSendByteToSlaveReg(I2C1, 0x29, 0x80, 0x00);
+
+				i2cSendByteToSlaveReg(I2C1, 0x29, TOF_REG_SYSRANGE_START, 0x01);
+
+*/
+
+				while(1)
+					{
+
+
+
+
+						TOF_read_distance_Task(&TOF_Sensor_1);
+						setRotaryColor(LED_RED);
+						//TOF_read_single_distance(&TOF_Sensor_1);
+
+						setRotaryColor(LED_GREEN);
+						delayms(200);
+					}
+
+		//------------------------------
 				visualisationTOF(&TOF_Sensor_1);
+
 				break;
 			case SCREEN_PAGE3:
 				//visualisationRangingProfileTOF(mode);

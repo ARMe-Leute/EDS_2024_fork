@@ -195,6 +195,8 @@ struct TOFSensor {
 	uint32_t measuredRange;            // RAW Data of measured distance
 	bool enableTOFSensor;              // Flag indicating if the sensor is enabled (true/false)
 	uint32_t Ranging_Profile_time;	   // Time for the execution for readcontinuos in dependence of RangingProfile
+	uint8_t TOF_readyFlag;			   // Flag indicating if the sensor data is ready to read
+	uint8_t TOF_measuringage; 		   // Age of the measured distance
 
 	// Function pointers for initializing, configuring, and retrieving measurements from the TOF sensor
 	void (*initialize)(TOFSensor_t*, I2C_TypeDef*, uint16_t, uint16_t, uint16_t);  // Function for initializing the sensor
@@ -605,6 +607,26 @@ bool TOF_read_continuous_distance(TOFSensor_t* TOFSENS);
 
  */
 bool TOF_read_single_distance(TOFSensor_t* TOFSensor);
+
+
+/**
+ * @function:    TOF_read_distance_Task
+ *
+ * @brief:       -
+ *
+ * @details:     -
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     uint16_t: returns current stored distance value.
+ */
+uint16_t TOF_read_distance_Task(TOFSensor_t* TOFSENS);
 
 
 /**

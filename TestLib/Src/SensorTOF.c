@@ -781,9 +781,7 @@ bool TOF_read_single_distance(TOFSensor_t* TOFSENS)
 	}
 
 
-	i2c_return = i2cSendByteToSlaveReg(
-			TOF_i2c, TOF_address_used,
-			TOF_REG_SYSRANGE_START, 0x01);
+	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
 	if (i2c_return != I2C_OK)
 	{
 		// returns false, if i2c communication was not successful
@@ -793,10 +791,7 @@ bool TOF_read_single_distance(TOFSensor_t* TOFSENS)
 	uint8_t sysrange_start[1];
 	do
 	{
-		i2c_return = i2cBurstRegRead(
-				TOF_i2c, TOF_address_used,
-				TOF_REG_SYSRANGE_START,
-				sysrange_start, 1);
+		i2c_return = i2cBurstRegRead(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, sysrange_start, 1);
 	} while (i2c_return == I2C_OK && (sysrange_start[0] & 0x01));
 	if (i2c_return != I2C_OK)
 	{
@@ -807,6 +802,109 @@ bool TOF_read_single_distance(TOFSensor_t* TOFSENS)
 
 	return true;
 }
+
+
+uint16_t TOF_read_distance_Task(TOFSensor_t* TOFSENS)
+{
+
+	I2C_RETURN_CODE_t i2c_return;
+	TOF_address_used = TOFSENS->TOF_address_used;
+	TOF_i2c = TOFSENS->i2c_tof;
+	uint8_t interrupt_status = 0;		//Vlt clearn??
+	uint8_t interrupt_bit = 0;
+	uint16_t taskdistance;
+
+	//check the readydata Flag
+
+	i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used,	TOF_REG_RESULT_INTERRUPT_STATUS, interrupt_status);
+	if (i2c_return != I2C_OK)
+	{
+		return false;
+	}
+	interrupt_bit = interrupt_status & 0x07;
+
+
+	//readydata Flag high ?
+	if(interrupt_status != 0)			//hier muss dann das interrupt_bit stehen
+	{
+		uint8_t readBuffer[2];
+		i2c_return = i2cBurstRegRead(TOF_i2c, TOF_address_used, TOF_REG_RESULT_RANGE_STATUS + 10, readBuffer, 2);
+		if (i2c_return != I2C_OK)
+		{
+			return false;
+		}
+
+
+		taskdistance = (readBuffer[0] << 8) + readBuffer[1];
+
+		TOFSENS->measuredRange = (uint32_t)readBuffer;
+		i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSTEM_INTERRUPT_CLEAR, 0x01);
+		if (i2c_return != I2C_OK)
+		{
+			return false;
+		}
+
+		if (taskdistance == 8190 || taskdistance == 8191)
+		{
+			taskdistance = TOF_VL53L0X_OUT_OF_RANGE;
+		}
+		TOFSENS->distanceFromTOF = taskdistance;
+
+		i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used,	TOF_REG_RESULT_INTERRUPT_STATUS, interrupt_status);
+		//Successfull Measurement start new one
+		i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x01);
+		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x01);
+		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x00, 0x00);
+		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x91, TOF_stop_variable);
+		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x00, 0x01);
+		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x00);
+		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x00);
+		if (i2c_return != I2C_OK) {
+			return false;
+		}
+
+
+		i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
+		if (i2c_return != I2C_OK)
+		{
+			// returns false, if i2c communication was not successful
+			return false;
+		}
+
+		uint8_t sysrange_start[1];
+		do
+		{
+			i2c_return = i2cBurstRegRead(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, sysrange_start, 1);
+		} while (i2c_return == I2C_OK && (sysrange_start[0] & 0x01));
+		if (i2c_return != I2C_OK)
+		{
+			return false;
+		}
+
+		TOFSENS->TOF_measuringage = 0; 		//reset measuring age
+	}
+
+	//readydata Flag LOW !
+	else
+	{
+		TOFSENS->TOF_measuringage ++;
+
+	}
+
+
+
+
+
+
+
+
+
+//-------------------------------------------
+//Read Single distance
+
+
+}
+
 
 
 bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t new_Addr)
@@ -831,6 +929,7 @@ bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t new_Addr)
 
 bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *range)
 {
+
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
 
@@ -1352,6 +1451,7 @@ uint8_t TOF_get_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type)
 
     return vcsel_period;
 }
+
 
 
 //--------------------- ADDITIONAL NON TOF FUNCTIONS ---------------------
