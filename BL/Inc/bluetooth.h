@@ -122,6 +122,8 @@ bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule);
 int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK);
 int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
 
+bool dmacUsartSendString(BluetoothModule_t *BluetoothModule,  char *data);
+
 /**
  * @brief Global buffer for USART2 communication.
  *

@@ -218,6 +218,18 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK)
 
     }
 
+bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data){
+
+      strcpy(BluetoothModule->messageBufferTX, data);
+      while(DMA1_Stream6->CR & DMA_SxCR_EN);
+
+      dmacDisableStream(DMA1_Stream6);
+      dmacSetMemoryAddress(DMA1_Stream6, MEM_0, BluetoothModule->messageBufferTX);
+      dmacSetNumData(DMA1_Stream6, strlen(BluetoothModule->messageBufferTX));
+      dmacClearAllStreamIrqFlags(DMA1, DMA1_Stream6);
+      dmacEnableStream(DMA1_Stream6);
+}
+
 /**
  * @brief Transfers data from the global USART buffer to the module's buffer.
  *
