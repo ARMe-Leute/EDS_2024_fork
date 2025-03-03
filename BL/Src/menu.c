@@ -73,3 +73,39 @@ void showMenuPage(MenuManager_t * manager, MenuPosition_t position){
 
 
 }
+
+void handleMenu(MenuManager_t * menuManager, int lastRotaryPosition)
+   {
+
+      if (getMenuRotaryPosition(getRotaryPosition()) != menuManager->currentPosition)
+         {
+            menuManager->currentPosition = getMenuRotaryPosition(getRotaryPosition());
+             lastRotaryPosition = getMenuRotaryPosition(getRotaryPosition());
+            drawGrid();
+            higlightEntry(menuManager->currentPosition);
+         }
+      if (getRotaryPushButton() == true)
+         {
+            MenuPosition_t test = menuManager->currentPosition;
+            MenuEntry_t *test1 = getEntryFromPosition(menuManager, menuManager->currentPosition);
+            if (getEntryFromPosition(menuManager, menuManager->currentPosition)->type == Page)
+               {
+                  getEntryFromPosition(menuManager, menuManager->currentPosition)->page->lastMenu =
+                        menuManager->activePage;
+                  menuManager->activePage = getEntryFromPosition(menuManager,
+                        menuManager->currentPosition)->page;
+               }
+            else if (getEntryFromPosition(menuManager, menuManager->currentPosition)->type
+                  == Entry)
+               {
+                  menuManager->activeEntry = getEntryFromPosition(menuManager,
+                        menuManager->currentPosition);
+                  menuManager->activeMode = Entry;
+               }
+            else
+               {
+                  menuManager->activePage = menuManager->activePage->lastMenu;
+               }
+            showMenuPage(menuManager, menuManager->currentPosition);
+         }
+   }

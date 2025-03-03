@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include <ST7735.h>
+#include <RotaryPushButton.h>
 
 #define TL_OFFSET_X (0+1)
 #define TL_OFFSET_Y (0)
@@ -79,5 +80,6 @@ void drawGrid();
 void higlightEntry(MenuPosition_t position);
 MenuEntry_t * getEntryFromPosition(MenuManager_t* manager, MenuPosition_t position);
 uint8_t getMenuRotaryPosition(int rotaryCounter);
+void handleMenu(MenuManager_t * menuManager, int lastRotaryPosition);
 
 #endif /* MENU_H_ */

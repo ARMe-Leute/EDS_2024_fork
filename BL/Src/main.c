@@ -205,6 +205,7 @@ int initStatus = -100;
                case MAIN_LOOP:
                   if (timerTrigger == true)
                      {
+                        setRotaryColor(LED_RED);
                         systickUpdateTimerList((uint32_t*) timerList, arraySize);
 
                      }
@@ -222,41 +223,8 @@ int initStatus = -100;
                         switch (menuManager_1.activeMode)
                            {
                            case Page:
-                              if (getMenuRotaryPosition(getRotaryPosition())
-                                    != menuManager_1.currentPosition)
-                                 {
-                                    menuManager_1.currentPosition = getMenuRotaryPosition(
-                                          getRotaryPosition());
-                                    lastRotaryPosition = getMenuRotaryPosition(getRotaryPosition());
-                                    drawGrid();
-                                    higlightEntry(menuManager_1.currentPosition);
-                                 }
-                              if (getRotaryPushButton() == true)
-                                 {
-                                    if (getEntryFromPosition(&menuManager_1,
-                                          menuManager_1.currentPosition)->type == Page)
-                                       {
-                                          getEntryFromPosition(&menuManager_1,
-                                                menuManager_1.currentPosition)->page->lastMenu =
-                                                menuManager_1.activePage;
-                                          menuManager_1.activePage =
-                                                getEntryFromPosition(&menuManager_1,
-                                                      menuManager_1.currentPosition)->page;
-                                       }
-                                    else if (getEntryFromPosition(&menuManager_1,
-                                          menuManager_1.currentPosition)->type == Entry)
-                                       {
-                                          menuManager_1.activeEntry = getEntryFromPosition(
-                                                &menuManager_1, menuManager_1.currentPosition);
-                                          menuManager_1.activeMode = Entry;
-                                       }
-                                    else
-                                       {
-                                          menuManager_1.activePage =
-                                                menuManager_1.activePage->lastMenu;
-                                       }
-                                    showMenuPage(&menuManager_1, menuManager_1.currentPosition);
-                                 }
+
+                              handleMenu(&menuManager_1, lastRotaryPosition);
                               break;
                            case Entry:
                               if (menuManager_1.activeEntry == &feld2)
