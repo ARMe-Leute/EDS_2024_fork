@@ -286,12 +286,12 @@ int main(void)
 
 
 
-
+						setRotaryColor(LED_GREEN);
 						TOF_read_distance_Task(&TOF_Sensor_1);
 						setRotaryColor(LED_RED);
 						//TOF_read_single_distance(&TOF_Sensor_1);
 
-						setRotaryColor(LED_GREEN);
+
 						delayms(200);
 					}
 
