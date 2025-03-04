@@ -277,28 +277,26 @@ int initStatus = -100;
                                     if (active == true)
                                        {
                                           status = bluetoothGetStatus(&HM17_1, &reply);
-                                          if (status == BluetoothFinish)
-                                             {
-                                                if (reply == true)
-                                                   {
-                                                      tftPrintColor((char*) "OK", 0, 60, tft_GREEN);
-                                                   }
-                                                else
-                                                   {
-                                                      tftPrintColor((char*) "Unknown Error", 0, 60,
-                                                      tft_RED);
-                                                   }
-                                                active = false;
-                                             }
-                                          else if (status > 0)
-                                             {
-                                                tftPrintColor((char*) "Error:", 0, 60, tft_RED);
-                                                tftPrintInt(status, 0, 70, 0);
-                                                active = false;
-                                             }
+
                                        }
-                                 }
-                              else
+                                    if (status == BluetoothFinish && reply == true)
+                                       {
+
+                                          tftPrintColor((char*) "OK", 0, 60, tft_GREEN);
+                                          dmacUsartSendString(&HM17_1,
+                                                "Das ist ein sehr langer Text der hier verschickt wird, um zu überprüfen ob das Asyncrone senden funktioniert");
+
+                                          active = false;
+                                       }
+                                    else if (status > 0)
+                                       {
+                                          tftPrintColor((char*) "Error:", 0, 60, tft_RED);
+                                          tftPrintInt(status, 0, 70, 0);
+                                          active = false;
+                                       }
+
+                           }
+                        else
                                  {
                                     if (getRotaryPushButton() == true)
                                        {
