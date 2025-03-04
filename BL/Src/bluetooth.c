@@ -230,14 +230,16 @@ bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
          }
       DMA_Stream_TypeDef *dmaStream = dmacGetStreamFromUSART(BluetoothModule->usart);
       strcpy(BluetoothModule->messageBufferTX, data);
-      while(DMA1_Stream6->CR & DMA_SxCR_EN);
+      while (dmaStream->CR & DMA_SxCR_EN);
 
-      dmacDisableStream(DMA1_Stream6);
-      dmacSetMemoryAddress(DMA1_Stream6, MEM_0, BluetoothModule->messageBufferTX);
-      dmacSetNumData(DMA1_Stream6, strlen(BluetoothModule->messageBufferTX));
-      dmacClearAllStreamIrqFlags(DMA1, DMA1_Stream6);
-      dmacEnableStream(DMA1_Stream6);
-}
+      dmacDisableStream(dmaStream);
+      dmacSetMemoryAddress(dmaStream, MEM_0, BluetoothModule->messageBufferTX);
+      dmacSetNumData(dmaStream, strlen(BluetoothModule->messageBufferTX));
+      dmacClearAllStreamIrqFlags(DMA1, dmaStream);
+      dmacEnableStream(dmaStream);
+     // BluetoothModule->TXComplete = false;
+      return true;
+   }
 
 /**
  * @brief Transfers data from the global USART buffer to the module's buffer.
