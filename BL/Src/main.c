@@ -61,39 +61,39 @@ volatile bool usart2TXComplete;
 uint32_t ST7735_Timer = 0UL;
 
 MenuManager_t menuManager_1;
-MenuPage_t submenu1;
-MenuPage_t submenu2;
-MenuPage_t submenu3;
+MenuPage_t featuresPage;
+MenuPage_t nestedPage;
+MenuPage_t bluetoothPage;
 MenuPage_t submenu4;
 MenuEntry_t feldBack =
    {
    .color = tft_WHITE, .title = "BACK", .type = Back, .page = NULL
    };
-MenuEntry_t subfeld1 =
+MenuEntry_t featuresEntry =
    {
-   .color = tft_WHITE, .title = "Features", .type = Page, .page = &submenu1
+   .color = tft_WHITE, .title = "Features", .type = Page, .page = &featuresPage
    };
-MenuEntry_t subfeld2 =
+MenuEntry_t nestedEntry =
    {
-   .color = tft_WHITE, .title = "Nested", .type = Page, .page = &submenu2
+   .color = tft_WHITE, .title = "Nested", .type = Page, .page = &nestedPage
    };
-MenuEntry_t subfeld3 =
+MenuEntry_t bluetoothEntry =
    {
-   .color = tft_WHITE, .title = "submenu_3_", .type = Page, .page = &submenu3
+   .color = tft_WHITE, .title = "Bluetooth", .type = Page, .page = &bluetoothPage
    };
 MenuEntry_t subfeld4 =
    {
    .color = tft_WHITE, .title = "submenu_4_", .type = Page, .page = &submenu4
    };
-MenuEntry_t feld2 =
+MenuEntry_t textEntry =
    {
    .color = tft_BLUE, .title = "Text", .type = Entry, .page = NULL
    };
-MenuEntry_t feld3 =
+MenuEntry_t counterEntry =
    {
    .color = tft_RED, .title = "Counter", .type = Entry, .page = NULL
    };
-MenuEntry_t feld4 =
+MenuEntry_t getStatusEntry =
    {
    .color = tft_GREEN, .title = "GetStatus", .type = Entry, .page = NULL
    };
@@ -119,30 +119,30 @@ int main(void)
 
       int lastRotaryPosition = 0;
 
-      menuPage1.TL = &subfeld1;
-      menuPage1.TR = &subfeld2;
-      menuPage1.BL = &subfeld3;
+      menuPage1.TL = &featuresEntry;
+      menuPage1.TR = &nestedEntry;
+      menuPage1.BL = &bluetoothEntry;
       menuPage1.BR = &subfeld4;
 
-      submenu1.TL = &feldBack;
-      submenu1.BL = &feld2;
-      submenu1.BR = &feld3;
-      submenu1.TR = &feld4;
+      featuresPage.TL = &feldBack;
+      featuresPage.BL = &textEntry;
+      featuresPage.BR = &counterEntry;
+      featuresPage.TR = &getStatusEntry;
 
-      submenu2.TL = &feldBack;
-      submenu2.BL = &subfeld1;
-      submenu2.BR = &feld3;
-      submenu2.TR = &feld4;
+      nestedPage.TL = &feldBack;
+      nestedPage.BL = &featuresEntry;
+      nestedPage.BR = &counterEntry;
+      nestedPage.TR = &getStatusEntry;
 
-      submenu3.TL = &feldBack;
-      submenu3.BL = &feld3;
-      submenu3.BR = &feld2;
-      submenu3.TR = &feld4;
+      bluetoothPage.TL = &feldBack;
+      bluetoothPage.BL = &counterEntry;
+      bluetoothPage.BR = &textEntry;
+      bluetoothPage.TR = &getStatusEntry;
 
       submenu4.TL = &feldBack;
-      submenu4.BL = &feld4;
-      submenu4.BR = &feld3;
-      submenu4.TR = &feld2;
+      submenu4.BL = &getStatusEntry;
+      submenu4.BR = &counterEntry;
+      submenu4.TR = &textEntry;
 
       menuManager_1.activeMode = Page;
       menuManager_1.activePage = &menuPage1;
@@ -223,7 +223,7 @@ int main(void)
                               handleMenu(&menuManager_1, lastRotaryPosition);
                               break;
                            case Entry:
-                              if (menuManager_1.activeEntry == &feld2)
+                              if (menuManager_1.activeEntry == &textEntry)
                                  {
                                     tftPrint((char*) "sdofihv", 50, 50, 0);
                                     if (getRotaryPushButton() == true)
@@ -234,7 +234,7 @@ int main(void)
 
                                        }
                                  }
-                              else if (menuManager_1.activeEntry == &feld3)
+                              else if (menuManager_1.activeEntry == &counterEntry)
                                  {
                                     tftPrintInt(getRotaryPosition(), 50, 50, 0);
                                     if (getRotaryPushButton() == true)
@@ -245,7 +245,7 @@ int main(void)
 
                                        }
                                  }
-                              else if (menuManager_1.activeEntry == &feld4)
+                              else if (menuManager_1.activeEntry == &getStatusEntry)
                                  {
                                     static int status = -127;
                                     static bool reply;
