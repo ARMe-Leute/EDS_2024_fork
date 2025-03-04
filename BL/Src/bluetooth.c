@@ -84,11 +84,13 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 		usartEnableIrq(usart, USART_IRQ_RXNEIE);
 		if (BluetoothModule->usart == USART2) {
 			NVIC_EnableIRQ(USART2_IRQn);
+			BluetoothModule->TXComplete = &usart2TXComplete;
 		} else {
 			// Todo: Handle other USART instances if needed
 		}
 		__enable_irq();
 #endif
+		BluetoothModule->TXComplete=true;
 	return ++BluetoothModule->initStatus;
 
     case -9:
@@ -220,8 +222,13 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK)
 
     }
 
-bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data){
-
+bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
+   {
+      if (BluetoothModule->TXComplete == false)
+         {
+            return false;
+         }
+      DMA_Stream_TypeDef *dmaStream = dmacGetStreamFromUSART(BluetoothModule->usart);
       strcpy(BluetoothModule->messageBufferTX, data);
       while(DMA1_Stream6->CR & DMA_SxCR_EN);
 
@@ -305,3 +312,17 @@ void USART2_IRQHandler(void)
 #endif
 
     }
+
+void DMA1_Stream6_IRQHandler(void)
+{
+    // Check if transfer complete flag is set
+    if (dmacGetHighInterruptStatus(DMA1) & (1 << 21)) // Check TC flag for Stream6
+    {
+
+        // Clear the transfer complete flag
+          usart2TXComplete = true;
+        dmacClearInterruptFlag(DMA1, DMA1_Stream6, TX_COMPLETE);
+
+        // Additional processing after transfer completion could go here
+    }
+}

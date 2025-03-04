@@ -53,8 +53,10 @@ typedef enum
 bool timerTrigger;
 
 volatile char usart2BufferRX[USART2_BUFFER_SIZE];
-volatile char usart2BufferTX[USART2_BUFFER_SIZE];
 volatile uint16_t usart2BufferIndex = 0;
+
+volatile char usart2BufferTX[USART2_BUFFER_SIZE];
+volatile bool usart2TXComplete;
 
 uint32_t ST7735_Timer = 0UL;
 

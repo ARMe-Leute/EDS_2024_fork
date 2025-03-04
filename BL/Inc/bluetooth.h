@@ -90,6 +90,7 @@ typedef struct BluetoothModule
 	uint16_t available; /**< Number of available characters in the buffer. */
 	uint8_t counter; /**< Counter for internal operations, e.g., retry count. */
 	int16_t state; /**< Current state of the state machine. */
+	volatile bool *TXComplete;
 
     } BluetoothModule_t;
 
@@ -102,7 +103,8 @@ typedef enum BluetoothError
     BluetoothBusy, /**< Module is busy with another command. */
     BluetoothWrongParameter, /**< Invalid parameter provided. */
     BluetoothRetryError, /**< Retry operation error. */
-    BluetoothLengthError /**< Reply length error length error. */
+    BluetoothLengthError, /**< Reply length error length error. */
+    BluetoothTXBusy
     } BluetoothError_t;
 
 /**
@@ -123,6 +125,7 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK);
 int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
 
 bool dmacUsartSendString(BluetoothModule_t *BluetoothModule,  char *data);
+DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart);
 
 /**
  * @brief Global buffer for USART2 communication.
@@ -138,5 +141,6 @@ extern volatile char usart2BufferTX[];
  * Indicates the next position in the buffer to write to.
  */
 extern volatile uint16_t usart2BufferIndex;
+extern volatile bool usart2TXComplete;
 
 #endif /* BLUETOOTH_H_ */
