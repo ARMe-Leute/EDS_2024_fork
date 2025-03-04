@@ -70,12 +70,12 @@ typedef struct MenuManager
       MenuPosition_t currentPosition;
    } MenuManager_t;
 
-void showMenuPage(MenuManager_t *manager, MenuPosition_t position);
-void higlightEntry(MenuPosition_t position);
-void drawGrid();
-void higlightEntry(MenuPosition_t position);
-MenuEntry_t* getEntryFromPosition(MenuManager_t *manager, MenuPosition_t position);
-uint8_t getMenuRotaryPosition(int rotaryCounter);
-void handleMenu(MenuManager_t *menuManager, int lastRotaryPosition);
+extern void showMenuPage(MenuManager_t *manager, MenuPosition_t position);
+extern void higlightEntry(MenuPosition_t position);
+extern void drawGrid();
+extern void higlightEntry(MenuPosition_t position);
+extern MenuEntry_t* getEntryFromPosition(MenuManager_t *manager, MenuPosition_t position);
+extern uint8_t getMenuRotaryPosition(int rotaryCounter);
+extern void handleMenu(MenuManager_t *menuManager, int lastRotaryPosition);
 
 #endif /* MENU_H_ */

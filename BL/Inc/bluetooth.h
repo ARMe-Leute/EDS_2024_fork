@@ -116,14 +116,14 @@ enum BluetoothState
    getMacAddress_2 /**< Secondary state for getMacAddress command. */
    };
 
-int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART, uint32_t baudRate,
-      volatile char txMessageBuffer[]);
-bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule);
-int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK);
-int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
+extern int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART,
+      uint32_t baudRate, volatile char txMessageBuffer[]);
+extern bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule);
+extern int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK);
+extern int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
 
-bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data);
-DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart);
+extern bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data);
+extern DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart);
 
 /**
  * @brief Global buffer for USART2 communication.
