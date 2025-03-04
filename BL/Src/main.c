@@ -118,7 +118,7 @@ int main(void)
 int initStatus = -100;
 
 
-      int lastRotaryPosition;
+      int lastRotaryPosition = 0;
 
       menuPage1.TL = &subfeld1;
       menuPage1.TR = &subfeld2;
