@@ -28,33 +28,33 @@
  *  @return 0 on successful initialization, negative value if not finished,
  *  or positive value if there is an error.
  */
-int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, uint32_t baudRate, volatile char* txMessageBuffer)
+int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, uint32_t baudRate,
+      volatile char *txMessageBuffer)
    {
 
-    switch (BluetoothModule->initStatus)
-	{
-    case -10:
-	BluetoothModule->usart = usart;
-	BluetoothModule->baudRate = baudRate;
-	BluetoothModule->available = 0;
-	BluetoothModule->counter = 0;
-	BluetoothModule->state = 0;
-	BluetoothModule->messageBufferTX = txMessageBuffer;
+      switch (BluetoothModule->initStatus)
+         {
+         case -10:
+            BluetoothModule->usart = usart;
+            BluetoothModule->baudRate = baudRate;
+            BluetoothModule->available = 0;
+            BluetoothModule->counter = 0;
+            BluetoothModule->state = 0;
+            BluetoothModule->messageBufferTX = txMessageBuffer;
 
-
-	// Clear the buffer during initialization
-	for (uint32_t i = 0; i < USART2_BUFFER_SIZE; i++)
-	    {
-	    BluetoothModule->messageBufferRX[i] = '\0';
-	    }
-	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; 		// Enable GPIOA clock
-	gpioSelectPinMode(GPIOA, PIN3, ALTFUNC); // PA3: Alternate Function Mode
-	gpioSelectAltFunc(GPIOA, PIN3, AF7); 	// PA3: AF7 for USART2 Rx
-	gpioSelectPinMode(GPIOA, PIN2, ALTFUNC); // PA2: Alternate Function Mode
-	gpioSelectAltFunc(GPIOA, PIN2, AF7); 	// PA2: AF7 for USART2 Tx
-	usartSelectUsart(usart);
-	usartEnableUsart(usart);
-	usartSetCommParams(usart, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);
+            // Clear the buffer during initialization
+            for (uint32_t i = 0; i < USART2_BUFFER_SIZE; i++)
+               {
+                  BluetoothModule->messageBufferRX[i] = '\0';
+               }
+            RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; 		// Enable GPIOA clock
+            gpioSelectPinMode(GPIOA, PIN3, ALTFUNC); // PA3: Alternate Function Mode
+            gpioSelectAltFunc(GPIOA, PIN3, AF7); 	// PA3: AF7 for USART2 Rx
+            gpioSelectPinMode(GPIOA, PIN2, ALTFUNC); // PA2: Alternate Function Mode
+            gpioSelectAltFunc(GPIOA, PIN2, AF7); 	// PA2: AF7 for USART2 Tx
+            usartSelectUsart(usart);
+            usartEnableUsart(usart);
+            usartSetCommParams(usart, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);
 
             usartSetDmaTxMode(USART2, DMA_TRANSMIT_ON);
             usartResetIrqFlag(USART2, USART_TC_FLG);
@@ -81,45 +81,48 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
             dmacClearAllStreamIrqFlags(DMA1, DMA1_Stream6);
 
 #ifndef debugMode
-		usartEnableIrq(usart, USART_IRQ_RXNEIE);
-		if (BluetoothModule->usart == USART2) {
-			NVIC_EnableIRQ(USART2_IRQn);
-			BluetoothModule->TXComplete = &usart2TXComplete;
-		} else {
-			// Todo: Handle other USART instances if needed
-		}
-		__enable_irq();
+            usartEnableIrq(usart, USART_IRQ_RXNEIE);
+            if (BluetoothModule->usart == USART2)
+               {
+                  NVIC_EnableIRQ(USART2_IRQn);
+                  BluetoothModule->TXComplete = &usart2TXComplete;
+               }
+            else
+               {
+                  // Todo: Handle other USART instances if needed
+               }
+            __enable_irq();
 #endif
-		BluetoothModule->TXComplete=true;
-	return ++BluetoothModule->initStatus;
+            BluetoothModule->TXComplete = true;
+            return ++BluetoothModule->initStatus;
 
-    case -9:
-	if (BluetoothModule->counter > 10)
-	    { // Return an error after 10 failed attempts
-	    return BluetoothRetryError;
-	    }
-	bool reply;
-	int16_t status;
-	status = bluetoothGetStatus(BluetoothModule, &reply);
-	if (status == 0 && reply == true)
-	    { // HM17 replied with OK
-	    return BluetoothModule->initStatus = 0;
-	    }
-	else if (status < 0)
-	    { // Pending steps
-	    return BluetoothModule->initStatus;
-	    }
-	else
-	    { // Retry on error
-	    BluetoothModule->counter++;
-	    return BluetoothModule->initStatus - 9;
-	    }
+         case -9:
+            if (BluetoothModule->counter > 10)
+               { // Return an error after 10 failed attempts
+                  return BluetoothRetryError;
+               }
+            bool reply;
+            int16_t status;
+            status = bluetoothGetStatus(BluetoothModule, &reply);
+            if (status == 0 && reply == true)
+               { // HM17 replied with OK
+                  return BluetoothModule->initStatus = 0;
+               }
+            else if (status < 0)
+               { // Pending steps
+                  return BluetoothModule->initStatus;
+               }
+            else
+               { // Retry on error
+                  BluetoothModule->counter++;
+                  return BluetoothModule->initStatus - 9;
+               }
 
-    default:
-	return 0;
-	}
+         default:
+            return 0;
+         }
 
-    }
+   }
 
 /**
  * @brief Handles the state transitions for the Bluetooth state machine.
@@ -131,27 +134,27 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
  * @return Next ::BluetoothState, or a ::BluetoothError code on failure.
  */
 int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
-    {
+   {
 
-    // Ensure it is an initial step
-    if (state % 10 != 0)
-	{
-	return BluetoothWrongParameter;
-	}
-    if (BluetoothModule->state == 0)
-	{ // Begin if no state is active
-	BluetoothModule->state = state;
-	// Ensure the called state matches the current procedure
-	}
-    else if (!(BluetoothModule->state - state < 10))
-	{
-	return BluetoothBusy;
-	}
-    switch (BluetoothModule->state)
-	{
+      // Ensure it is an initial step
+      if (state % 10 != 0)
+         {
+            return BluetoothWrongParameter;
+         }
+      if (BluetoothModule->state == 0)
+         { // Begin if no state is active
+            BluetoothModule->state = state;
+            // Ensure the called state matches the current procedure
+         }
+      else if (!(BluetoothModule->state - state < 10))
+         {
+            return BluetoothBusy;
+         }
+      switch (BluetoothModule->state)
+         {
 
-    case getStatus:
-	dmacUsartSendString(BluetoothModule, "AT");
+         case getStatus:
+            dmacUsartSendString(BluetoothModule, "AT");
 
 #ifdef BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK
 	usart2BufferRX[usart2BufferIndex++] = 'O';
@@ -166,23 +169,23 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 	usart2BufferRX[usart2BufferIndex++] = 'R';
 #endif //BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR
 
-	return ++BluetoothModule->state;
+            return ++BluetoothModule->state;
 
-    case getStatus_2:
-	BluetoothModule->state = BluetoothFinish; // Mark as finished
-	if (BluetoothModule->available >= 2)
-	    { // Sufficient characters received
-	    return BluetoothFinish;
-	    }
-	else
-	    { // Insufficient data
-	    return BluetoothLengthError;
-	    }
-    default:
-	return BluetoothWrongParameter;
-	}
+         case getStatus_2:
+            BluetoothModule->state = BluetoothFinish; // Mark as finished
+            if (BluetoothModule->available >= 2)
+               { // Sufficient characters received
+                  return BluetoothFinish;
+               }
+            else
+               { // Insufficient data
+                  return BluetoothLengthError;
+               }
+         default:
+            return BluetoothWrongParameter;
+         }
 
-    }
+   }
 
 /**
  * @brief Sends the "AT" command to the Bluetooth module.
@@ -194,7 +197,7 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
  * @note Check isOK only if the return value is ::BluetoothFinish.
  */
 int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK)
-    {
+   {
 #ifdef BLUETOOTH_GET_STATUS_RETURN_OK
     *isOK = true;
     return 0;
@@ -204,23 +207,23 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK)
     return BLUETOOTH_GET_STATUS_RETURN_ERROR;
 #endif //BLUETOOTH_GET_STATUS_RETURN_ERROR
 
-    int16_t reply = bluetoothStateHandler(BluetoothModule, getStatus);
-    BluetoothModule->available = 0; // Reset buffer
-    if (reply == 0)
-	{ // We can look for an OK
-	*isOK = (strncmp(BluetoothModule->messageBufferRX, "OK", 2) == 0);
-	return BluetoothFinish;
-	}
-    else if (reply < 0)
-	{
-	return reply; // Continue
-	}
-    else
-	{
-	return reply; // Pass error or do error handling here
-	}
+      int16_t reply = bluetoothStateHandler(BluetoothModule, getStatus);
+      BluetoothModule->available = 0; // Reset buffer
+      if (reply == 0)
+         { // We can look for an OK
+            *isOK = (strncmp(BluetoothModule->messageBufferRX, "OK", 2) == 0);
+            return BluetoothFinish;
+         }
+      else if (reply < 0)
+         {
+            return reply; // Continue
+         }
+      else
+         {
+            return reply; // Pass error or do error handling here
+         }
 
-    }
+   }
 
 bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
    {
@@ -237,7 +240,7 @@ bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
       dmacSetNumData(dmaStream, strlen(BluetoothModule->messageBufferTX));
       dmacClearAllStreamIrqFlags(DMA1, dmaStream);
       dmacEnableStream(dmaStream);
-     // BluetoothModule->TXComplete = false;
+      // BluetoothModule->TXComplete = false;
       return true;
    }
 
@@ -248,44 +251,43 @@ bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
  * @return True if data transfer is complete, false otherwise.
  */
 bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule)
-    {
-    if (BluetoothModule->usart == USART2)
-	{
-	static uint16_t lastIndex;
-	if (usart2BufferIndex == lastIndex && usart2BufferIndex != 0)
-	    { // Check if no new characters have been received and the buffer is not empt
-	    NVIC_DisableIRQ(USART2_IRQn); // Disable USART2 IRQ during data transfer
-	    for (uint16_t x = 0; x < usart2BufferIndex; x++)
-		{
+   {
+      if (BluetoothModule->usart == USART2)
+         {
+            static uint16_t lastIndex;
+            if (usart2BufferIndex == lastIndex && usart2BufferIndex != 0)
+               { // Check if no new characters have been received and the buffer is not empt
+                  NVIC_DisableIRQ(USART2_IRQn); // Disable USART2 IRQ during data transfer
+                  for (uint16_t x = 0; x < usart2BufferIndex; x++)
+                     {
 
-		BluetoothModule->messageBufferRX[BluetoothModule->available] =
-			usart2BufferRX[x];
-		BluetoothModule->available++;
-		}
-	    BluetoothModule->messageBufferRX[BluetoothModule->available] = '\0';
-	    usart2BufferIndex = 0;
-	    NVIC_EnableIRQ(USART2_IRQn);
-	    return true;
-	    }
-	else
-	    {
-	    lastIndex = usart2BufferIndex;
-	    return false;
-	    }
+                        BluetoothModule->messageBufferRX[BluetoothModule->available] =
+                              usart2BufferRX[x];
+                        BluetoothModule->available++;
+                     }
+                  BluetoothModule->messageBufferRX[BluetoothModule->available] = '\0';
+                  usart2BufferIndex = 0;
+                  NVIC_EnableIRQ(USART2_IRQn);
+                  return true;
+               }
+            else
+               {
+                  lastIndex = usart2BufferIndex;
+                  return false;
+               }
 
-	}
-    else
-	{
-	// Todo: Implement support for additional USART instances
-	return false;
-	}
-    }
+         }
+      else
+         {
+            // Todo: Implement support for additional USART instances
+            return false;
+         }
+   }
 
 #ifndef USART2_BUFFER_SIZE
 #warning USART2_BUFFER_SIZE not defined, using 120 Bytes buffer. This may result in lost characters
 #define USART2_BUFFER_SIZE 120
 #endif
-
 
 DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart)
    {
@@ -307,25 +309,26 @@ DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart)
  * Handles incoming data on USART2 and stores it in the global interrupt buffer.
  */
 void USART2_IRQHandler(void)
-    {
+   {
 #ifndef debugMode
-	if (USART2->SR & USART_SR_RXNE) {
-		usart2BufferRX[usart2BufferIndex++] = USART2->DR & 0xFF; // Ensure 8-bit data
-	}
+      if (USART2->SR & USART_SR_RXNE)
+         {
+            usart2BufferRX[usart2BufferIndex++] = USART2->DR & 0xFF; // Ensure 8-bit data
+         }
 #endif
 
-    }
+   }
 
 void DMA1_Stream6_IRQHandler(void)
-{
-    // Check if transfer complete flag is set
-    if (dmacGetHighInterruptStatus(DMA1) & (1 << 21)) // Check TC flag for Stream6
-    {
+   {
+      // Check if transfer complete flag is set
+      if (dmacGetHighInterruptStatus(DMA1) & (1 << 21)) // Check TC flag for Stream6
+         {
 
-        // Clear the transfer complete flag
-          usart2TXComplete = true;
-        dmacClearInterruptFlag(DMA1, DMA1_Stream6, TX_COMPLETE);
+            // Clear the transfer complete flag
+            usart2TXComplete = true;
+            dmacClearInterruptFlag(DMA1, DMA1_Stream6, TX_COMPLETE);
 
-        // Additional processing after transfer completion could go here
-    }
-}
+            // Additional processing after transfer completion could go here
+         }
+   }

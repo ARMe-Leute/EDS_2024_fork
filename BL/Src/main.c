@@ -101,22 +101,21 @@ MenuEntry_t feld4 =
 MenuPage_t menuPage1;
 
 int main(void)
-    {
+   {
 
-    uint32_t BluetoothTimer = 0UL;      // Timer for Bluetooth setup steps.
-    uint32_t BluetoothFetchTimer = 0UL; // Timer for calling bluetoothFetchBuffer().
-    uint32_t Button = 0UL;// Timer for button polling, helps with debouncing.
-    uint32_t ButtonLEDOff = 0UL;        // Timer for turning off the button LED.
+      uint32_t BluetoothTimer = 0UL;      // Timer for Bluetooth setup steps.
+      uint32_t BluetoothFetchTimer = 0UL; // Timer for calling bluetoothFetchBuffer().
+      uint32_t Button = 0UL; // Timer for button polling, helps with debouncing.
+      uint32_t ButtonLEDOff = 0UL;        // Timer for turning off the button LED.
 
-    uint32_t *timerList[] =
-        {
-        &BluetoothTimer, &BluetoothFetchTimer, &Button, &ButtonLEDOff, &ST7735_Timer
-        };
-    uint8_t arraySize = sizeof(timerList) / sizeof(timerList[0]);
+      uint32_t *timerList[] =
+         {
+         &BluetoothTimer, &BluetoothFetchTimer, &Button, &ButtonLEDOff, &ST7735_Timer
+         };
+      uint8_t arraySize = sizeof(timerList) / sizeof(timerList[0]);
 
-        BluetoothModule_t HM17_1;   // Bluetooth module instance.
-int initStatus = -100;
-
+      BluetoothModule_t HM17_1;   // Bluetooth module instance.
+      int initStatus = -100;
 
       int lastRotaryPosition = 0;
 
@@ -145,12 +144,10 @@ int initStatus = -100;
       submenu4.BR = &feld3;
       submenu4.TR = &feld2;
 
-
       menuManager_1.activeMode = Page;
       menuManager_1.activePage = &menuPage1;
 
       MAIN_MODE mode = MAIN_INIT;
-
 
       for (;;)
          {
@@ -191,16 +188,13 @@ int initStatus = -100;
                            }
                         if (isSystickExpired(BluetoothTimer))
                            {
-                              initStatus = bluetoothInit(&HM17_1, USART2, 9600, usart2BufferTX );
+                              initStatus = bluetoothInit(&HM17_1, USART2, 9600, usart2BufferTX);
                               systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
                            }
                      }
 
-
-
-
                   mode = MAIN_LOOP; // Transition to main loop
-                  showMenuPage(&menuManager_1, (MenuPosition_t)0);
+                  showMenuPage(&menuManager_1, (MenuPosition_t) 0);
                   break;
 
                   // Main application loop
@@ -295,8 +289,8 @@ int initStatus = -100;
                                           active = false;
                                        }
 
-                           }
-                        else
+                                 }
+                              else
                                  {
                                     if (getRotaryPushButton() == true)
                                        {

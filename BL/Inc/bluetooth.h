@@ -22,7 +22,6 @@
 #include <mcalGPIO.h>
 #include <mcalDMAC.h>
 
-
 /**
  * @brief Interval at which the buffer is fetched, in milliseconds.
  */
@@ -44,7 +43,6 @@
  */
 // Uncomment to enable debug mode
 //#define debugMode
-
 #ifdef debugMode
 
 /**
@@ -81,50 +79,50 @@
  * @brief Structure representing a Bluetooth module instance.
  */
 typedef struct BluetoothModule
-    {
-	const USART_TypeDef *usart; /**< USART instance for communication. */
-	int8_t initStatus; /**< Initialization status of the module. */
-	uint32_t baudRate; /**< Baud rate for the USART. */
-	char messageBufferRX[USART2_BUFFER_SIZE + 1]; /**< Buffer for received messages. */
-	volatile char *messageBufferTX;
-	uint16_t available; /**< Number of available characters in the buffer. */
-	uint8_t counter; /**< Counter for internal operations, e.g., retry count. */
-	int16_t state; /**< Current state of the state machine. */
-	volatile bool *TXComplete;
+   {
+      const USART_TypeDef *usart; /**< USART instance for communication. */
+      int8_t initStatus; /**< Initialization status of the module. */
+      uint32_t baudRate; /**< Baud rate for the USART. */
+      char messageBufferRX[USART2_BUFFER_SIZE + 1]; /**< Buffer for received messages. */
+      volatile char *messageBufferTX;
+      uint16_t available; /**< Number of available characters in the buffer. */
+      uint8_t counter; /**< Counter for internal operations, e.g., retry count. */
+      int16_t state; /**< Current state of the state machine. */
+      volatile bool *TXComplete;
 
-    } BluetoothModule_t;
+   } BluetoothModule_t;
 
 /**
  * @brief Enum representing possible Bluetooth errors and status codes.
  */
 typedef enum BluetoothError
-    {
-    BluetoothFinish = 0, /**< Operation completed successfully. */
-    BluetoothBusy, /**< Module is busy with another command. */
-    BluetoothWrongParameter, /**< Invalid parameter provided. */
-    BluetoothRetryError, /**< Retry operation error. */
-    BluetoothLengthError, /**< Reply length error length error. */
-    BluetoothTXBusy
-    } BluetoothError_t;
+   {
+   BluetoothFinish = 0, /**< Operation completed successfully. */
+   BluetoothBusy, /**< Module is busy with another command. */
+   BluetoothWrongParameter, /**< Invalid parameter provided. */
+   BluetoothRetryError, /**< Retry operation error. */
+   BluetoothLengthError, /**< Reply length error length error. */
+   BluetoothTXBusy
+   } BluetoothError_t;
 
 /**
  * @brief Enum defining states for the Bluetooth state machine.
  */
 enum BluetoothState
-    {
-    getStatus = -10, /**< Initial state for getStatus command. */
-    getStatus_2, /**< Secondary state for getStatus command. */
-    getMacAddress = -20, /**< Initial state for getMacAddress command. */
-    getMacAddress_2 /**< Secondary state for getMacAddress command. */
-    };
+   {
+   getStatus = -10, /**< Initial state for getStatus command. */
+   getStatus_2, /**< Secondary state for getStatus command. */
+   getMacAddress = -20, /**< Initial state for getMacAddress command. */
+   getMacAddress_2 /**< Secondary state for getMacAddress command. */
+   };
 
-int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART,
-	uint32_t baudRate, volatile char txMessageBuffer[] );
+int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART, uint32_t baudRate,
+      volatile char txMessageBuffer[]);
 bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule);
 int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK);
 int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
 
-bool dmacUsartSendString(BluetoothModule_t *BluetoothModule,  char *data);
+bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data);
 DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart);
 
 /**
