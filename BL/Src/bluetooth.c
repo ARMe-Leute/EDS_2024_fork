@@ -39,11 +39,13 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
 	BluetoothModule->available = 0;
 	BluetoothModule->counter = 0;
 	BluetoothModule->state = 0;
+	BluetoothModule->messageBufferTX = txMessageBuffer;
+
 
 	// Clear the buffer during initialization
 	for (uint32_t i = 0; i < USART2_BUFFER_SIZE; i++)
 	    {
-	    BluetoothModule->messageBuffer[i] = '\0';
+	    BluetoothModule->messageBufferRX[i] = '\0';
 	    }
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; 		// Enable GPIOA clock
 	gpioSelectPinMode(GPIOA, PIN3, ALTFUNC); // PA3: Alternate Function Mode
