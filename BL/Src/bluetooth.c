@@ -151,7 +151,7 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 	{
 
     case getStatus:
-	usartSendString(USART2, (char*) "AT");
+	dmacUsartSendString(BluetoothModule, "AT");
 
 #ifdef BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK
 	usart2BufferRX[usart2BufferIndex++] = 'O';
