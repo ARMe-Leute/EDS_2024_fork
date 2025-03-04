@@ -296,6 +296,7 @@ DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart)
          }
       else
          {
+            // Todo: Implement support for additional USART instances
             return NULL;
          }
    }
