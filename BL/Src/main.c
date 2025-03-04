@@ -97,6 +97,10 @@ MenuEntry_t getStatusEntry =
    {
    .color = tft_GREEN, .title = "GetStatus", .type = Entry, .page = NULL
    };
+MenuEntry_t sendTestStringEntry =
+   {
+   .color = tft_GREEN, .title = "SendString", .type = Entry, .page = NULL
+   };
 
 MenuPage_t menuPage1;
 
@@ -135,7 +139,7 @@ int main(void)
       nestedPage.TR = &getStatusEntry;
 
       bluetoothPage.TL = &feldBack;
-      bluetoothPage.BL = &counterEntry;
+      bluetoothPage.BL = &sendTestStringEntry;
       bluetoothPage.BR = &textEntry;
       bluetoothPage.TR = &getStatusEntry;
 
@@ -277,8 +281,6 @@ int main(void)
                                        {
 
                                           tftPrintColor((char*) "OK", 0, 60, tft_GREEN);
-                                          dmacUsartSendString(&HM17_1,
-                                                "Das ist ein sehr langer Text der hier verschickt wird, um zu überprüfen ob das Asyncrone senden funktioniert");
 
                                           active = false;
                                        }
@@ -287,6 +289,28 @@ int main(void)
                                           tftPrintColor((char*) "Error:", 0, 60, tft_RED);
                                           tftPrintInt(status, 0, 70, 0);
                                           active = false;
+                                       }
+
+                                 }
+                              else if (menuManager_1.activeEntry == &sendTestStringEntry)
+                                 {
+                                    static bool active = false;
+                                    if (getRotaryPushButton() == true)
+                                       {
+                                          if (active == false)
+                                             {
+                                                dmacUsartSendString(&HM17_1,
+                                                      "Das ist ein sehr langer Text der hier verschickt wird, um zu überprüfen ob das Asyncrone senden funktioniert");
+                                                active = true;
+                                                tftPrint((char*) "Sending test string", 0, 50, 0);
+                                             }
+                                          else
+                                             {
+                                                active = false;
+                                                menuManager_1.activeMode = Page;
+                                                showMenuPage(&menuManager_1,
+                                                      menuManager_1.currentPosition);
+                                             }
                                        }
 
                                  }
