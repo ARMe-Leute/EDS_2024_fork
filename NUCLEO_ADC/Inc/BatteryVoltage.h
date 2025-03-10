@@ -16,6 +16,27 @@
 #include <mcalGPIO.h>
 #include <mcalADC.h>
 
+#define halfBatVolt  (float)14
+#define emptyBatVolt (float)13
+
+
+typedef enum
+{
+	okBat = 0,
+	halfBat,
+	emptyBat,
+	underVolt,
+	overVolt
+} BatStat_t;
+
+typedef struct analogCh
+{
+	ADC_TypeDef *adc;
+	float BatVolt;
+	BatStat_t BatStatus;
+	float ratioBatVolt;
+	float CpuTemp;
+} analogCh_t;
 
 /* Constant for Voltage Conversion */
 #define BATTERY_VOLTAGE_COEFFICIENT 0.80586
@@ -23,5 +44,10 @@
 /* Functions of BatteryVoltage.c */
 extern void ADCInit(GPIO_TypeDef *port, PIN_NUM_t pin, ADC_TypeDef *adc, ADC_CHANNEL_t chnList[], size_t listSize, ADC_RESOLUTION_t resolution);
 extern uint16_t getBatteryMilliVolts(ADC_TypeDef *adc);
+
+extern void adcActivate(void);
+extern BatStat_t getBatVolt(analogCh_t* pADChn);
+
+
 
 /* end of BatteryVoltage.h */
