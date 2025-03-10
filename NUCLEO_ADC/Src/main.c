@@ -22,6 +22,7 @@
 #include <mcalGPIO.h>
 #include <mcalADC.h>
 #include <stdio.h>
+#include <RotaryPushButton.h>
 
 extern bool timerTrigger = false;  								// Necessary for the mcalTimer
 static uint8_t colorcode = 0;									// Variable used for cycling through the colors
