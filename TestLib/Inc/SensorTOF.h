@@ -118,6 +118,14 @@
 #define FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI                 (0x71)  // High byte for final range timeout
 #define SYSTEM_SEQUENCE_CONFIG                               (0x01)  // System sequence configuration register
 
+/*
+//Defines for ... Registers
+#define
+
+*/
+
+
+
 // Helper macro for encoding VCSEL period
 #define encodeVcselPeriod(period_pclks)                      (((period_pclks) >> 1) - 1)  // Encodes VCSEL period in PCLKs
 
@@ -231,7 +239,7 @@ extern void configureTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t,
  *
  * @returns:     bool: true if the configuration is successful, otherwise false.
  */
-bool TOF_configure_interrupt(TOFSensor_t* TOFSENS);
+extern bool TOF_configure_interrupt(TOFSensor_t* TOFSENS);
 
 
 /**
@@ -254,7 +262,7 @@ bool TOF_configure_interrupt(TOFSensor_t* TOFSENS);
  *
  * @returns:     bool: true if the correct TOF sensor is connected and communication is successful, otherwise false.
  */
-bool TOF_init_address(TOFSensor_t* TOFSENS);
+extern bool TOF_init_address(TOFSensor_t* TOFSENS);
 
 
 /**
@@ -278,7 +286,7 @@ bool TOF_init_address(TOFSensor_t* TOFSENS);
  *
  * @returns:     bool: true if the sensor is successfully initialized, otherwise false.
  */
-bool TOF_data_init(TOFSensor_t* TOFSENS);
+extern bool TOF_data_init(TOFSensor_t* TOFSENS);
 
 
 /**
@@ -305,7 +313,7 @@ bool TOF_data_init(TOFSensor_t* TOFSENS);
  *
  * @returns:    bool: true if the SPAD information is successfully retrieved, otherwise false.
  */
-bool TOF_get_spad_info_from_nvm(TOFSensor_t* TOFSENS, uint8_t * count, bool * type_is_aperture);
+extern bool TOF_get_spad_info_from_nvm(TOFSensor_t* TOFSENS, uint8_t * count, bool * type_is_aperture);
 
 
 /**
@@ -329,7 +337,7 @@ bool TOF_get_spad_info_from_nvm(TOFSensor_t* TOFSENS, uint8_t * count, bool * ty
  *
  * @returns:     bool: true if the SPAD configuration is successful, otherwise false.
  */
-bool TOF_set_spads_from_nvm(TOFSensor_t* TOFSENS);
+extern bool TOF_set_spads_from_nvm(TOFSensor_t* TOFSENS);
 
 
 /**
@@ -352,7 +360,7 @@ bool TOF_set_spads_from_nvm(TOFSensor_t* TOFSENS);
  *
  * @returns:     bool: true if the tuning configuration was successful, otherwise false.
  */
-bool TOF_load_default_tuning_settings(TOFSensor_t* TOFSENS);
+extern bool TOF_load_default_tuning_settings(TOFSensor_t* TOFSENS);
 
 
 /**
@@ -378,7 +386,7 @@ bool TOF_load_default_tuning_settings(TOFSensor_t* TOFSENS);
  *
  * @returns:     bool: true if the sequence configuration was successfully written to the sensor, otherwise false.
  */
-bool TOF_set_sequence_steps_enabled(TOFSensor_t* TOFSENS, uint8_t sequence_step);
+extern bool TOF_set_sequence_steps_enabled(TOFSensor_t* TOFSENS, uint8_t sequence_step);
 
 
 /**
@@ -405,7 +413,7 @@ bool TOF_set_sequence_steps_enabled(TOFSensor_t* TOFSENS, uint8_t sequence_step)
  *
  * @returns:     bool: true if the calibration was successfully performed, otherwise false.             
  */              
-bool TOF_perform_single_ref_calibration(TOFSensor_t* TOFSENS, TOF_calibration_type_t calib_type);
+extern bool TOF_perform_single_ref_calibration(TOFSensor_t* TOFSENS, TOF_calibration_type_t calib_type);
 
 
 /**
@@ -435,7 +443,7 @@ bool TOF_perform_single_ref_calibration(TOFSensor_t* TOFSENS, TOF_calibration_ty
  *                 TOF_set_sequence_steps_enabled.
  *               - If any step in the calibration or configuration fails, the function returns false.
  */
-bool TOF_perform_ref_calibration(TOFSensor_t* TOFSENS);
+extern bool TOF_perform_ref_calibration(TOFSensor_t* TOFSENS);
 
 
 /**
@@ -466,7 +474,7 @@ bool TOF_perform_ref_calibration(TOFSensor_t* TOFSENS);
  *                 task. If any step fails, the initialization halts and the function returns false.
  *               - Ensure the I2C communication setup is properly initialized before calling this function.
  */
-bool TOF_init_device(TOFSensor_t* TOFSENS);
+extern bool TOF_init_device(TOFSensor_t* TOFSENS);
 
 
 /**
@@ -490,7 +498,7 @@ bool TOF_init_device(TOFSensor_t* TOFSENS);
  *               - If the range is out of the sensor's measurable distance, the value returned is defined
  *                 as TOF_VL53L0X_OUT_OF_RANGE.
  */
-bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range);
+extern bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range);
 
 
 //--------------------- EXTERNAL FUNCTIONS ---------------------
@@ -515,7 +523,7 @@ bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range);
  *
  * @returns:     bool: true if the initialization was successful, otherwise false.
  */
-bool TOF_init(TOFSensor_t* TOFSENS);
+extern bool TOF_init(TOFSensor_t* TOFSENS);
 
 
 /**
@@ -539,7 +547,7 @@ bool TOF_init(TOFSensor_t* TOFSENS);
  *
  * @returns:     bool: true if continuous mode starts successfully, otherwise false.
  */
-bool TOF_start_continuous(TOFSensor_t* TOFSENS);
+extern bool TOF_start_continuous(TOFSensor_t* TOFSENS);
 
 
 /**
@@ -561,7 +569,7 @@ bool TOF_start_continuous(TOFSensor_t* TOFSENS);
  *
  * @returns:     bool: true if continuous mode stops successfully, false otherwise.
  */
-bool TOF_stop_continuous(TOFSensor_t* TOFSENS);
+extern bool TOF_stop_continuous(TOFSensor_t* TOFSENS);
 
 
 /**
@@ -583,7 +591,7 @@ bool TOF_stop_continuous(TOFSensor_t* TOFSENS);
  *
  * @returns:     bool: true if the distance is successfully read and updated, otherwise false.
  */
-bool TOF_read_continuous_distance(TOFSensor_t* TOFSENS);
+extern bool TOF_read_continuous_distance(TOFSensor_t* TOFSENS);
 
 
 /**
@@ -606,7 +614,29 @@ bool TOF_read_continuous_distance(TOFSensor_t* TOFSENS);
  * @returns:     bool: true if the measurement was successfully initiated, completed, and retrieved, false otherwise.
 
  */
-bool TOF_read_single_distance(TOFSensor_t* TOFSensor);
+extern bool TOF_read_single_distance(TOFSensor_t* TOFSensor);
+
+
+
+/**
+ * @function:    TOF_start_up_task
+ *
+ * @brief:       -
+ *
+ * @details:     -
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     uint16_t: returns current stored distance value.
+ */
+extern bool TOF_start_up_task(TOFSensor_t* TOFSENS);
+
 
 
 /**
@@ -626,7 +656,7 @@ bool TOF_read_single_distance(TOFSensor_t* TOFSensor);
  *
  * @returns:     uint16_t: returns current stored distance value.
  */
-uint16_t TOF_read_distance_Task(TOFSensor_t* TOFSENS);
+extern uint16_t TOF_read_distance_Task(TOFSensor_t* TOFSENS);
 
 
 /**
@@ -648,7 +678,7 @@ uint16_t TOF_read_distance_Task(TOFSensor_t* TOFSENS);
  *
  * @returns:     bool: true if the address was successfully updated, otherwise false.
  */
-bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t newAddr);
+extern bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t newAddr);
 
 
 /**
@@ -677,7 +707,7 @@ bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t newAddr);
  *
  *
  */
-bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *range);
+extern bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *range);
 
 
 /**
@@ -699,7 +729,7 @@ bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *rang
  *
  * @returns:     bool: true if the ranging profile was successfully set, otherwise false.
  */
-bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS);
+extern bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS);
 
 
 /**
@@ -729,7 +759,7 @@ bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS);
  *               - Changing VCSEL pulse periods may impact the sensor's measurement range and accuracy.
  *               - Always reapply the measurement timing budget after changing VCSEL configurations to maintain consistency.
  */
-bool TOF_set_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type, uint8_t period_pclks);
+extern bool TOF_set_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type, uint8_t period_pclks);
 
 
 /**
@@ -762,7 +792,7 @@ bool TOF_set_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type, uint
  *               - If the rate limit is set too low, it may affect the sensor's ability to detect distant objects.
  *               - If the rate limit is too high, the sensor may be overwhelmed with noise, leading to inaccurate measurements.
  */
-bool TOF_set_signal_rate_limit(TOFSensor_t* TOFSENS, float signalRateLimit);
+extern bool TOF_set_signal_rate_limit(TOFSensor_t* TOFSENS, float signalRateLimit);
 
 
 /**
@@ -782,7 +812,7 @@ bool TOF_set_signal_rate_limit(TOFSensor_t* TOFSENS, float signalRateLimit);
  *               - The calculated timeouts are in microseconds and are stored in the `timeouts` structure.
  *               - The VCSEL period for both pre-range and final-range steps is used to calculate the corresponding timeouts.
  */
-bool TOF_get_sequence_step_timeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *enables, SequenceStepTimeouts *timeouts);
+extern bool TOF_get_sequence_step_timeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *enables, SequenceStepTimeouts *timeouts);
 
 
 /**
@@ -811,7 +841,7 @@ bool TOF_get_sequence_step_timeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *e
  *               - Each bit in the byte represents an individual sequence step: TCC, DSS, MSRC, PRE_RANGE, FINAL_RANGE.
  *               - The SequenceStepEnables structure is populated with the status of each sequence step based on these bits.
  */
-bool TOF_get_sequence_step_enables(TOFSensor_t* TOFSENS, SequenceStepEnables *enables);
+extern bool TOF_get_sequence_step_enables(TOFSensor_t* TOFSENS, SequenceStepEnables *enables);
 
 
 /**
@@ -839,7 +869,7 @@ bool TOF_get_sequence_step_enables(TOFSensor_t* TOFSENS, SequenceStepEnables *en
  *               - The raw register values are decoded before returning.
  *               - A return value of 255 indicates an error during the process (either reading the register or decoding the value).
  */
-uint8_t TOF_get_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type);
+extern uint8_t TOF_get_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type);
 
 
 /**
@@ -864,7 +894,7 @@ uint8_t TOF_get_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type);
  *
  * @returns:     bool: true if the timing budget was successfully set, otherwise false.
  */
-bool TOF_set_measurement_timing_budget(TOFSensor_t* TOFSENS, uint32_t budget_us);
+extern bool TOF_set_measurement_timing_budget(TOFSensor_t* TOFSENS, uint32_t budget_us);
 
 
 /**
@@ -892,7 +922,7 @@ bool TOF_set_measurement_timing_budget(TOFSensor_t* TOFSENS, uint32_t budget_us)
  *               - The raw register values are decoded before returning.
  *               - A return value of 255 indicates an error during the process (either reading the register or decoding the value).
  */
-uint8_t TOF_get_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type);
+extern uint8_t TOF_get_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type);
 
 
 //--------------------- ADDITIONAL NON TOF FUNCTIONS ---------------------
@@ -922,7 +952,7 @@ uint8_t TOF_get_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type);
  *               - The encoded value is a 16-bit value where the higher byte represents the number of shifts, and the lower byte holds the adjusted value.
  *               - The input timeout value should be greater than zero, as the function is designed to handle positive timeouts.
  */
-uint16_t encode_timeOut(uint16_t final_range_timeout_mclks);
+extern uint16_t encode_timeOut(uint16_t final_range_timeout_mclks);
 
 
 /**
@@ -950,7 +980,7 @@ uint16_t encode_timeOut(uint16_t final_range_timeout_mclks);
  *               - The formula used to calculate the timeout ensures that the timeout is a value greater than or equal to 1.
  *               - The decoded timeout can be used in further sensor configurations or calculations.
  */
-uint16_t decode_timeout(uint16_t reg_val);
+extern uint16_t decode_timeout(uint16_t reg_val);
 
 
 /**
@@ -977,7 +1007,7 @@ uint16_t decode_timeout(uint16_t reg_val);
  *               - This function is used to convert the sensor's timeout period (expressed in MCLKs) into a more human-readable form (microseconds).
  *               - The calculation ensures the proper timing conversion based on the VCSEL period, which varies depending on the sensor configuration.
  */
-uint32_t timeout_mclks_to_microseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks);
+extern uint32_t timeout_mclks_to_microseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks);
 
 
 /**
@@ -1001,6 +1031,6 @@ uint32_t timeout_mclks_to_microseconds(uint16_t timeout_period_mclks, uint8_t vc
  *               - This function is used to convert a timeout period from microseconds into the raw timing unit (MCLKs), which is suitable for sensor register configurations.
  *               - The conversion takes into account the VCSEL period (in PCLKs) to properly adjust for different sensor configurations.
  */
-uint32_t timeout_microseconds_to_mclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks);
+extern uint32_t timeout_microseconds_to_mclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks);
 
 #endif /* SENSORTOF_H */

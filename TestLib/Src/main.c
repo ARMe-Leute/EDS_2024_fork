@@ -279,22 +279,17 @@ int main(void)
 
 				i2cSendByteToSlaveReg(I2C1, 0x29, TOF_REG_SYSRANGE_START, 0x01);
 
-*/
 
 				while(1)
 					{
-
-
-
 						setRotaryColor(LED_GREEN);
 						TOF_read_distance_Task(&TOF_Sensor_1);
 						setRotaryColor(LED_RED);
 						//TOF_read_single_distance(&TOF_Sensor_1);
 
-
 						delayms(200);
 					}
-
+*/
 		//------------------------------
 				visualisationTOF(&TOF_Sensor_1);
 
