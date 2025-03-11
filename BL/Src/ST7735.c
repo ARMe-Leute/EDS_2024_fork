@@ -16,6 +16,11 @@ Please see the included documents for further information.
 */
 
 
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+
+
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>

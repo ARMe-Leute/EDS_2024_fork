@@ -10,6 +10,7 @@
  ******************************************************************************
  */
 
+#pragma GCC diagnostic ignored "-Wswitch-default"
 
 /* Includes */
 #include <stdint.h>
