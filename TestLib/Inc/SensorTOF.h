@@ -640,7 +640,7 @@ extern bool TOF_start_up_task(TOFSensor_t* TOFSENS);
 
 
 /**
- * @function:    TOF_read_distance_Task
+ * @function:    TOF_read_distance_task
  *
  * @brief:       -
  *
@@ -656,7 +656,7 @@ extern bool TOF_start_up_task(TOFSensor_t* TOFSENS);
  *
  * @returns:     uint16_t: returns current stored distance value.
  */
-extern uint16_t TOF_read_distance_Task(TOFSensor_t* TOFSENS);
+extern uint16_t TOF_read_distance_task(TOFSensor_t* TOFSENS);
 
 
 /**

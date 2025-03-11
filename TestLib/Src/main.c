@@ -77,6 +77,11 @@ EXIT_MENU_t exitMenu = EXIT_FALSE;			// variable to exit menu to a certain page
 // variable for MCAL SysTick
 bool timerTrigger = false;
 
+//___________
+	uint8_t interrupt_statustest = 0;	//Variable for the Register Content
+//___________
+
+
 /*
  * @function:	 main
  *
@@ -84,6 +89,7 @@ bool timerTrigger = false;
  */
 int main(void)
 {
+
 
 	enableTOFSensor = true;
 	TOF_sensor_used = 0x29;
@@ -268,28 +274,18 @@ int main(void)
 				break;
 			case SCREEN_PAGE2:
 		//------------------------------
-/*
-				i2cSendByteToSlaveReg(I2C1, 0x29, 0x80, 0x01);
-				i2cSendByteToSlaveReg(I2C1, 0x29, 0xFF, 0x01);
-				i2cSendByteToSlaveReg(I2C1, 0x29, 0x00, 0x00);
-				i2cSendByteToSlaveReg(I2C1, 0x29, 0x91, 0);
-				i2cSendByteToSlaveReg(I2C1, 0x29, 0x00, 0x01);
-				i2cSendByteToSlaveReg(I2C1, 0x29, 0xFF, 0x00);
-				i2cSendByteToSlaveReg(I2C1, 0x29, 0x80, 0x00);
+				//TOF_read_single_distance(&TOF_Sensor_1);
+				//check the ReadyData Flag
+				//i2cReadByteFromSlaveReg(I2C1, 0x29, 0x00, &interrupt_statustest);
 
-				i2cSendByteToSlaveReg(I2C1, 0x29, TOF_REG_SYSRANGE_START, 0x01);
-
-
+				TOF_start_up_task(&TOF_Sensor_1);
 				while(1)
 					{
 						setRotaryColor(LED_GREEN);
-						TOF_read_distance_Task(&TOF_Sensor_1);
+						TOF_read_distance_task(&TOF_Sensor_1);
 						setRotaryColor(LED_RED);
-						//TOF_read_single_distance(&TOF_Sensor_1);
-
-						delayms(200);
 					}
-*/
+
 		//------------------------------
 				visualisationTOF(&TOF_Sensor_1);
 

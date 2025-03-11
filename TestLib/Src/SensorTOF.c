@@ -832,22 +832,47 @@ uint16_t TOF_read_distance_task(TOFSensor_t* TOFSENS)
 	I2C_RETURN_CODE_t i2c_return;
 	TOF_address_used = TOFSENS->TOF_address_used;	//TOF Adress from Struct TOF
 	TOF_i2c = TOFSENS->i2c_tof;		//I2C Adress from Struct TOF
-	uint8_t interrupt_status = 0;	//Variable for the Register Content
+	uint8_t interrupt_status[1];	//Variable for the Register Content
 	uint8_t interrupt_bit = 0;		//Vaariable for the ReadyData Flag
 	uint16_t taskdistance;			//Variable to Store the read distance
 
+
+	/*
+	do
+	{
+		i2c_return = i2cBurstRegRead(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, sysrange_start, 1);
+	} while (i2c_return == I2C_OK && (sysrange_start[0] & 0x01));
+	*/
+
+
+
+	/*
+	uint8_t interrupt_status[1];
+	do
+	{
+
+	} while (i2c_return == I2C_OK && ((interrupt_status[0] & 0x07) == 0));
+	if (i2c_return != I2C_OK)
+	{
+		return false;
+	}
+	*/
+
+
+	i2c_return = i2cBurstRegRead(TOF_i2c, TOF_address_used,	TOF_REG_RESULT_INTERRUPT_STATUS, interrupt_status, 1);
+
 	//check the ReadyData Flag
-	i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used,	TOF_REG_RESULT_INTERRUPT_STATUS, &interrupt_status);
+	//i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used,	TOF_REG_SYSRANGE_START, &interrupt_status);
 	//i2c_return = i2cReadByte(TOF_i2c, TOF_REG_RESULT_INTERRUPT_STATUS, &interrupt_status);
 	if (i2c_return != I2C_OK)
 	{
 		return false;
 	}
-	interrupt_bit = interrupt_status & 0x01;	//Mask the Register (only last Bit)
+	//interrupt_bit = interrupt_status & 0x01;	//Mask the Register (only last Bit)
 
 
 	//readydata Flag high ?
-	if(interrupt_bit != 0)			//hier muss dann das interrupt_bit stehen
+	if(i2c_return == I2C_OK && ((interrupt_status[0] & 0x07) != 0))			//hier muss dann das interrupt_bit stehen
 	{
 		uint8_t readBuffer[2];
 		i2c_return = i2cBurstRegRead(TOF_i2c, TOF_address_used, TOF_REG_RESULT_RANGE_STATUS + 10, readBuffer, 2);
@@ -897,22 +922,10 @@ uint16_t TOF_read_distance_task(TOFSensor_t* TOFSENS)
 		}
 
 		TOFSENS->TOF_measuringage = 0; 		//reset measuring age
-
-/*
-		uint8_t sysrange_start[1];
-		do
-		{
-			i2c_return = i2cBurstRegRead(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, sysrange_start, 1);
-		} while (i2c_return == I2C_OK && (sysrange_start[0] & 0x01));
-		if (i2c_return != I2C_OK)
-		{
-			return false;
-		}
-*/
 	}
 
-	//readydata Flag LOW !
-	else
+
+	else		//readydata Flag LOW !
 	{
 		TOFSENS->TOF_measuringage ++;
 
