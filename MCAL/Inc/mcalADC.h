@@ -125,6 +125,8 @@ extern ADC_RETURN_CODE_t adcDisableWatchdogForAllChannels(ADC_TypeDef *adc);
 
 extern ADC_RETURN_CODE_t adcSetChannelSequence(ADC_TypeDef *adc, ADC_CHANNEL_t *chnList, size_t listSize);
 
+extern void activateTemperatureSensor(ADC_Common_TypeDef *adc);
+
 #ifdef __cplusplus
 }
 #endif

@@ -71,7 +71,7 @@ void ADC1_Init(void)
 
     // 2) Temperatur-Sensor in ADC_CCR aktivieren
     ADC_CCR |= ADC_CCR_TSVREFE;
-    // gibts in mcalADC nicht --> CCR-Register-Beschreibung in mcalADC hinzufügen
+    // gibts in mcalADC nicht --> CCR-Register-Beschreibung in mcalADC hinzufuegen
 
     // 3) ADC1 deaktivieren, bevor wir CR1/CR2 einstellen (sicherheitshalber)
     ADC1_CR2 &= ~ADC_CR2_ADON;

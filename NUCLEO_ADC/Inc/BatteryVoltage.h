@@ -19,6 +19,13 @@
 #define halfBatVolt  (float)14
 #define emptyBatVolt (float)13
 
+typedef struct adc
+{
+	ADC_TypeDef *adc;
+	ADC_RESOLUTION_t resolution;
+	float AnalogVoltage;
+	ADC_CHANNEL_t chnList[];
+}adcAnalog_t;
 
 typedef enum
 {
@@ -32,21 +39,25 @@ typedef enum
 typedef struct analogCh
 {
 	ADC_TypeDef *adc;
-	float BatVolt;
+	ADC_RESOLUTION_t resolution;
+	size_t listSize;
 	BatStat_t BatStatus;
 	float ratioBatVolt;
+	float BatVolt;
 	float CpuTemp;
+	ADC_CHANNEL_t chnList[];
 } analogCh_t;
 
 /* Constant for Voltage Conversion */
 #define BATTERY_VOLTAGE_COEFFICIENT 0.80586
+
 
 /* Functions of BatteryVoltage.c */
 extern void ADCInit(GPIO_TypeDef *port, PIN_NUM_t pin, ADC_TypeDef *adc, ADC_CHANNEL_t chnList[], size_t listSize, ADC_RESOLUTION_t resolution);
 extern uint16_t getBatteryMilliVolts(ADC_TypeDef *adc);
 
 extern void adcActivate(void);
-extern BatStat_t getBatVolt(analogCh_t* pADChn);
+extern BatStat_t getBatVolt(analogCh_t* pADChn, size_t listSize);
 
 
 
