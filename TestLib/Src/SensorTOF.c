@@ -833,7 +833,6 @@ uint16_t TOF_read_distance_task(TOFSensor_t* TOFSENS)
 	TOF_address_used = TOFSENS->TOF_address_used;	//TOF Adress from Struct TOF
 	TOF_i2c = TOFSENS->i2c_tof;		//I2C Adress from Struct TOF
 	uint8_t interrupt_status[1];	//Variable for the Register Content
-	uint8_t interrupt_bit = 0;		//Vaariable for the ReadyData Flag
 	uint16_t taskdistance;			//Variable to Store the read distance
 
 
@@ -872,7 +871,7 @@ uint16_t TOF_read_distance_task(TOFSensor_t* TOFSENS)
 
 
 	//readydata Flag high ?
-	if(i2c_return == I2C_OK && ((interrupt_status[0] & 0x07) != 0))			//hier muss dann das interrupt_bit stehen
+	if(i2c_return == I2C_OK && ((interrupt_status[0] & 0x07) != 0))
 	{
 		uint8_t readBuffer[2];
 		i2c_return = i2cBurstRegRead(TOF_i2c, TOF_address_used, TOF_REG_RESULT_RANGE_STATUS + 10, readBuffer, 2);
@@ -896,8 +895,6 @@ uint16_t TOF_read_distance_task(TOFSensor_t* TOFSENS)
 			taskdistance = TOF_VL53L0X_OUT_OF_RANGE;
 		}
 		TOFSENS->distanceFromTOF = taskdistance;
-
-		//i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used,	TOF_REG_RESULT_INTERRUPT_STATUS, interrupt_status);	//testabfrage
 
 
 		//Successfull Measurement start new one
