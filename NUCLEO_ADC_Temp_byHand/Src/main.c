@@ -67,12 +67,15 @@ void ADC1_Init(void)
 {
     // 1) ADC1-Takt aktivieren
     RCC_APB2ENR |= RCC_APB2ENR_ADC1EN;
+    // geht auch mit adcSelectADC(ADC_TypeDef *adc) aus mcalADC
 
     // 2) Temperatur-Sensor in ADC_CCR aktivieren
     ADC_CCR |= ADC_CCR_TSVREFE;
+    // gibts in mcalADC nicht --> CCR-Register-Beschreibung in mcalADC hinzufügen
 
     // 3) ADC1 deaktivieren, bevor wir CR1/CR2 einstellen (sicherheitshalber)
     ADC1_CR2 &= ~ADC_CR2_ADON;
+    // geht auch mit adcEnableADC(ADC_TypeDef *adc) aus mcalADC
 
     // 4) Sample-Time für Kanal 16 konfigurieren
     //    Kanal 16 wird in SMPR1[ (16-10)*3 ] = SMPR1[18..20 Bits] gesetzt
@@ -80,10 +83,12 @@ void ADC1_Init(void)
     //    (je nach Referenzmanual: Bits für CH16 sind an Position 18..20 in SMPR1).
     ADC1_SMPR1 &= ~(7UL << (3 * (16 - 10)));    // vorher nullen
     ADC1_SMPR1 |=  (7UL << (3 * (16 - 10)));    // 111 => 480 cycles
+    // geht vmtl auch mit ADC_CHN_16 in adcSetSampleCycles(ADC_TypeDef *adc, ADC_CHANNEL_t chn, ADC_SAMPLING_CYCLES_t cycles)
 
     // 5) Kanal 16 als einzige Conversion in der Regular Sequence SQR3
     //    Die untersten 5 Bits in SQR3 wählen den Kanal aus.
     ADC1_SQR3 = 16UL;  // => 16 & 0x1F
+    // geht auch mit seqLen = 1 in adcSetChannelSequence(ADC_TypeDef *adc, ADC_CHANNEL_t *chnList, size_t seqLen)
 
     // 6) Sequenz-Länge = 1
     //    SQR1[L[3:0]] => 0 => 1 Conversion
@@ -91,6 +96,7 @@ void ADC1_Init(void)
 
     // 7) ADC1 einschalten (ADON-Bit)
     ADC1_CR2 |= ADC_CR2_ADON;
+    // geht auch mit adcEnableADC(ADC_TypeDef *adc) aus mcalADC
 
     // Kurz warten, damit sich ADC intern einschwingen kann.
     // Evtl. kleine Software-Pause (z. B. for-Schleife).
@@ -105,14 +111,17 @@ uint16_t ADC1_ReadTemperatureRaw(void)
 {
     // 1) Start der Software-Conversion
     ADC1_CR2 |= ADC_CR2_SWSTART;
+    // geht auch mit adcStartConversion(ADC_TypeDef *adc) aus mcalADC
 
     // 2) Warten auf End-of-Conversion (EOC)
     while ((ADC1_SR & ADC_SR_EOC) == 0) {
         // hier optional Watchdog/Timeout
     }
+    // kann man auch abfragen mit: adcIsConversionFinished(ADC_TypeDef *adc)
 
     // 3) ADC-Daten aus dem Data-Register auslesen
     uint16_t adcValue = (uint16_t)(ADC1_DR & 0xFFFF);
+    // geht auch mit adcGetConversionResult(ADC_TypeDef *adc)
 
     return adcValue;
 }
