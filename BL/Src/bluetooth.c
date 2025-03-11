@@ -54,7 +54,7 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
             gpioSelectAltFunc(GPIOA, PIN2, AF7); 	// PA2: AF7 for USART2 Tx
             usartSelectUsart(usart);
             usartEnableUsart(usart);
-            usartSetCommParams(usart, 9600, NO_PARITY, LEN_8BIT, ONE_BIT);
+		usartSetCommParams(usart, bluetoothBaudToInt(baudRate), NO_PARITY, LEN_8BIT, ONE_BIT);
 
             usartSetDmaTxMode(USART2, DMA_TRANSMIT_ON);
             usartResetIrqFlag(USART2, USART_TC_FLG);
@@ -223,7 +223,7 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK)
             return reply; // Pass error or do error handling here
          }
 
-   }
+}
 
 bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
    {

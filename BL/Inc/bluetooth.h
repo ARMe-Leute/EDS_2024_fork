@@ -75,22 +75,7 @@
 #endif // !(defined(BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK) || defined(BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR))
 #endif //debugMode
 
-/**
- * @brief Structure representing a Bluetooth module instance.
- */
-typedef struct BluetoothModule
-   {
-      const USART_TypeDef *usart; /**< USART instance for communication. */
-      int8_t initStatus; /**< Initialization status of the module. */
-      uint32_t baudRate; /**< Baud rate for the USART. */
-      char messageBufferRX[USART2_BUFFER_SIZE + 1]; /**< Buffer for received messages. */
-      volatile char *messageBufferTX;
-      uint16_t available; /**< Number of available characters in the buffer. */
-      uint8_t counter; /**< Counter for internal operations, e.g., retry count. */
-      int16_t state; /**< Current state of the state machine. */
-      volatile bool *TXComplete;
 
-   } BluetoothModule_t;
 
 /**
  * @brief Enum representing possible Bluetooth errors and status codes.
@@ -116,11 +101,44 @@ enum BluetoothState
    getMacAddress_2 /**< Secondary state for getMacAddress command. */
    };
 
+
+typedef enum BluetoothBaudRate {
+      bluetoothBaud_9600 =0,
+      bluetoothBaud_19200,
+      bluetoothBaud_38400,
+      bluetoothBaud_57600,
+      bluetoothBaud_115200,
+      bluetoothBaud_4800,
+      bluetoothBaud_2400,
+      bluetoothBaud_1200,
+      bluetoothBaud_230400
+
+} BluetoothBaudRate_t;
+
+/**
+ * @brief Structure representing a Bluetooth module instance.
+ */
+typedef struct BluetoothModule {
+        const USART_TypeDef *usart;                             /**< USART instance for communication. */
+        int8_t initStatus;                                                      /**< Initialization status of the module. */
+        BluetoothBaudRate_t baudRate;                                                   /**< Baud rate for the USART. */
+        char messageBufferRX[USART2_BUFFER_SIZE + 1]; /**< Buffer for received messages. */
+        volatile char *messageBufferTX;
+        uint16_t available;                                             /**< Number of available characters in the buffer. */
+        uint8_t counter;                                                        /**< Counter for internal operations, e.g., retry count. */
+        int16_t state;                                                          /**< Current state of the state machine. */
+        volatile bool *TXComplete;
+
+} BluetoothModule_t;
+
 extern int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART,
       uint32_t baudRate, volatile char txMessageBuffer[]);
 extern bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule);
 extern int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK);
 extern int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
+
+extern uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate);
+extern uint8_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, BluetoothBaudRate_t baudRate);
 
 extern bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data);
 extern DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart);
