@@ -174,10 +174,7 @@ bool TOF_init_address(TOFSensor_t* TOFSENS)
 
 	//check correct device by reading the ID
 	uint8_t device_id[1];
-	I2C_RETURN_CODE_t i2c_return = i2cBurstRegRead(
-			TOF_i2c, TOF_address_used,
-			TOF_REG_IDENTIFICATION_MODEL_ID,
-			device_id, 1);
+	I2C_RETURN_CODE_t i2c_return = i2cBurstRegRead(TOF_i2c, TOF_address_used, TOF_REG_IDENTIFICATION_MODEL_ID, device_id, 1);
 
 	if (i2c_return != I2C_OK)
 	{
@@ -199,9 +196,7 @@ bool TOF_data_init(TOFSensor_t* TOFSENS)
 
 	/* Set 2v8 mode */
 	uint8_t vhv_config_scl_sda = 0;
-	success = i2cReadByteFromSlaveReg(
-			TOF_i2c, TOF_address_used,
-			TOF_REG_VHV_CONFIG_PAD_SCL_SDA_EXTSUP_HV, &vhv_config_scl_sda);
+	success = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_VHV_CONFIG_PAD_SCL_SDA_EXTSUP_HV, &vhv_config_scl_sda);
 	if (success != I2C_OK)
 	{
 		return false;
@@ -209,23 +204,21 @@ bool TOF_data_init(TOFSensor_t* TOFSENS)
 
 	vhv_config_scl_sda |= 0x01;
 
-	success = i2cSendByteToSlaveReg(
-		TOF_i2c, TOF_address_used,
-		TOF_REG_VHV_CONFIG_PAD_SCL_SDA_EXTSUP_HV, vhv_config_scl_sda);
+	success = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_VHV_CONFIG_PAD_SCL_SDA_EXTSUP_HV, vhv_config_scl_sda);
 	if (success != I2C_OK)
 	{
 		return false;
 	}
 
 	/* Set I2C standard mode */
-	success = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x88, 0x00);	//ToDO Register Adressen mit Namen ergänzen
-	success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x01);
+	success = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, INTERNAL_CONFIG_0x88, 0x00);	//ToDO Register Adressen mit Namen ergänzen
+	success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x01);
 	success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x01);
 	success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x00);
 	success &= i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, 0x91, &TOF_stop_variable);
 	success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
 	success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x00);
-	success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x00);
+	success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x00);
 
 	if (success != I2C_OK)
 	{
@@ -243,7 +236,7 @@ bool TOF_get_spad_info_from_nvm(TOFSensor_t* TOFSENS, uint8_t * count, bool * ty
 
 	uint8_t tmp;
 
-	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x01);//ToDO Register Adressen mit Namen ergänzen
+	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x01);//ToDO Register Adressen mit Namen ergänzen
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x01);
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x00);
 
@@ -255,7 +248,7 @@ bool TOF_get_spad_info_from_nvm(TOFSensor_t* TOFSENS, uint8_t * count, bool * ty
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x07);
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x81, 0x01);
 
-	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x01);
+	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x01);
 
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x94, 0x6b);
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x83, 0x00);
@@ -287,7 +280,7 @@ bool TOF_get_spad_info_from_nvm(TOFSensor_t* TOFSENS, uint8_t * count, bool * ty
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
 
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x00);
-	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x00);
+	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x00);
 
 	return true;
 }
@@ -423,13 +416,13 @@ bool TOF_load_default_tuning_settings(TOFSensor_t* TOFSENS)
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x01);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x0D, 0x01);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x00);
-    success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x01);
+    success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x01);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x01, 0xF8);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x01);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x8E, 0x01);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x00);
-    success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x00);
+    success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x00);
 
     if (success != I2C_OK)
 	{
@@ -529,9 +522,7 @@ bool TOF_perform_ref_calibration(TOFSensor_t* TOFSENS)
 		return false;
 	}
 	/* Restore sequence steps enabled */
-	if (!TOF_set_sequence_steps_enabled(TOFSENS, TOF_RANGE_SEQUENCE_STEP_DSS +
-			TOF_RANGE_SEQUENCE_STEP_PRE_RANGE +
-			TOF_RANGE_SEQUENCE_STEP_FINAL_RANGE)) {
+	if (!TOF_set_sequence_steps_enabled(TOFSENS, TOF_RANGE_SEQUENCE_STEP_DSS + TOF_RANGE_SEQUENCE_STEP_PRE_RANGE + TOF_RANGE_SEQUENCE_STEP_FINAL_RANGE)) {
 		return false;
 	}
 	return true;
@@ -658,13 +649,13 @@ bool TOF_start_continuous(TOFSensor_t* TOFSENS)
 
 	TOF_address_used = TOFSENS->TOF_address_used;
 
-	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x01);
+	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x01);
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x01);	//ToDO Register Adressen mit Namen ergänzen
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x00);
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x91, TOF_stop_variable);
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x00);
-	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x00);
+	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x00);
 
 	if (period_ms != 0)
 	{
@@ -764,13 +755,13 @@ bool TOF_read_single_distance(TOFSensor_t* TOFSENS)
 
 	I2C_RETURN_CODE_t i2c_return;
 
-	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x01);		//ToDO Register Adressen mit Namen ergänzen
+	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x01);		//ToDO Register Adressen mit Namen ergänzen
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x01);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x00);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x91, TOF_stop_variable);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x00);
-	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x00);
+	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x00);
 	if (i2c_return != I2C_OK) {
 		return false;
 	}
@@ -805,13 +796,13 @@ bool TOF_start_up_task(TOFSensor_t* TOFSENS)
 	TOF_address_used = TOFSENS->TOF_address_used;	//TOF Adress from Struct TOF
 	TOF_i2c = TOFSENS->i2c_tof;		//I2C Adress from Struct TOF
 
-	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x01);
+	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x01);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x01);		//ToDO Register Adressen mit Namen ergänzen
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x00);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x91, TOF_stop_variable);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x00);
-	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x00);
+	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x00);
 	if (i2c_return != I2C_OK) {
 		return false;
 	}
@@ -900,13 +891,13 @@ uint16_t TOF_read_distance_task(TOFSensor_t* TOFSENS)
 		//Successfull Measurement start new one
 
 
-		i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x01);
+		i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x01);
 		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x01);		//ToDO Register Adressen mit Namen ergänzen
 		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x00);
 		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x91, TOF_stop_variable);
 		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
 		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x00);
-		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x00);
+		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x00);
 		if (i2c_return != I2C_OK) {
 			return false;
 		}
@@ -963,13 +954,13 @@ bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *rang
 
 	I2C_RETURN_CODE_t i2c_return;
 
-	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x01);
+	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x01);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x01);		//ToDO Register Adressen mit Namen ergänzen
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x00);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x91, TOF_stop_variable);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x00);
-	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x00);
+	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, IDENTIFICATION_MODEL_ID, 0x00);
 	if (i2c_return != I2C_OK) {
 		return false;
 	}

@@ -38,7 +38,7 @@ void i2cActivate()
     gpioSetOutputType(portB, PIN8, OPENDRAIN);   // Immer externe Pull-up-
     gpioSetOutputType(portB, PIN9, OPENDRAIN);   // Widerstaende verwenden!!!
     // Initialisierung des I2C-Controllers
-    i2cInitI2C(i2c, I2C_DUTY_CYCLE_2, 17, I2C_CLOCK_50);
+    i2cInitI2C(i2c, I2C_DUTY_CYCLE_2, 17, I2C_CLOCK_1Mz);		//I2C_CLOCK_50
     i2cEnableDevice(i2c);                        // MCAL I2C1 activ
 #ifdef BALA2024
 

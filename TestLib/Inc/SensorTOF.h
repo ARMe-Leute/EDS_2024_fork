@@ -118,11 +118,20 @@
 #define FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI                 (0x71)  // High byte for final range timeout
 #define SYSTEM_SEQUENCE_CONFIG                               (0x01)  // System sequence configuration register
 
-/*
-//Defines for ... Registers
-#define
 
-*/
+//Defines for ... Registers
+#define IDENTIFICATION_MODEL_ID								(0x80)	//REGISTER
+#define INTERNAL_CONFIG_0x88								(0x88)	//REGISTER
+
+
+
+//Configuration constants
+
+
+
+
+
+
 
 
 
