@@ -6,7 +6,7 @@
  *                    Currently adapted to the VL53LOX sensor.
  *                    The library supports both single-shot and continuous measurement modes.
  *                    Configuration is managed via the appropriate register settings for the sensor.
- * @date           : December 2024
+ * @date           : April 2025
  ******************************************************************************
 
 
@@ -67,30 +67,52 @@
 #include <stdbool.h>
 
 // Register defines for communication with the TOF sensor (according to the API)
-
-// Identification Registers
-#define TOF_REG_IDENTIFICATION_MODEL_ID                     (0xC0)  // Get Device ID (Model ID)
-#define TOF_VL53L0X_EXPECTED_DEVICE_ID                       (0xEE)  // Expected device ID for VL53L0X
-#define TOF_VL53L0X_DEFAULT_ADDRESS                          (0x29)  // Default I2C address for VL53L0X sensor
-
-// Configuration and Control Registers
-#define TOF_REG_VHV_CONFIG_PAD_SCL_SDA_EXTSUP_HV             (0x89)  // VHV (Voltage High Voltage) configuration register
-#define TOF_REG_MSRC_CONFIG_CONTROL                          (0x60)  // MSRC (Minimum Signal Rate Check) control register
-#define TOF_REG_FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT  (0x44)  // Final range config for count rate return limit
-#define TOF_REG_SYSTEM_SEQUENCE_CONFIG                       (0x01)  // Sequence configuration register
-#define TOF_REG_DYNAMIC_SPAD_REF_EN_START_OFFSET             (0x4F)  // Dynamic SPAD reference enable start offset register
-#define TOF_REG_DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD          (0x4E)  // Dynamic SPAD requested reference count register
-#define TOF_REG_GLOBAL_CONFIG_REF_EN_START_SELECT            (0xB6)  // Global config for reference enable start selection
-#define TOF_REG_SYSTEM_INTERRUPT_CONFIG_GPIO                 (0x0A)  // System interrupt config GPIO register
-#define TOF_REG_GPIO_HV_MUX_ACTIVE_HIGH                      (0x84)  // GPIO HV MUX active high configuration register
-#define TOF_REG_SYSTEM_INTERRUPT_CLEAR                       (0x0B)  // System interrupt clear register
-#define TOF_REG_RESULT_INTERRUPT_STATUS                      (0x13)  // Interrupt status for results
 #define TOF_REG_SYSRANGE_START                               (0x00)  // Trigger start of range measurement
-#define TOF_REG_GLOBAL_CONFIG_SPAD_ENABLES_REF_0             (0xB0)  // Global SPAD enables reference register
+#define TOF_REG_SYSTEM_SEQUENCE_CONFIG                       (0x01)  // Sequence configuration register
+#define TOF_REG_SYSTEM_INTERMEASUREMENT_PERIOD               (0x04)  // Inter-measurement period for the system
+#define TOF_REG_INTERNAL_CONFIG_0x09						 (0x09)
+#define TOF_REG_SYSTEM_INTERRUPT_CONFIG_GPIO                 (0x0A)  // System interrupt config GPIO register
+#define TOF_REG_SYSTEM_INTERRUPT_CLEAR                       (0x0B)  // System interrupt clear register
+#define TOF_REG_INTERNAL_CONFIG_0x10						 (0x10)
+#define TOF_REG_INTERNAL_CONFIG_0x11						 (0x11)
+#define TOF_REG_RESULT_INTERRUPT_STATUS                      (0x13)  // Interrupt status for results
 #define TOF_REG_RESULT_RANGE_STATUS                          (0x14)  // Range status result register
+#define TOF_REG_INTERNAL_CONFIG_0x24						 (0x24)
+#define TOF_REG_INTERNAL_CONFIG_0x25						 (0x25)
+
+#define TOF_REG_GLOBAL_CONFIG_VCSEL_WIDTH                    (0x32)  // VCSEL width configuration for global settings
+#define TOF_REG_FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT  (0x44)  // Final range config for count rate return limit
+#define TOF_REG_MSRC_CONFIG_TIMEOUT_MACROP                   (0x46)  // MSRC timeout macrop register
+#define TOF_REG_FINAL_RANGE_CONFIG_VALID_PHASE_LOW           (0x47)  // Final range valid phase low register
+#define TOF_REG_FINAL_RANGE_CONFIG_VALID_PHASE_HIGH          (0x48)  // Final range valid phase high register
+#define TOF_REG_DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD          (0x4E)  // Dynamic SPAD requested reference count register
+#define TOF_REG_DYNAMIC_SPAD_REF_EN_START_OFFSET             (0x4F)  // Dynamic SPAD reference enable start offset register
+#define TOF_REG_PRE_RANGE_CONFIG_VCSEL_PERIOD                (0x50)  // Pre-range VCSEL period register
+#define TOF_REG_PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI           (0x51)  // High byte for pre-range timeout
+#define TOF_REG_PRE_RANGE_CONFIG_VALID_PHASE_LOW             (0x56)  // Pre-range valid phase low register
+#define TOF_REG_PRE_RANGE_CONFIG_VALID_PHASE_HIGH            (0x57)  // Pre-range valid phase high register
+#define TOF_REG_MSRC_CONFIG_CONTROL                          (0x60)  // MSRC (Minimum Signal Rate Check) control register
+#define TOF_REG_FINAL_RANGE_CONFIG_VCSEL_PERIOD              (0x70)  // Final-range VCSEL period register
+#define TOF_REG_FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI         (0x71)  // High byte for final range timeout
+#define TOF_REG_POWER_MANAGEMENT_GO1_POWER_FORCE             (0x80)  // Power management register
+#define TOF_REG_INTERNAL_CONFIG_0x83						 (0x83)
+#define TOF_REG_GPIO_HV_MUX_ACTIVE_HIGH                      (0x84)  // GPIO HV MUX active high configuration register
+#define TOF_REG_I2C_MODE                                     (0x88)  // NOT officially documented
+#define TOF_REG_VHV_CONFIG_PAD_SCL_SDA_EXTSUP_HV             (0x89)  // VHV (Voltage High Voltage) configuration register
 #define TOF_REG_SLAVE_DEVICE_ADDRESS                         (0x8A)  // Slave device address register
-#define TOF_SYSTEM_INTERMEASUREMENT_PERIOD                   (0x04)  // Inter-measurement period for the system
-#define TOF_OSC_CALIBRATE_VAL                                (0xF8)  // Oscillator calibration value register
+#define TOF_REG_INTERNAL_TUNING_1                            (0x91)  // Internal tuning register 1
+#define TOF_REG_INTERNAL_CONFIG_0x94						 (0x94)
+#define TOF_REG_GLOBAL_CONFIG_SPAD_ENABLES_REF_0             (0xB0)  // Global SPAD enables reference register
+#define TOF_REG_GLOBAL_CONFIG_REF_EN_START_SELECT            (0xB6)  // Global config for reference enable start selection
+#define TOF_REG_IDENTIFICATION_MODEL_ID                      (0xC0)  // Get Device ID (Model ID)
+#define TOF_REG_OSC_CALIBRATE_VAL                            (0xF8)  // Oscillator calibration value register
+#define TOF_REG_INTERNAL_TUNING_2                            (0xFF)  // Internal tuning register 2
+
+
+//Configuration Constants
+
+// Range Out-of-Range Value
+#define TOF_VL53L0X_OUT_OF_RANGE                             (8190)  // Value indicating out-of-range result
 
 // Range Sequence Step Registers (Step identifiers for different ranges)
 #define TOF_RANGE_SEQUENCE_STEP_TCC                          (0x10)  // Target Center Check step (TCC)
@@ -99,37 +121,9 @@
 #define TOF_RANGE_SEQUENCE_STEP_PRE_RANGE                    (0x40)  // Pre-range step
 #define TOF_RANGE_SEQUENCE_STEP_FINAL_RANGE                  (0x80)  // Final range step
 
-// Range Out-of-Range Value
-#define TOF_VL53L0X_OUT_OF_RANGE                             (8190)  // Value indicating out-of-range result
-
-// Defines for SetRangingProfile: Registers used to configure various ranging profiles and parameters
-#define MSRC_CONFIG_TIMEOUT_MACROP                           (0x46)  // MSRC timeout macrop register
-#define PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI                   (0x51)  // High byte for pre-range timeout
-#define FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI                 (0x71)  // High byte for final range timeout
-#define SYSTEM_SEQUENCE_CONFIG                               (0x01)  // Sequence configuration register
-#define PRE_RANGE_CONFIG_VALID_PHASE_HIGH                    (0x57)  // Pre-range valid phase high register
-#define PRE_RANGE_CONFIG_VALID_PHASE_LOW                     (0x56)  // Pre-range valid phase low register
-#define PRE_RANGE_CONFIG_VCSEL_PERIOD                        (0x50)  // Pre-range VCSEL period register
-#define PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI                   (0x51)  // High byte for pre-range timeout
-#define FINAL_RANGE_CONFIG_VALID_PHASE_HIGH                  (0x48)  // Final range valid phase high register
-#define FINAL_RANGE_CONFIG_VALID_PHASE_LOW                   (0x47)  // Final range valid phase low register
-#define MSRC_CONFIG_TIMEOUT_MACROP                           (0x46)  // MSRC timeout macrop register
-#define GLOBAL_CONFIG_VCSEL_WIDTH                            (0x32)  // VCSEL width configuration for global settings
-#define FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI                 (0x71)  // High byte for final range timeout
-#define SYSTEM_SEQUENCE_CONFIG                               (0x01)  // System sequence configuration register
-
-
-//Defines for ... Registers
-#define IDENTIFICATION_MODEL_ID								(0x80)	//REGISTER
-#define INTERNAL_CONFIG_0x88								(0x88)	//REGISTER
-
-
-
-//Configuration constants
-
-
-
-
+// Identification Registers
+#define TOF_VL53L0X_EXPECTED_DEVICE_ID                       (0xEE)  // Expected device ID for VL53L0X
+#define TOF_VL53L0X_DEFAULT_ADDRESS                          (0x29)  // Default I2C address for VL53L0X sensor
 
 
 
@@ -138,9 +132,6 @@
 // Helper macro for encoding VCSEL period
 #define encodeVcselPeriod(period_pclks)                      (((period_pclks) >> 1) - 1)  // Encodes VCSEL period in PCLKs
 
-// Additional VCSEL period configurations for pre-range and final range
-#define PRE_RANGE_CONFIG_VCSEL_PERIOD                        (0x50)  // Pre-range VCSEL period register
-#define FINAL_RANGE_CONFIG_VCSEL_PERIOD                      (0x70)  // Final-range VCSEL period register
 
 
 // Enum defining implemented TOF Sensors and their addresses (currently only VL53LOX)
