@@ -59,3 +59,5 @@ statistics.txt
 *.exe
 *.out
 *.app
+*.o
+*.xml

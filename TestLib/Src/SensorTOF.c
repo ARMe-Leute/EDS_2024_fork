@@ -427,7 +427,11 @@ bool TOF_load_default_tuning_settings(TOFSensor_t* TOFSENS)
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x01, 0xF8);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x01);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x8E, 0x01);
+<<<<<<< HEAD
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
+=======
+    success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x00, 0x01);
+>>>>>>> main
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0xFF, 0x00);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, 0x80, 0x00);
 
@@ -579,8 +583,12 @@ bool TOF_init_device(TOFSensor_t* TOFSENS)
 bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range)
 {
 	I2C_RETURN_CODE_t i2c_return;
+<<<<<<< HEAD
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
+=======
+
+>>>>>>> main
 	uint8_t interrupt_status[1];
 	do
 	{
@@ -955,7 +963,6 @@ bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t new_Addr)
 
 bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *range)
 {
-
 	TOF_address_used = TOFSENS->TOF_address_used;
 	TOF_i2c = TOFSENS->i2c_tof;
 
@@ -1477,7 +1484,6 @@ uint8_t TOF_get_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type)
 
     return vcsel_period;
 }
-
 
 
 //--------------------- ADDITIONAL NON TOF FUNCTIONS ---------------------

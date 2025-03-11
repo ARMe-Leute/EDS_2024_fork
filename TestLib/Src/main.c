@@ -90,7 +90,6 @@ bool timerTrigger = false;
 int main(void)
 {
 
-
 	enableTOFSensor = true;
 	TOF_sensor_used = 0x29;
 

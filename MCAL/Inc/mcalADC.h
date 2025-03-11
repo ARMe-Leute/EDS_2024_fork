@@ -1,8 +1,9 @@
 /*
  * mcalADC.h
- *
+ * Rev: 1.1
  *  Created on: Dec 18, 2020
  *      Author: Ralf
+ *      edited by: Tobias Flaemig Dez, 2024
  */
 
 #ifndef MCALADC_H_
@@ -46,7 +47,7 @@ typedef enum
 
 typedef enum
 {
-    ADC_CHN_0  = 1,
+    ADC_CHN_0  = 0,
     ADC_CHN_1,
     ADC_CHN_2,
     ADC_CHN_3,
@@ -62,7 +63,7 @@ typedef enum
     ADC_CHN_13,
     ADC_CHN_14,
     ADC_CHN_15,
-    ADC_CHN_16,
+    ADC_CHN_16,		// cpuTemp
     ADC_CHN_17,
     ADC_CHN_18,
 } ADC_CHANNEL_t;
