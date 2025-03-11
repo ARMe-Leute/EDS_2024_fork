@@ -15,18 +15,25 @@ const int ctrlLED = 13; // On-Board-LED
 const int tastPin = A0; // für Kalibrier-Taster
 
 struct balancer {
-  int     pwmValue;
-  int     pwmMax;
-  int     direction;
-  int     newDirection;
+  float   currentVelocity; 
+  float   flPWM; // PWM Wert ergebnis aus dem dann Motor angesteuert wird
   MPU6050 mpu1;
-  float   roll;
-  float   pitch;
-  float   yaw;
+  float   currentPitch; // von MPU Daten berechnen
 }
+
+typedef struct {
+  float KP;
+  float KI;
+  float KD;
+  float TA;
+} pid_t
 
 float xyzFactor = 0.000006103515625;
 float angleFactor = 57.29577951;
+
+int     pwmValue;
+int     pwmMax;
+int     direction;
 
 void setup() {
   // Pins definieren
