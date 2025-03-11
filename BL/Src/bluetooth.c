@@ -244,6 +244,39 @@ bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
       return true;
    }
 
+uint8_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, BluetoothBaudRate_t baudRate)
+   {
+
+   }
+
+uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate)
+   {
+      switch (baudRate)
+         {
+         case bluetoothBaud_9600:
+            return 9600;
+         case bluetoothBaud_19200:
+            return 19200;
+         case bluetoothBaud_38400:
+            return 38400;
+         case bluetoothBaud_57600:
+            return 57600;
+         case bluetoothBaud_115200:
+            return 115200;
+         case bluetoothBaud_4800:
+            return 4800;
+         case bluetoothBaud_2400:
+            return 2400;
+         case bluetoothBaud_1200:
+            return 1200;
+         case bluetoothBaud_230400:
+            return 230400;
+         default:
+            return 0;
+
+         }
+   }
+
 /**
  * @brief Transfers data from the global USART buffer to the module's buffer.
  *
