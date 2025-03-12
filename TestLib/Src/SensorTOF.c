@@ -118,6 +118,27 @@ void configureTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t, bool e
 
 //---------------------INTERNAL FUNCTIONS---------------------
 
+
+/**
+ * @function:    TOF_configure_interrupt
+ *
+ * @brief:       Configures the interrupt settings for the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function initializes and configures the interrupt mechanism for the TOF sensor.
+ *               It sets the interrupt to trigger on a new sample being ready and configures the
+ *               GPIO interrupt pin as active low, which is compatible with most breakout boards.
+ *               The function communicates with the TOF sensor over I2C to apply the required settings.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the configuration is successful, otherwise false.
+ */
 bool TOF_configure_interrupt(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -157,6 +178,26 @@ bool TOF_configure_interrupt(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_verify_device
+ *
+ * @brief:       Verifies the connection to the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function performs initialization steps to prepare communication with the TOF sensor.
+ *               It checks the sensor's I2C address and attempts to read the device identification register
+ *               to confirm the correct TOF sensor is connected. If the device ID matches the expected value,
+ *               the function confirms the presence of the correct sensor.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the correct TOF sensor is connected and communication is successful, otherwise false.
+ */
 bool TOF_init_address(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -183,6 +224,27 @@ bool TOF_init_address(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_data_init
+ *
+ * @brief:       Initializes data communication and operating modes for the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function sets up the TOF sensor by configuring its power supply mode and I2C communication
+ *               parameters. It enables 2.8V mode for the sensor's power pads and configures the sensor to use
+ *               standard I2C mode. The function also initializes internal sensor variables required for
+ *               proper communication and operation. If any I2C operation fails, the initialization process
+ *               terminates and the function returns false.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the sensor is successfully initialized, otherwise false.
+ */
 bool TOF_data_init(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -225,6 +287,30 @@ bool TOF_data_init(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_get_spad_info_from_nvm
+ *
+ * @brief:       Retrieves SPAD (Single Photon Avalanche Diode) configuration information from the TOF sensor's NVM.
+ *
+ * @details:     This function reads the TOF sensor's non-volatile memory (NVM) to retrieve information about
+ *               the SPAD array, including the count of active SPADs and whether they are of the aperture type.
+ *               The function uses a sequence of I2C register reads and writes to configure the sensor, access
+ *               the NVM, and extract the required information. Upon successful execution, the SPAD count and
+ *               type information are stored in the provided output parameters.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ *				uint8_t * count 							where the SPAD count will be stored.
+ * 				bool * type_is_aperture						indicating whether the SPADs are of the aperture type.
+ *
+ * @returns:    bool: true if the SPAD information is successfully retrieved, otherwise false.
+ */
 bool TOF_get_spad_info_from_nvm(TOFSensor_t* TOFSENS, uint8_t * count, bool * type_is_aperture)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -279,6 +365,27 @@ bool TOF_get_spad_info_from_nvm(TOFSensor_t* TOFSENS, uint8_t * count, bool * ty
 }
 
 
+/**
+ * @function:    TOF_set_spads_from_nvm
+ *
+ * @brief:       Configures the SPAD (Single Photon Avalanche Diode) settings for the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function reads SPAD configuration data from the sensor's non-volatile memory (NVM) and
+ *               sets up the SPAD array for operation. It retrieves the SPAD count and type (aperture or non-aperture)
+ *               using the TOF_get_spad_info_from_nvm function. Based on this data, the function adjusts the SPAD
+ *               enable map stored in the sensor's memory to activate the appropriate SPADs. This ensures the sensor
+ *               operates optimally according to its hardware configuration.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the SPAD configuration is successful, otherwise false.
+ */
 bool TOF_set_spads_from_nvm(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -331,6 +438,26 @@ bool TOF_set_spads_from_nvm(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_load_default_tuning_settings
+ *
+ * @brief:       Configures the Time-of-Flight (TOF) sensor with default tuning settings.
+ *
+ * @details:     This function writes a predefined set of configuration values to the TOF sensor registers.
+ *               These settings optimize the sensor's operation by adjusting internal parameters such as
+ *               timing, gain, and measurement sensitivity. This default tuning is typically required to
+ *               initialize the sensor for accurate and reliable distance measurements.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the tuning configuration was successful, otherwise false.
+ */
 bool TOF_load_default_tuning_settings(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -426,6 +553,29 @@ bool TOF_load_default_tuning_settings(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_set_sequence_steps_enabled
+ *
+ * @brief:       Configures the sequence steps enabled in the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function sets the SYSTEM_SEQUENCE_CONFIG register in the TOF sensor to enable
+ *               specific sequence steps for measurement. The sequence steps define the sensor's internal
+ *               operational flow, such as initialization, pre-range, final range, etc. The sequence_step
+ *               parameter is a bitmask that determines which steps are enabled.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ *  			 uint8_t sequence_step						Bitmask specifying the sequence steps to enable. Each bit corresponds to
+ *  														specific step in the sensor's operational sequence.
+ *
+ * @returns:     bool: true if the sequence configuration was successfully written to the sensor, otherwise false.
+ */
 bool TOF_set_sequence_steps_enabled(TOFSensor_t* TOFSENS, uint8_t sequence_step)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -444,6 +594,30 @@ bool TOF_set_sequence_steps_enabled(TOFSensor_t* TOFSENS, uint8_t sequence_step)
 }
 
 
+/**
+ * @function:    TOF_perform_single_ref_calibration
+ *
+ * @brief:       Performs a single reference calibration on the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function configures and executes a single calibration sequence, either for
+ *               Very High Voltage (VHV) settings or for phase calibration, based on the provided
+ *               calibration type. The calibration ensures the sensor is accurately configured for
+ *               reliable distance measurements.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * 				 TOF_calibration_type_t calib_type 			The type of calibration to perform. It can be one of the following:
+ *                  - TOF_CALIBRATION_TYPE_VHV  			Calibrates Very High Voltage (VHV) settings.
+ *                  - TOF_CALIBRATION_TYPE_PHASE 			Calibrates phase measurements.
+ *
+ * @returns:     bool: true if the calibration was successfully performed, otherwise false.
+ */
 bool TOF_perform_single_ref_calibration(TOFSensor_t* TOFSENS, TOF_calibration_type_t calib_type)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -503,6 +677,33 @@ bool TOF_perform_single_ref_calibration(TOFSensor_t* TOFSENS, TOF_calibration_ty
 }
 
 
+/**
+ * @function:    TOF_perform_ref_calibration
+ *
+ * @brief:       Performs a complete reference calibration on the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function runs two sequential calibration steps for the sensor:
+ *               - Very High Voltage (VHV) calibration
+ *               - Phase calibration
+ *               After the calibration is complete, the function restores the sensor's default
+ *               measurement sequence settings to ensure proper operation.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the reference calibration was successfully completed, otherwise false.
+ *
+ * @note:        - This function depends on the helper function TOF_perform_single_ref_calibration
+ *                 to perform individual calibration steps.
+ *               - After calibration, the sequence steps for measurement are re-enabled using
+ *                 TOF_set_sequence_steps_enabled.
+ *               - If any step in the calibration or configuration fails, the function returns false.
+ */
 bool TOF_perform_ref_calibration(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -515,6 +716,7 @@ bool TOF_perform_ref_calibration(TOFSensor_t* TOFSENS)
 	if (!TOF_perform_single_ref_calibration(TOFSENS, TOF_CALIBRATION_TYPE_PHASE)) {
 		return false;
 	}
+
 	/* Restore sequence steps enabled */
 
 	if (!TOF_set_sequence_steps_enabled(TOFSENS, TOF_RANGE_SEQUENCE_STEP_DSS + TOF_RANGE_SEQUENCE_STEP_PRE_RANGE + TOF_RANGE_SEQUENCE_STEP_FINAL_RANGE)) {
@@ -525,6 +727,34 @@ bool TOF_perform_ref_calibration(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_init_device
+ *
+ * @brief:       Initializes the Time-of-Flight (TOF) sensor and prepares it for operation.
+ *
+ * @details:     This function performs all necessary steps to initialize the TOF sensor, including:
+ *               - Data initialization
+ *               - Loading SPAD (Single Photon Avalanche Diode) settings from Non-Volatile Memory (NVM)
+ *               - Loading default tuning settings
+ *               - Configuring the interrupt settings
+ *               - Setting the measurement sequence steps
+ *               - Performing a reference calibration
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the initialization is successful, otherwise false.
+ *
+ *
+ * @note:        - This function depends on several helper functions, each responsible for a specific initialization
+ *                 task. If any step fails, the initialization halts and the function returns false.
+ *               - Ensure the I2C communication setup is properly initialized before calling this function.
+ */
 bool TOF_init_device(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -553,7 +783,8 @@ bool TOF_init_device(TOFSensor_t* TOFSENS)
 		return false;
 	}
 
-    if (!TOF_perform_ref_calibration(TOFSENS)) {
+    if (!TOF_perform_ref_calibration(TOFSENS))
+    {
         return false;
     }
 
@@ -561,6 +792,27 @@ bool TOF_init_device(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_getMeasurement
+ *
+ * @brief:       Retrieves a distance measurement from the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function reads the measured range data from the sensor and processes it.
+ *               It handles interrupt checking, data retrieval, and out-of-range conditions.
+ *
+ * @param[out]:  uint16_t *range							variable where the measured range will be stored.
+ *               - The value represents the measured distance in millimeters (mm).
+ *               - If the obstacle is out of range, the value is set to TOF_VL53L0X_OUT_OF_RANGE.
+ *
+ * @returns:     bool: true if the measurement was successfully retrieved, false otherwise.
+ *
+ * @note:        - Ensure the sensor is initialized using TOF_init_device before calling this function.
+ *               - The function assumes the interrupt status is handled internally by the sensor.
+ *
+ * @limitations:
+ *               - If the range is out of the sensor's measurable distance, the value returned is defined
+ *                 as TOF_VL53L0X_OUT_OF_RANGE.
+ */
 bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range)
 {
 	I2C_RETURN_CODE_t i2c_return;
@@ -611,6 +863,25 @@ bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range)
 //--------------------- EXTERNAL FUNCTIONS ---------------------
 
 
+/**
+ * @function:    TOF_init
+ *
+ * @brief:       Initializes the Time-of-Flight (TOF) sensor for operation.
+ *
+ * @details:     This function performs the necessary initialization steps to prepare the TOF sensor for use,
+ *               including setting the I2C address, verifying connectivity, and initializing the device with
+ *               default configurations and calibration.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the initialization was successful, otherwise false.
+ */
 bool TOF_init(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -633,6 +904,27 @@ bool TOF_init(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_start_continuous
+ *
+ * @brief:       Initiates continuous measurement mode for the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function configures the TOF sensor to operate in continuous measurement mode,
+ *               either timed or back-to-back mode, based on the provided period. It adjusts settings
+ *               for the selected mode and ensures accurate timing by using the oscillator calibration value.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * 				uint32_t period_ms							Measurement interval in milliseconds.
+ *
+ * @returns:     bool: true if continuous mode starts successfully, otherwise false.
+ */
 bool TOF_start_continuous(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -700,6 +992,25 @@ bool TOF_start_continuous(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_stop_continuous
+ *
+ * @brief:       Stops the continuous measurement mode of the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function halts the ongoing continuous measurement mode and restores the sensor
+ *               to a single-shot measurement mode. It resets relevant configuration registers and
+ *               ensures that the sensor is ready for other operations.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if continuous mode stops successfully, false otherwise.
+ */
 bool TOF_stop_continuous(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -723,6 +1034,25 @@ bool TOF_stop_continuous(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_read_continuous_distance
+ *
+ * @brief:       Reads the distance measurement from the Time-of-Flight (TOF) sensor while in continuous mode.
+ *
+ * @details:     This function retrieves the latest distance measurement from the sensor and updates the
+ *               distanceFromTOF field in the provided TOFSensor_t structure. It assumes that the sensor
+ *               is operating in continuous measurement mode.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the distance is successfully read and updated, otherwise false.
+ */
 bool TOF_read_continuous_distance(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -742,6 +1072,26 @@ bool TOF_read_continuous_distance(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_read_single_distance
+ *
+ * @brief:       Initiates a single-shot distance measurement on the TOF sensor and retrieves the result.
+ *
+ * @details:     This function configures the TOF sensor for a single measurement, waits for the measurement
+ *               to complete, and retrieves the measured distance. The distance is stored in the
+ *               distanceFromTOF field of the TOFSensor_t structure.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the measurement was successfully initiated, completed, and retrieved, false otherwise.
+
+ */
 bool TOF_read_single_distance(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -784,6 +1134,24 @@ bool TOF_read_single_distance(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_start_up_task
+ *
+ * @brief:       Initializes and starts the "Briefkasten" measuring method of the TOF sensor.
+ *
+ * @details:     This function configures the TOF sensor by sending a series of commands to set up the measuring management,
+ *               internal tuning, and ranging start registers.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: Returns true if the TOF sensor was successfully initialized and started, otherwise false.
+ */
 bool TOF_start_up_task(TOFSensor_t* TOFSENS)
 {
 	I2C_RETURN_CODE_t i2c_return;
@@ -811,6 +1179,25 @@ bool TOF_start_up_task(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_read_distance_task
+ *
+ * @brief:       Reads the current distance of the TOF sensor by checking permanently for new measuring results ("Briefkasten" measuring method).
+ *
+ * @details:     The function initiates communication with the TOF sensor and checks for a measurement result.
+ *               If the data ready flag is set, the new measurement result is processed, and a new measurement is started.
+ *               If no new data is available, the measurement age counter is incremented.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     uint16_t: returns current stored distance value.
+ */
 bool TOF_read_distance_task(TOFSensor_t* TOFSENS)
 {
 
@@ -893,7 +1280,25 @@ bool TOF_read_distance_task(TOFSensor_t* TOFSENS)
 }
 
 
-
+/**
+ * @function:    TOF_set_address
+ *
+ * @brief:       Sets a new I2C address for the TOF sensor.
+ *
+ * @details:     This function updates the I2C address of the TOF sensor by writing the new address
+ *               to the appropriate register on the sensor. The new address is also updated in the
+ *               TOFSensor_t structure for future communication.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the address was successfully updated, otherwise false.
+ */
 bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t new_Addr)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -914,6 +1319,32 @@ bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t new_Addr)
 }
 
 
+/**
+ * @function:    TOF_read_distance_timed
+ *
+ * @brief:       Reads a single distance measurement from the TOF sensor with a specified delay.
+ *
+ * @details:     This function triggers a single measurement on the TOF sensor after waiting for the
+ *               specified delay. It handles the necessary register configuration for the measurement,
+ *               reads the distance result, and stores it in the provided `range` pointer.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ *               uint16_t time    							The delay in milliseconds before initiating the measurement.
+ * @param[out]:  uint16_t *range							Pointer to store the measured distance in millimeters.
+ *
+ * @returns:     bool: true if the distance was successfully read, false otherwise.
+ *
+ * @warning: 	NOT IMPLEMENTED YET
+ *
+ *
+ */
 bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *range)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -960,6 +1391,25 @@ bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_t *rang
 }
 
 
+/**
+ * @function:    TOF_set_ranging_profile
+ *
+ * @brief:       Configures the Time-of-Flight (TOF) sensor to operate with a specified ranging profile.
+ *
+ * @details:     This function sets different operational profiles for the TOF sensor, such as high speed,
+ *               high accuracy, long range, or default mode. The profiles adjust parameters like measurement
+ *               timing budgets and signal rate limits to optimize the sensor for specific applications.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @returns:     bool: true if the ranging profile was successfully set, otherwise false.
+ */
 bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -1079,6 +1529,33 @@ bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS)
 }
 
 
+/**
+ * @function:    TOF_set_vcsel_pulse_period
+ *
+ * @brief:       Configures the VCSEL (Vertical-Cavity Surface-Emitting Laser) pulse period for the TOF sensor.
+ *
+ * @details:     This function adjusts the VCSEL pulse period used for either the pre-range or final-range measurement phase.
+ *               It updates related phase settings, timeouts, and applies the necessary calibration adjustments.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * 				vcselPeriodType type						Specifies whether to configure the pre-range (VcselPeriodPreRange) or final-range (VcselPeriodFinalRange) phase.
+ * 				 uint8_t period_pclks						The new VCSEL pulse period in PCLKs. Acceptable values vary for pre-range and final-range types:
+ *                   - Pre-Range: 12, 14, 16, 18.
+ *                   - Final-Range: 8, 10, 12, 14.
+ *
+ * @returns:     bool: true if the configuration was successful, otherwise false.
+ *
+ * @notes:
+ *               - Changing VCSEL pulse periods may impact the sensor's measurement range and accuracy.
+ *               - Always reapply the measurement timing budget after changing VCSEL configurations to maintain consistency.
+ */
 bool TOF_set_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type, uint8_t period_pclks)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -1227,6 +1704,36 @@ bool TOF_set_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type, uint
 }
 
 
+/**
+ * @function:    TOF_set_signal_rate_limit
+ *
+ * @brief:       Sets the signal rate limit for the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function configures the maximum signal rate that the sensor will measure, expressed in megacounts per second (MCPS).
+ *               It ensures the signal rate limit is within the valid range (0 to 511.99 MCPS) and applies the appropriate conversion
+ *               to send the value to the sensor.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * 				float signalRateLimit						The desired signal rate limit in MCPS (megacounts per second). This should be a floating-point value between 0 and 511.99.
+ *
+ * @returns:     bool: true if the signal rate limit was successfully set, false otherwise.
+ *
+ * @limitations:
+ *               - The signalRateLimit must be within the range of 0 to 511.99. If it is outside this range, the function returns false.
+ *               - The I2C transaction must succeed for the function to return true.
+ *
+ * @notes:
+ *               - The signal rate limit impacts the accuracy and the maximum measurable distance of the sensor.
+ *               - If the rate limit is set too low, it may affect the sensor's ability to detect distant objects.
+ *               - If the rate limit is too high, the sensor may be overwhelmed with noise, leading to inaccurate measurements.
+ */
 bool TOF_set_signal_rate_limit(TOFSensor_t* TOFSENS, float signalRateLimit)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -1249,6 +1756,32 @@ bool TOF_set_signal_rate_limit(TOFSensor_t* TOFSENS, float signalRateLimit)
 }
 
 
+/**
+ * @function:    TOF_get_sequence_step_enables
+ *
+ * @brief:       Retrieves the sequence step enables from the TOF sensor.
+ *
+ * @details:     This function reads the current sequence configuration of the sensor from the SYSTEM_SEQUENCE_CONFIG register and
+ *               extracts the bit values to determine which sequence steps (TCC, DSS, MSRC, PRE_RANGE, and FINAL_RANGE) are enabled.
+ *               These steps define the order and conditions for various measurement phases in the sensor's operation.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * @param[out]:  SequenceStepEnables *enables 				Pointer to a SequenceStepEnables structure where the extracted enable values will be stored.
+ *
+ * @returns:     bool: true if the sequence step enables were successfully retrieved, false otherwise.
+ *
+ * @notes:
+ *               - The SYSTEM_SEQUENCE_CONFIG register stores the configuration of the sequence steps used by the sensor.
+ *               - Each bit in the byte represents an individual sequence step: TCC, DSS, MSRC, PRE_RANGE, FINAL_RANGE.
+ *               - The SequenceStepEnables structure is populated with the status of each sequence step based on these bits.
+ */
 bool TOF_get_sequence_step_enables(TOFSensor_t* TOFSENS, SequenceStepEnables *enables)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -1277,6 +1810,23 @@ bool TOF_get_sequence_step_enables(TOFSensor_t* TOFSENS, SequenceStepEnables *en
 }
 
 
+/**
+ * @function:    TOF_get_sequence_step_timeouts
+ *
+ * @brief:       Retrieves the timeout values for the sequence steps in the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function calculates the timeout values for different steps in the ranging sequence (MSRC, pre-range, and final-range) based on the current sensor configuration. The timeouts are adjusted according to the VCSEL (Vertical Cavity Surface Emitting Laser) pulse periods for the pre-range and final-range modes. The timeouts are expressed in microseconds.
+ *
+ * @param[in]:   TOFSENS - Pointer to the `TOFSensor_t` structure containing the sensor's configuration and state.
+ * 				 enables - Pointer to a `SequenceStepEnables` structure containing the enables for each step in the sequence.
+ * @param[out]:  timeouts - Pointer to a `SequenceStepTimeouts` structure that will hold the calculated timeout values for each sequence step.
+ *
+ * @returns:     bool: true if the timeouts were successfully retrieved and calculated, false if there was an error in the process.
+ *
+ * @notes:
+ *               - The calculated timeouts are in microseconds and are stored in the `timeouts` structure.
+ *               - The VCSEL period for both pre-range and final-range steps is used to calculate the corresponding timeouts.
+ */
 bool TOF_get_sequence_step_timeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *enables, SequenceStepTimeouts *timeouts)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -1328,6 +1878,28 @@ bool TOF_get_sequence_step_timeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *e
 }
 
 
+/**
+ * @function:    TOF_set_measurement_timing_budget
+ *
+ * @brief:       Configures the measurement timing budget for the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     The measurement timing budget defines the total time allowed for a single measurement,
+ *               which includes the time consumed by each sequence step (e.g., pre-range, final range).
+ *               This function calculates the required time for enabled steps and adjusts the final range
+ *               timeout to meet the specified budget.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ *               uint32_t budget_us							Desired timing budget in microseconds (µs).
+ *
+ * @returns:     bool: true if the timing budget was successfully set, otherwise false.
+ */
 bool TOF_set_measurement_timing_budget(TOFSensor_t* TOFSENS, uint32_t budget_us)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -1407,6 +1979,31 @@ bool TOF_set_measurement_timing_budget(TOFSensor_t* TOFSENS, uint32_t budget_us)
 }
 
 
+/**
+ * @function:    TOF_get_vcsel_pulse_period
+ *
+ * @brief:       Retrieves the VCSEL (Vertical Cavity Surface Emitting Laser) pulse period from the TOF sensor.
+ *
+ * @details:     This function reads the VCSEL pulse period for either the pre-range or final-range mode of the sensor. The VCSEL period is stored in specific registers, and the function decodes the value to return the period in a readable format.
+ *               The VCSEL pulse period determines the time duration of the laser pulses emitted by the sensor, and it can vary based on the measurement mode.
+ *
+ * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
+ *               	- TOF_address_used: 					The I2C address of the TOF sensor.
+ *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
+ *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
+ *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
+ *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
+ *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ *
+ * 				vcselPeriodType type 						Specifies whether to get the VCSEL pulse period for pre-range (`VcselPeriodPreRange`) or final-range (`VcselPeriodFinalRange`).
+ *
+ * @returns:     uint8_t: The decoded VCSEL pulse period value. Returns 255 if there was an error reading or decoding the value.
+ *
+ * @notes:
+ *               - This function reads the sensor register corresponding to the VCSEL period for either the pre-range or final-range mode.
+ *               - The raw register values are decoded before returning.
+ *               - A return value of 255 indicates an error during the process (either reading the register or decoding the value).
+ */
 uint8_t TOF_get_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type)
 {
 	TOF_address_used = TOFSENS->TOF_address_used;
@@ -1441,7 +2038,30 @@ uint8_t TOF_get_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType type)
 
 //--------------------- ADDITIONAL NON TOF FUNCTIONS ---------------------
 
+/**
+ * @function:    encode_timeOut
+ *
+ * @brief:       Encodes the timeout value into a specific format used by the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function takes a timeout value in macro clocks (MCLKs) and encodes it into a register-friendly format. The encoding process involves extracting the most significant byte (MSB) and the least significant byte (LSB) from the timeout value, as per the sensor's internal requirements.
+ *               The result is returned as a 16-bit encoded value that can be directly written to the sensor's timeout registers.
+ *
+ * @param[in]:   final_range_timeout_mclks 					The timeout value in macro clocks (MCLKs) for the final range step.
+ *
+ * @returns:     uint16_t: A 16-bit encoded timeout value that can be written to the sensor's timeout registers. The result is composed of:
+ *                         - The most significant byte (MSB) that indicates the number of shifts used to fit the timeout value.
+ *                         - The least significant byte (LSB) that holds the adjusted timeout value.
 
+ * @limitations:
+ *               - The function assumes that the input timeout value (final_range_timeout_mclks) is a valid unsigned 16-bit value.
+ *               - If the input timeout is zero, the function returns 0.
+
+ *
+ * @notes:
+ *               - This function is crucial for converting a timeout value in macro clocks (MCLKs) into the format that can be used by the TOF sensor.
+ *               - The encoded value is a 16-bit value where the higher byte represents the number of shifts, and the lower byte holds the adjusted value.
+ *               - The input timeout value should be greater than zero, as the function is designed to handle positive timeouts.
+ */
 uint16_t encode_timeOut(uint16_t final_range_timeout_mclks)
 {
 	uint32_t ls_byte = 0;
@@ -1461,6 +2081,31 @@ uint16_t encode_timeOut(uint16_t final_range_timeout_mclks)
 }
 
 
+/**
+ * @function:    decodeTimeout
+ *
+ * @brief:       Decodes the timeout value from the register format used by the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function decodes a 16-bit register value, which encodes a timeout in the form of:
+ *               - The most significant byte (MSB) represents how many times the least significant byte (LSB) needs to be shifted left.
+ *               - The least significant byte (LSB) holds the timeout value.
+ *               The decoded value is the actual timeout in macro clocks (MCLKs), which can be used for further processing.
+ *
+ * @param[in]:   reg_val - A 16-bit register value that represents an encoded timeout.
+ *                 - The MSB (upper 8 bits) indicates the number of shifts.
+ *                 - The LSB (lower 8 bits) holds the adjusted timeout value.
+ *
+ * @returns:     uint16_t: The decoded timeout value in macro clocks (MCLKs). This is the actual timeout value
+ *                         that was encoded in the register.
+ *
+ * @limitations:
+ *               - The function assumes that the input register value (reg_val) is a valid 16-bit encoded timeout.
+ *
+ * @notes:
+ *               - This function is used to decode the timeout value from the format used by the TOF sensor's registers.
+ *               - The formula used to calculate the timeout ensures that the timeout is a value greater than or equal to 1.
+ *               - The decoded timeout can be used in further sensor configurations or calculations.
+ */
 uint16_t decode_timeout(uint16_t reg_val)
 {
     // Formula: (LSByte * 2^MSByte) + 1
@@ -1477,6 +2122,30 @@ uint16_t decode_timeout(uint16_t reg_val)
 }
 
 
+/**
+ * @function:    timeoutMclksToMicroseconds
+ *
+ * @brief:       Converts a timeout period from macro clocks (MCLKs) to microseconds.
+ *
+ * @details:     This function takes a timeout value expressed in macro clocks (MCLKs) and converts it into microseconds.
+ *               The calculation is based on the VCSEL period, which affects the macro period in nanoseconds.
+ *               The macro period is calculated using the `calcMacroPeriod` function, which determines the time duration
+ *               of each macro clock in nanoseconds. The timeout period in MCLKs is then multiplied by the macro period
+ *               and converted to microseconds.
+ *
+ * @param[in]:   timeout_period_mclks - The timeout period in macro clocks (MCLKs).
+ *               This is the raw value obtained from the sensor's registers.
+ *				 vcsel_period_pclks  - The VCSEL period in photon clocks (PCLKs).
+ *               This is the period in photon clocks used for the light emission cycle.
+ *
+ * @returns:     uint32_t: The timeout period converted to microseconds (µs).
+ *               This value is calculated by multiplying the timeout period by the macro period and converting to microseconds.
+ *
+ *
+ * @notes:
+ *               - This function is used to convert the sensor's timeout period (expressed in MCLKs) into a more human-readable form (microseconds).
+ *               - The calculation ensures the proper timing conversion based on the VCSEL period, which varies depending on the sensor configuration.
+ */
 uint32_t timeout_mclks_to_microseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks)
 {
     // Calculate the macro period in nanoseconds
@@ -1488,6 +2157,27 @@ uint32_t timeout_mclks_to_microseconds(uint16_t timeout_period_mclks, uint8_t vc
 }
 
 
+/**
+ * @function:    timeout_microseconds_to_mclks
+ *
+ * @brief:       Converts a timeout period from microseconds to macro clocks (MCLKs).
+ *
+ * @details:     This function takes a timeout value in microseconds and converts it into macro clocks (MCLKs), which is the raw timing unit used by the sensor's hardware.
+ *               The conversion is based on the VCSEL period, which affects the macro period in nanoseconds. The macro period is calculated using the `calcMacroPeriod` function,
+ *               which determines the time duration of each macro clock in nanoseconds. The timeout period in microseconds is then converted into MCLKs.
+ *
+ * @param[in]:   timeout_period_us - The timeout period in microseconds (µs).
+ *               This value is usually obtained from the sensor configuration or measurement timing budget.
+ *				 vcsel_period_pclks  - The VCSEL period in photon clocks (PCLKs).
+ *               This is the period used for the light emission cycle, which affects the macro clock timing.
+ *
+ * @returns:     uint32_t: The timeout period converted to macro clocks (MCLKs).
+ *               This value represents the timeout period in macro clock cycles based on the VCSEL period and microseconds input.
+ *
+ * @notes:
+ *               - This function is used to convert a timeout period from microseconds into the raw timing unit (MCLKs), which is suitable for sensor register configurations.
+ *               - The conversion takes into account the VCSEL period (in PCLKs) to properly adjust for different sensor configurations.
+ */
 uint32_t timeout_microseconds_to_mclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks)
 {
     // Calculate the macro period in nanoseconds

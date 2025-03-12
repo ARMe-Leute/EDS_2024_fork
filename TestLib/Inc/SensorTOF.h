@@ -71,80 +71,80 @@
 // include standard libraries
 #include <stdbool.h>
 
-// Register defines for communication with the TOF sensor (according to the API)		//NOD - NOT OFFICIAL DEFINED
+// Register defines for communication with the TOF sensor (according to the API)
 #define TOF_REG_SYSRANGE_START                               (0x00)  // Trigger start of range measurement
 #define TOF_REG_SYSTEM_SEQUENCE_CONFIG                       (0x01)  // Sequence configuration register
 #define TOF_REG_SYSTEM_INTERMEASUREMENT_PERIOD               (0x04)  // Inter-measurement period for the system
-#define TOF_REG_SYSTEM_RANGE_CONFIG							 (0x09)
+#define TOF_REG_SYSTEM_RANGE_CONFIG							 (0x09)	 // System range config register
 #define TOF_REG_SYSTEM_INTERRUPT_CONFIG_GPIO                 (0x0A)  // System interrupt config GPIO register
 #define TOF_REG_SYSTEM_INTERRUPT_CLEAR                       (0x0B)  // System interrupt clear register
-#define TOF_REG_SYSTEM_THRESH_HIGH							 (0x0C)
-#define TOF_REG_INTERNAL_CONFIG_0x0D						 (0x0D)	 //NOD
-#define TOF_REG_SYSTEM_THRESH_LOW							 (0x0E)
-#define TOF_REG_INTERNAL_CONFIG_0x10						 (0x10)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x11						 (0x11)	 //NOD
+#define TOF_REG_SYSTEM_THRESH_HIGH							 (0x0C)	 // high tresh register
+#define TOF_REG_INTERNAL_CONFIG_0x0D						 (0x0D)	 // Not officially documented
+#define TOF_REG_SYSTEM_THRESH_LOW							 (0x0E)	 // low tresh register
+#define TOF_REG_INTERNAL_CONFIG_0x10						 (0x10)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x11						 (0x11)	 // Not officially documented
 #define TOF_REG_RESULT_INTERRUPT_STATUS                      (0x13)  // Interrupt status for results
 #define TOF_REG_RESULT_RANGE_STATUS                          (0x14)  // Range status result register
-#define TOF_REG_INTERNAL_CONFIG_0x20						 (0x20)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x22						 (0x22)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x23						 (0x23)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x24						 (0x24)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x25						 (0x25)	 //NOD
-#define TOF_REG_PRE_RANGE_CONFIG_MIN_SNR					 (0x27)
-#define TOF_REG_ALGO_PHASECAL								 (0x30)
-#define TOF_REG_INTERNAL_CONFIG_0x31						 (0x31)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x20						 (0x20)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x22						 (0x22)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x23						 (0x23)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x24						 (0x24)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x25						 (0x25)	 // Not officially documented
+#define TOF_REG_PRE_RANGE_CONFIG_MIN_SNR					 (0x27)	 // Minimum pre range config reg
+#define TOF_REG_ALGO_PHASECAL								 (0x30)	 // Algo phasecal register
+#define TOF_REG_INTERNAL_CONFIG_0x31						 (0x31)	 // Not officially documented
 #define TOF_REG_GLOBAL_CONFIG_VCSEL_WIDTH                    (0x32)  // VCSEL width configuration for global settings
-#define TOF_REG_HISTOGRAM_CONFIG_INITIAL_PHASE_SELECT		 (0x33)
-#define TOF_REG_INTERNAL_CONFIG_0x34						 (0x34)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x35						 (0x35)	 //NOD
-#define TOF_REG_SYSTEM_HISTOGRAM_BIN						 (0x40)
-#define TOF_REG_INTERNAL_CONFIG_0x42						 (0x42)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x43						 (0x43)	 //NOD
+#define TOF_REG_HISTOGRAM_CONFIG_INITIAL_PHASE_SELECT		 (0x33)	 // Initial phase select register
+#define TOF_REG_INTERNAL_CONFIG_0x34						 (0x34)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x35						 (0x35)	 // Not officially documented
+#define TOF_REG_SYSTEM_HISTOGRAM_BIN						 (0x40)	 // System histogram register 1
+#define TOF_REG_INTERNAL_CONFIG_0x42						 (0x42)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x43						 (0x43)	 // Not officially documented
 #define TOF_REG_FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT  (0x44)  // Final range config for count rate return limit
-#define TOF_REG_INTERNAL_CONFIG_0x45						 (0x45)
+#define TOF_REG_INTERNAL_CONFIG_0x45						 (0x45)	 // Not officially documented
 #define TOF_REG_MSRC_CONFIG_TIMEOUT_MACROP                   (0x46)  // MSRC timeout macrop register
 #define TOF_REG_FINAL_RANGE_CONFIG_VALID_PHASE_LOW           (0x47)  // Final range valid phase low register
 #define TOF_REG_FINAL_RANGE_CONFIG_VALID_PHASE_HIGH          (0x48)  // Final range valid phase high register
-#define TOF_REG_INTERNAL_CONFIG_0x49						 (0x49)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x4A						 (0x4A)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x4B						 (0x4B)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x4C						 (0x4C)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x4D						 (0x4D)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x49						 (0x49)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x4A						 (0x4A)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x4B						 (0x4B)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x4C						 (0x4C)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x4D						 (0x4D)	 // Not officially documented
 #define TOF_REG_DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD          (0x4E)  // Dynamic SPAD requested reference count register
 #define TOF_REG_DYNAMIC_SPAD_REF_EN_START_OFFSET             (0x4F)  // Dynamic SPAD reference enable start offset register
 #define TOF_REG_PRE_RANGE_CONFIG_VCSEL_PERIOD                (0x50)  // Pre-range VCSEL period register
 #define TOF_REG_PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI           (0x51)  // High byte for pre-range timeout
-#define TOF_REG_PRE_RANGE_CONFIG_TIMEOUT_MACROP_LO			 (0x52)
-#define TOF_REG_INTERNAL_CONFIG_0x54						 (0x54)
-#define TOF_REG_HISTOGRAM_CONFIG_READOUT_CTRL				 (0x55)
+#define TOF_REG_PRE_RANGE_CONFIG_TIMEOUT_MACROP_LO			 (0x52)	 // Low byte for pre-range timeout
+#define TOF_REG_INTERNAL_CONFIG_0x54						 (0x54)	 // Not officially documented
+#define TOF_REG_HISTOGRAM_CONFIG_READOUT_CTRL				 (0x55)	 // Readout CTRL register
 #define TOF_REG_PRE_RANGE_CONFIG_VALID_PHASE_LOW             (0x56)  // Pre-range valid phase low register
 #define TOF_REG_PRE_RANGE_CONFIG_VALID_PHASE_HIGH            (0x57)  // Pre-range valid phase high register
 #define TOF_REG_MSRC_CONFIG_CONTROL                          (0x60)  // MSRC (Minimum Signal Rate Check) control register
-#define TOF_REG_PRE_RANGE_CONFIG_SIGMA_THRESH_HI			 (0x61)
-#define TOF_REG_PRE_RANGE_CONFIG_SIGMA_THRESH_LO			 (0x62)
-#define TOF_REG_PRE_RANGE_MIN_COUNT_RATE_RTN_LIMIT			 (0x64)
-#define TOF_REG_INTERNAL_CONFIG_0x65						 (0x65)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x66						 (0x66)	 //NOD
-#define TOF_REG_FINAL_RANGE_CONFIG_MIN_SNR					 (0x67)
+#define TOF_REG_PRE_RANGE_CONFIG_SIGMA_THRESH_HI			 (0x61)	 // High sigma tresh register
+#define TOF_REG_PRE_RANGE_CONFIG_SIGMA_THRESH_LO			 (0x62)	 // Low sigma tresh register
+#define TOF_REG_PRE_RANGE_MIN_COUNT_RATE_RTN_LIMIT			 (0x64)	 // Minimum count rate register
+#define TOF_REG_INTERNAL_CONFIG_0x65						 (0x65)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x66						 (0x66)	 // Not officially documented
+#define TOF_REG_FINAL_RANGE_CONFIG_MIN_SNR					 (0x67)	 // Final-range minimum SNR register
 #define TOF_REG_FINAL_RANGE_CONFIG_VCSEL_PERIOD              (0x70)  // Final-range VCSEL period register
 #define TOF_REG_FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI         (0x71)  // High byte for final range timeout
 #define TOF_REG_FINAL_RANGE_CONFIG_TIMEOUT_MACROP_LO         (0x72)  // LOW byte for final range timeout
-#define TOF_REG_INTERNAL_CONFIG_0x75						 (0x75)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x76						 (0x76)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x77						 (0x77)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x78						 (0x78)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x7A						 (0x7A)	 //NOD
-#define TOF_REG_INTERNAL_CONFIG_0x7B						 (0x7B)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x75						 (0x75)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x76						 (0x76)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x77						 (0x77)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x78						 (0x78)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x7A						 (0x7A)	 // Not officially documented
+#define TOF_REG_INTERNAL_CONFIG_0x7B						 (0x7B)	 // Not officially documented
 #define TOF_REG_POWER_MANAGEMENT_GO1_POWER_FORCE             (0x80)  // Power management register
-#define TOF_REG_SYSTEM_HISTOGRAM_NON						 (0x81)
-#define TOF_REG_INTERNAL_CONFIG_0x83						 (0x83)	 //NOD
+#define TOF_REG_SYSTEM_HISTOGRAM_NON						 (0x81)	 // System Histogram register 2
+#define TOF_REG_INTERNAL_CONFIG_0x83						 (0x83)	 // Not officially documented
 #define TOF_REG_GPIO_HV_MUX_ACTIVE_HIGH                      (0x84)  // GPIO HV MUX active high configuration register
 #define TOF_REG_I2C_MODE                                     (0x88)  // NOT officially documented
 #define TOF_REG_VHV_CONFIG_PAD_SCL_SDA_EXTSUP_HV             (0x89)  // VHV (Voltage High Voltage) configuration register
 #define TOF_REG_SLAVE_DEVICE_ADDRESS                         (0x8A)  // Slave device address register
-#define TOF_REG_INTERNAL_CONFIG_0x8E						 (0x8E)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x8E						 (0x8E)	 // Not officially documented
 #define TOF_REG_INTERNAL_TUNING_1                            (0x91)  // Internal tuning register 1
-#define TOF_REG_INTERNAL_CONFIG_0x94						 (0x94)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x94						 (0x94)	 // Not officially documented
 #define TOF_REG_GLOBAL_CONFIG_SPAD_ENABLES_REF_0             (0xB0)  // Global SPAD enables reference register
 #define TOF_REG_GLOBAL_CONFIG_REF_EN_START_SELECT            (0xB6)  // Global config for reference enable start selection
 #define TOF_REG_IDENTIFICATION_MODEL_ID                      (0xC0)  // Get Device ID (Model ID)
@@ -153,7 +153,6 @@
 
 
 //Configuration Constants
-
 // Range Out-of-Range Value
 #define TOF_VL53L0X_OUT_OF_RANGE                             (8190)  // Value indicating out-of-range result
 
@@ -168,13 +167,8 @@
 #define TOF_VL53L0X_EXPECTED_DEVICE_ID                       (0xEE)  // Expected device ID for VL53L0X
 #define TOF_VL53L0X_DEFAULT_ADDRESS                          (0x29)  // Default I2C address for VL53L0X sensor
 
-
-
-
-
 // Helper macro for encoding VCSEL period
 #define encodeVcselPeriod(period_pclks)                      (((period_pclks) >> 1) - 1)  // Encodes VCSEL period in PCLKs
-
 
 
 // Enum defining implemented TOF Sensors and their addresses (currently only VL53LOX)
@@ -664,9 +658,10 @@ extern bool TOF_read_single_distance(TOFSensor_t* TOFSensor);
 /**
  * @function:    TOF_start_up_task
  *
- * @brief:       -
+ * @brief:       Initializes and starts the "Briefkasten" measuring method of the TOF sensor.
  *
- * @details:     -
+ * @details:     This function configures the TOF sensor by sending a series of commands to set up the measuring management,
+ *               internal tuning, and ranging start registers.
  *
  * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
  *               	- TOF_address_used: 					The I2C address of the TOF sensor.
@@ -676,7 +671,7 @@ extern bool TOF_read_single_distance(TOFSensor_t* TOFSensor);
  *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
  *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
  *
- * @returns:     uint16_t: returns current stored distance value.
+ * @returns:     bool: Returns true if the TOF sensor was successfully initialized and started, otherwise false.
  */
 extern bool TOF_start_up_task(TOFSensor_t* TOFSENS);
 
@@ -685,9 +680,11 @@ extern bool TOF_start_up_task(TOFSensor_t* TOFSENS);
 /**
  * @function:    TOF_read_distance_task
  *
- * @brief:       -
+ * @brief:       Reads the current distance of the TOF sensor by checking permanently for new measuring results ("Briefkasten" measuring method).
  *
- * @details:     -
+ * @details:     The function initiates communication with the TOF sensor and checks for a measurement result.
+ *               If the data ready flag is set, the new measurement result is processed, and a new measurement is started.
+ *               If no new data is available, the measurement age counter is incremented.
  *
  * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
  *               	- TOF_address_used: 					The I2C address of the TOF sensor.
@@ -839,26 +836,6 @@ extern bool TOF_set_signal_rate_limit(TOFSensor_t* TOFSENS, float signalRateLimi
 
 
 /**
- * @function:    TOF_get_sequence_step_timeouts
- *
- * @brief:       Retrieves the timeout values for the sequence steps in the Time-of-Flight (TOF) sensor.
- *
- * @details:     This function calculates the timeout values for different steps in the ranging sequence (MSRC, pre-range, and final-range) based on the current sensor configuration. The timeouts are adjusted according to the VCSEL (Vertical Cavity Surface Emitting Laser) pulse periods for the pre-range and final-range modes. The timeouts are expressed in microseconds.
- *
- * @param[in]:   TOFSENS - Pointer to the `TOFSensor_t` structure containing the sensor's configuration and state.
- * 				 enables - Pointer to a `SequenceStepEnables` structure containing the enables for each step in the sequence.
- * @param[out]:  timeouts - Pointer to a `SequenceStepTimeouts` structure that will hold the calculated timeout values for each sequence step.
- *
- * @returns:     bool: true if the timeouts were successfully retrieved and calculated, false if there was an error in the process.
- *
- * @notes:
- *               - The calculated timeouts are in microseconds and are stored in the `timeouts` structure.
- *               - The VCSEL period for both pre-range and final-range steps is used to calculate the corresponding timeouts.
- */
-extern bool TOF_get_sequence_step_timeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *enables, SequenceStepTimeouts *timeouts);
-
-
-/**
  * @function:    TOF_get_sequence_step_enables
  *
  * @brief:       Retrieves the sequence step enables from the TOF sensor.
@@ -885,6 +862,26 @@ extern bool TOF_get_sequence_step_timeouts(TOFSensor_t* TOFSENS, SequenceStepEna
  *               - The SequenceStepEnables structure is populated with the status of each sequence step based on these bits.
  */
 extern bool TOF_get_sequence_step_enables(TOFSensor_t* TOFSENS, SequenceStepEnables *enables);
+
+
+/**
+ * @function:    TOF_get_sequence_step_timeouts
+ *
+ * @brief:       Retrieves the timeout values for the sequence steps in the Time-of-Flight (TOF) sensor.
+ *
+ * @details:     This function calculates the timeout values for different steps in the ranging sequence (MSRC, pre-range, and final-range) based on the current sensor configuration. The timeouts are adjusted according to the VCSEL (Vertical Cavity Surface Emitting Laser) pulse periods for the pre-range and final-range modes. The timeouts are expressed in microseconds.
+ *
+ * @param[in]:   TOFSENS - Pointer to the `TOFSensor_t` structure containing the sensor's configuration and state.
+ * 				 enables - Pointer to a `SequenceStepEnables` structure containing the enables for each step in the sequence.
+ * @param[out]:  timeouts - Pointer to a `SequenceStepTimeouts` structure that will hold the calculated timeout values for each sequence step.
+ *
+ * @returns:     bool: true if the timeouts were successfully retrieved and calculated, false if there was an error in the process.
+ *
+ * @notes:
+ *               - The calculated timeouts are in microseconds and are stored in the `timeouts` structure.
+ *               - The VCSEL period for both pre-range and final-range steps is used to calculate the corresponding timeouts.
+ */
+extern bool TOF_get_sequence_step_timeouts(TOFSensor_t* TOFSENS, SequenceStepEnables *enables, SequenceStepTimeouts *timeouts);
 
 
 /**
