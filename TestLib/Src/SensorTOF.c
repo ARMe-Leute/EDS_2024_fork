@@ -118,7 +118,6 @@ void configureTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t, bool e
 
 //---------------------INTERNAL FUNCTIONS---------------------
 
-
 /**
  * @function:    TOF_configure_interrupt
  *
@@ -1158,6 +1157,7 @@ bool TOF_start_up_task(TOFSensor_t* TOFSENS)
 	TOF_address_used = TOFSENS->TOF_address_used;	//TOF Adress from Struct TOF
 	TOF_i2c = TOFSENS->i2c_tof;		//I2C Adress from Struct TOF
 
+	//start new measurement without reading
 	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_TUNING_2, 0x01);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x00);
@@ -1165,12 +1165,7 @@ bool TOF_start_up_task(TOFSensor_t* TOFSENS)
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_TUNING_2, 0x00);
 	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_POWER_MANAGEMENT_GO1_POWER_FORCE, 0x00);
-	if (i2c_return != I2C_OK) {
-		return false;
-	}
-
-
-	i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
+	i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
 	if (i2c_return != I2C_OK)
 	{
 		return false;
@@ -1200,26 +1195,20 @@ bool TOF_start_up_task(TOFSensor_t* TOFSENS)
  */
 bool TOF_read_distance_task(TOFSensor_t* TOFSENS)
 {
-
 	I2C_RETURN_CODE_t i2c_return;
 	TOF_address_used = TOFSENS->TOF_address_used;	//TOF Adress from Struct TOF
 	TOF_i2c = TOFSENS->i2c_tof;		//I2C Adress from Struct TOF
 	uint8_t interrupt_status[1];	//Variable for the Register Content
 	uint16_t taskdistance;			//Variable to Store the read distance
 
-	i2c_return = i2cBurstRegRead(TOF_i2c, TOF_address_used,	TOF_REG_RESULT_INTERRUPT_STATUS, interrupt_status, 1);
-
 	//check the ReadyData Flag
-	//i2c_return = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used,	TOF_REG_SYSRANGE_START, &interrupt_status);
-	//i2c_return = i2cReadByte(TOF_i2c, TOF_REG_RESULT_INTERRUPT_STATUS, &interrupt_status);
+	i2c_return = i2cBurstRegRead(TOF_i2c, TOF_address_used,	TOF_REG_RESULT_INTERRUPT_STATUS, interrupt_status, 1);
 	if (i2c_return != I2C_OK)
 	{
 		return false;
 	}
-	//interrupt_bit = interrupt_status & 0x01;	//Mask the Register (only last Bit)
 
-
-	//readydata Flag high ?
+	//readydata Flag high: read measurement result
 	if(i2c_return == I2C_OK && ((interrupt_status[0] & 0x07) != 0))
 	{
 		uint8_t readBuffer[2];
@@ -1229,10 +1218,10 @@ bool TOF_read_distance_task(TOFSensor_t* TOFSENS)
 			return false;
 		}
 
-
 		taskdistance = (readBuffer[0] << 8) + readBuffer[1];
 
 		TOFSENS->measuredRange = (uint32_t)readBuffer;
+
 		i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSTEM_INTERRUPT_CLEAR, 0x01);
 		if (i2c_return != I2C_OK)
 		{
@@ -1247,7 +1236,6 @@ bool TOF_read_distance_task(TOFSensor_t* TOFSENS)
 
 
 		//Successfull Measurement start new one
-
 		i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
 		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_TUNING_2, 0x01);
 		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x00);
@@ -1255,14 +1243,9 @@ bool TOF_read_distance_task(TOFSensor_t* TOFSENS)
 		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
 		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_TUNING_2, 0x00);
 		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_POWER_MANAGEMENT_GO1_POWER_FORCE, 0x00);
-		if (i2c_return != I2C_OK) {
-			return false;
-		}
-
-		i2c_return = i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
+		i2c_return &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSRANGE_START, 0x01);
 		if (i2c_return != I2C_OK)
 		{
-			// returns false, if i2c communication was not successful
 			return false;
 		}
 
@@ -1315,7 +1298,7 @@ bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t new_Addr)
         return false; // Return false if the operation fails
     }
     TOFSENS->TOF_address_used = newaddr;
-    return true; // Ensure the function always returns a value
+    return true;
 }
 
 
