@@ -101,7 +101,10 @@ MenuEntry_t sendTestStringEntry =
    {
    .color = tft_GREEN, .title = "SendString", .type = Entry, .page = NULL
    };
-
+MenuEntry_t setBaudRateEntry =
+   {
+   .color = tft_GREEN, .title = "Set BAUD", .type = Entry, .page = NULL
+   };
 MenuPage_t menuPage1;
 
 int main(void)
@@ -140,7 +143,7 @@ int main(void)
 
       bluetoothPage.TL = &feldBack;
       bluetoothPage.BL = &sendTestStringEntry;
-      bluetoothPage.BR = &textEntry;
+      bluetoothPage.BR = &setBaudRateEntry;
       bluetoothPage.TR = &getStatusEntry;
 
       submenu4.TL = &feldBack;
@@ -294,6 +297,19 @@ int main(void)
                                           active = false;
                                        }
 
+                                 }
+                              else if (menuManager_1.activeEntry == &setBaudRateEntry)
+                                 {
+                                    static int8_t status = -120;
+                                    status = bluetoothSetBaudRate(&HM17_1, bluetoothBaud_9600, status);
+                                    tftPrintInt(status, 0, 70, 0);
+
+                                    if (getRotaryPushButton() == true)
+                                       {
+                                          menuManager_1.activeMode = Page;
+                                          showMenuPage(&menuManager_1,
+                                                menuManager_1.currentPosition);
+                                       }
                                  }
                               else if (menuManager_1.activeEntry == &sendTestStringEntry)
                                  {
