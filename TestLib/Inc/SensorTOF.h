@@ -57,6 +57,11 @@
  *    VL53L0X Datasheet (PDF)
  *    Link: https://www.st.com/resource/en/datasheet/vl53l0x.pdf
  *
+ * 4. Register Definitions:
+ *    github: VL53L0X Register Map
+ *    Link: https://github.com/GrimbiXcode/VL53L0X-Register-Map?tab=readme-ov-file#register-map-of-vl53l0x
+ *
+ *
  ******************************************************************************
  */
 
@@ -66,42 +71,80 @@
 // include standard libraries
 #include <stdbool.h>
 
-// Register defines for communication with the TOF sensor (according to the API)
+// Register defines for communication with the TOF sensor (according to the API)		//NOD - NOT OFFICIAL DEFINED
 #define TOF_REG_SYSRANGE_START                               (0x00)  // Trigger start of range measurement
 #define TOF_REG_SYSTEM_SEQUENCE_CONFIG                       (0x01)  // Sequence configuration register
 #define TOF_REG_SYSTEM_INTERMEASUREMENT_PERIOD               (0x04)  // Inter-measurement period for the system
-#define TOF_REG_INTERNAL_CONFIG_0x09						 (0x09)
+#define TOF_REG_SYSTEM_RANGE_CONFIG							 (0x09)
 #define TOF_REG_SYSTEM_INTERRUPT_CONFIG_GPIO                 (0x0A)  // System interrupt config GPIO register
 #define TOF_REG_SYSTEM_INTERRUPT_CLEAR                       (0x0B)  // System interrupt clear register
-#define TOF_REG_INTERNAL_CONFIG_0x10						 (0x10)
-#define TOF_REG_INTERNAL_CONFIG_0x11						 (0x11)
+#define TOF_REG_SYSTEM_THRESH_HIGH							 (0x0C)
+#define TOF_REG_SYSTEM_THRESH_LOW							 (0x0E)
+#define TOF_REG_INTERNAL_CONFIG_0x10						 (0x10)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x11						 (0x11)	 //NOD
 #define TOF_REG_RESULT_INTERRUPT_STATUS                      (0x13)  // Interrupt status for results
 #define TOF_REG_RESULT_RANGE_STATUS                          (0x14)  // Range status result register
-#define TOF_REG_INTERNAL_CONFIG_0x24						 (0x24)
-#define TOF_REG_INTERNAL_CONFIG_0x25						 (0x25)
-
+#define TOF_REG_INTERNAL_CONFIG_0x20						 (0x20)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x22						 (0x22)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x23						 (0x23)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x24						 (0x24)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x25						 (0x25)	 //NOD
+#define TOF_REG_PRE_RANGE_CONFIG_MIN_SNR					 (0x27)
+#define TOF_REG_ALGO_PHASECAL								 (0x30)
+#define TOF_REG_INTERNAL_CONFIG_0x31						 (0x31)	 //NOD
 #define TOF_REG_GLOBAL_CONFIG_VCSEL_WIDTH                    (0x32)  // VCSEL width configuration for global settings
+#define TOF_REG_HISTOGRAM_CONFIG_INITIAL_PHASE_SELECT		 (0x33)
+#define TOF_REG_INTERNAL_CONFIG_0x34						 (0x34)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x35						 (0x35)	 //NOD
+#define TOF_REG_SYSTEM_HISTOGRAM_BIN						 (0x40)
+#define TOF_REG_INTERNAL_CONFIG_0x42						 (0x42)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x43						 (0x43)	 //NOD
 #define TOF_REG_FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT  (0x44)  // Final range config for count rate return limit
+#define TOF_REG_INTERNAL_CONFIG_0x45						 (0x45)
 #define TOF_REG_MSRC_CONFIG_TIMEOUT_MACROP                   (0x46)  // MSRC timeout macrop register
 #define TOF_REG_FINAL_RANGE_CONFIG_VALID_PHASE_LOW           (0x47)  // Final range valid phase low register
 #define TOF_REG_FINAL_RANGE_CONFIG_VALID_PHASE_HIGH          (0x48)  // Final range valid phase high register
+#define TOF_REG_INTERNAL_CONFIG_0x49						 (0x49)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x4A						 (0x4A)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x4B						 (0x4B)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x4C						 (0x4C)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x4D						 (0x4D)	 //NOD
 #define TOF_REG_DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD          (0x4E)  // Dynamic SPAD requested reference count register
 #define TOF_REG_DYNAMIC_SPAD_REF_EN_START_OFFSET             (0x4F)  // Dynamic SPAD reference enable start offset register
 #define TOF_REG_PRE_RANGE_CONFIG_VCSEL_PERIOD                (0x50)  // Pre-range VCSEL period register
 #define TOF_REG_PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI           (0x51)  // High byte for pre-range timeout
+#define TOF_REG_PRE_RANGE_CONFIG_TIMEOUT_MACROP_LO			 (0x52)
+#define TOF_REG_INTERNAL_CONFIG_0x54						 (0x54)
+#define TOF_REG_HISTOGRAM_CONFIG_READOUT_CTRL				 (0x55)
 #define TOF_REG_PRE_RANGE_CONFIG_VALID_PHASE_LOW             (0x56)  // Pre-range valid phase low register
 #define TOF_REG_PRE_RANGE_CONFIG_VALID_PHASE_HIGH            (0x57)  // Pre-range valid phase high register
 #define TOF_REG_MSRC_CONFIG_CONTROL                          (0x60)  // MSRC (Minimum Signal Rate Check) control register
+#define TOF_REG_PRE_RANGE_CONFIG_SIGMA_THRESH_HI			 (0x61)
+#define TOF_REG_PRE_RANGE_CONFIG_SIGMA_THRESH_LO			 (0x62)
+#define TOF_REG_PRE_RANGE_MIN_COUNT_RATE_RTN_LIMIT			 (0x64)
+#define TOF_REG_INTERNAL_CONFIG_0x65						 (0x65)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x66						 (0x66)	 //NOD
+#define TOF_REG_FINAL_RANGE_CONFIG_MIN_SNR					 (0x67)
 #define TOF_REG_FINAL_RANGE_CONFIG_VCSEL_PERIOD              (0x70)  // Final-range VCSEL period register
 #define TOF_REG_FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI         (0x71)  // High byte for final range timeout
+#define TOF_REG_FINAL_RANGE_CONFIG_TIMEOUT_MACROP_LO         (0x72)  // LOW byte for final range timeout
+#define TOF_REG_INTERNAL_CONFIG_0x75						 (0x75)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x76						 (0x76)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x77						 (0x77)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x78						 (0x78)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x7A						 (0x7A)	 //NOD
+#define TOF_REG_INTERNAL_CONFIG_0x7B						 (0x7B)	 //NOD
+
+
+
 #define TOF_REG_POWER_MANAGEMENT_GO1_POWER_FORCE             (0x80)  // Power management register
-#define TOF_REG_INTERNAL_CONFIG_0x83						 (0x83)
+#define TOF_REG_INTERNAL_CONFIG_0x83						 (0x83)	 //NOD
 #define TOF_REG_GPIO_HV_MUX_ACTIVE_HIGH                      (0x84)  // GPIO HV MUX active high configuration register
 #define TOF_REG_I2C_MODE                                     (0x88)  // NOT officially documented
 #define TOF_REG_VHV_CONFIG_PAD_SCL_SDA_EXTSUP_HV             (0x89)  // VHV (Voltage High Voltage) configuration register
 #define TOF_REG_SLAVE_DEVICE_ADDRESS                         (0x8A)  // Slave device address register
 #define TOF_REG_INTERNAL_TUNING_1                            (0x91)  // Internal tuning register 1
-#define TOF_REG_INTERNAL_CONFIG_0x94						 (0x94)
+#define TOF_REG_INTERNAL_CONFIG_0x94						 (0x94)	 //NOD
 #define TOF_REG_GLOBAL_CONFIG_SPAD_ENABLES_REF_0             (0xB0)  // Global SPAD enables reference register
 #define TOF_REG_GLOBAL_CONFIG_REF_EN_START_SELECT            (0xB6)  // Global config for reference enable start selection
 #define TOF_REG_IDENTIFICATION_MODEL_ID                      (0xC0)  // Get Device ID (Model ID)
