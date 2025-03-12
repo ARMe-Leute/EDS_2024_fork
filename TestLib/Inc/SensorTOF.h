@@ -79,6 +79,7 @@
 #define TOF_REG_SYSTEM_INTERRUPT_CONFIG_GPIO                 (0x0A)  // System interrupt config GPIO register
 #define TOF_REG_SYSTEM_INTERRUPT_CLEAR                       (0x0B)  // System interrupt clear register
 #define TOF_REG_SYSTEM_THRESH_HIGH							 (0x0C)
+#define TOF_REG_INTERNAL_CONFIG_0x0D						 (0x0D)	 //NOD
 #define TOF_REG_SYSTEM_THRESH_LOW							 (0x0E)
 #define TOF_REG_INTERNAL_CONFIG_0x10						 (0x10)	 //NOD
 #define TOF_REG_INTERNAL_CONFIG_0x11						 (0x11)	 //NOD
@@ -134,15 +135,14 @@
 #define TOF_REG_INTERNAL_CONFIG_0x78						 (0x78)	 //NOD
 #define TOF_REG_INTERNAL_CONFIG_0x7A						 (0x7A)	 //NOD
 #define TOF_REG_INTERNAL_CONFIG_0x7B						 (0x7B)	 //NOD
-
-
-
 #define TOF_REG_POWER_MANAGEMENT_GO1_POWER_FORCE             (0x80)  // Power management register
+#define TOF_REG_SYSTEM_HISTOGRAM_NON						 (0x81)
 #define TOF_REG_INTERNAL_CONFIG_0x83						 (0x83)	 //NOD
 #define TOF_REG_GPIO_HV_MUX_ACTIVE_HIGH                      (0x84)  // GPIO HV MUX active high configuration register
 #define TOF_REG_I2C_MODE                                     (0x88)  // NOT officially documented
 #define TOF_REG_VHV_CONFIG_PAD_SCL_SDA_EXTSUP_HV             (0x89)  // VHV (Voltage High Voltage) configuration register
 #define TOF_REG_SLAVE_DEVICE_ADDRESS                         (0x8A)  // Slave device address register
+#define TOF_REG_INTERNAL_CONFIG_0x8E						 (0x8E)	 //NOD
 #define TOF_REG_INTERNAL_TUNING_1                            (0x91)  // Internal tuning register 1
 #define TOF_REG_INTERNAL_CONFIG_0x94						 (0x94)	 //NOD
 #define TOF_REG_GLOBAL_CONFIG_SPAD_ENABLES_REF_0             (0xB0)  // Global SPAD enables reference register
@@ -699,7 +699,7 @@ extern bool TOF_start_up_task(TOFSensor_t* TOFSENS);
  *
  * @returns:     uint16_t: returns current stored distance value.
  */
-extern uint16_t TOF_read_distance_task(TOFSensor_t* TOFSENS);
+extern bool TOF_read_distance_task(TOFSensor_t* TOFSENS);
 
 
 /**

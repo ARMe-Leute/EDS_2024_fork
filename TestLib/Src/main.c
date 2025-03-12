@@ -272,10 +272,6 @@ int main(void)
 			case SCREEN_PAGE1:
 				break;
 			case SCREEN_PAGE2:
-		//------------------------------
-				//TOF_read_single_distance(&TOF_Sensor_1);
-				//check the ReadyData Flag
-				//i2cReadByteFromSlaveReg(I2C1, 0x29, 0x00, &interrupt_statustest);
 
 				TOF_start_up_task(&TOF_Sensor_1);
 				while(1)
@@ -285,7 +281,6 @@ int main(void)
 						setRotaryColor(LED_RED);
 					}
 
-		//------------------------------
 				visualisationTOF(&TOF_Sensor_1);
 
 				break;
