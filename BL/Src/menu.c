@@ -98,8 +98,7 @@ void handleMenu(MenuManager_t *menuManager, int lastRotaryPosition)
          }
       if (getRotaryPushButton() == true)
          {
-            MenuPosition_t test = menuManager->currentPosition;
-            MenuEntry_t *test1 = getEntryFromPosition(menuManager, menuManager->currentPosition);
+
             if (getEntryFromPosition(menuManager, menuManager->currentPosition)->type == Page)
                {
                   getEntryFromPosition(menuManager, menuManager->currentPosition)->page->lastMenu =
