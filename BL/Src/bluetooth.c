@@ -93,7 +93,7 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, u
                }
             __enable_irq();
 #endif
-            BluetoothModule->TXComplete = true;
+            *(BluetoothModule->TXComplete) = true;
             return ++BluetoothModule->initStatus;
 
          case -9:
