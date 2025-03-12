@@ -105,3 +105,9 @@ void getPitch(balancer_t bala) {
   sensorBuffer = bala.mpu1.getMotion6(); // read accel and gyro values
   // TODO: Mit funktion füllen
 }
+
+void pidControl(pid_t pid, balancer_t bala) {
+  // TODO: PID Controller implementieren
+  // - bala.currentVelocity in Position integrieren (?)
+  // Positionsregelung
+}
