@@ -88,19 +88,21 @@ void setup()
   mpu.setZGyroOffset(31);
 
   // PWM-Frequenz für Timer 2 (Pin 3) für Driver auf ~1kHz setzen
-  TCCR2B = TCCR2B & 0b11111000 | 0x03;
+  TCCR2B = TCCR2B & 0b11111000 | 0x03; // ACHTUNG: anpassen auf neuen PWM Pin!
 
   // Bremse deaktivieren und Driver aktivieren
   digitalWrite(brkPin, HIGH);
   digitalWrite(enblPin, LOW);
 }
 
-void loop() {
+void loop() 
+{
   // put your main code here, to run repeatedly:
 
 }
 
-void getCurrentVelocity(balancer_t bala) {
+void getCurrentVelocity(balancer_t bala) 
+{
   if(FreqCount.available) 
   {
     freq = FreqCount.read()*10; // Zählintervall = 100ms,Umrechnung in Hz
@@ -108,7 +110,8 @@ void getCurrentVelocity(balancer_t bala) {
   }
 }
 
-void getPitch(balancer_t bala) {
+void getPitch(balancer_t bala) 
+{
   bala.mpu1.getMotion6(&sensorBuffer[accelX],
   &sensorBuffer[accelY],
   &sensorBuffer[accelZ],
