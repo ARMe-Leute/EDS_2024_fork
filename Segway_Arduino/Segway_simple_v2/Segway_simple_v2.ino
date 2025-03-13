@@ -11,7 +11,7 @@ const int pwmPin  = 6;    // Blau -- ACHTUNG - UMKLEMMEN
 const int dirPin  = 4;    // Grün
 const int brkPin  = 7;    // Weiß -- ACHTUNG - UMKLEMMEN
 const int almPin  = 3;    // Gelb -- ACHTUNG - UMKLEMMEN
-const int veloPin = 5;    // To be defined, Frequenzeingang
+const int veloPin = 5;    // Color to be defined, Frequenzeingang
 
 const int ctrlLED = 13;   // On-Board-LED
 const int tastPin = A0;   // für Kalibrier-Taster
@@ -24,17 +24,20 @@ typedef struct {
 } balancer_t;
 
 typedef struct {
-  float KP;
-  float KI;
-  float KD;
-  float TA;
+  float KP;       // Proportional Coefficient
+  float KI;       // Integral     Coefficient
+  float KD;       // Differential Coefficient
+  float ISum;     // Integral Sum fpr PID
+  float posISum;  // Integral Sum to get from Velocity to position
+  float TA;       // Cycle Time sec
+  float inpOld;   // Last Input Value
 } pid_t;
 
-int sensorBuffer[6];
+int16_t sensorBuffer[6];
 enum sensorOutput {
   accelX,
   accelY,
-  accelY,
+  accelZ,
   gyroX,
   gyroY,
   gyroZ
@@ -49,7 +52,8 @@ int     pwmMax;
 int     direction;
 unsigned long freq;
 
-void setup() {
+void setup() 
+{
   // Pins initialisieren
   pinMode(pwmPin,   OUTPUT);
   pinMode(dirPin,   OUTPUT);
@@ -65,10 +69,12 @@ void setup() {
   FreqCount.begin(100);
 
   //MPU Verbindung überprüfen
-  if (mpu.testConnection()) {
+  if (mpu.testConnection()) 
+  {
     //Serial.println("MPU 6050 verbunden");
   }
-  else {
+  else 
+  {
     //Serial.println("Verbindung zum MPU6050 fehlgeschlagen!");
     digitalWrite(ctrlLED, HIGH);
   }
@@ -95,19 +101,35 @@ void loop() {
 }
 
 void getCurrentVelocity(balancer_t bala) {
-  if(FreqCount.available) {
+  if(FreqCount.available) 
+  {
     freq = FreqCount.read()*10; // Zählintervall = 100ms,Umrechnung in Hz
     bala.currentVelocity = freq * velocityFactor;
   }
 }
 
 void getPitch(balancer_t bala) {
-  sensorBuffer = bala.mpu1.getMotion6(); // read accel and gyro values
-  // TODO: Mit funktion füllen
+  bala.mpu1.getMotion6(&sensorBuffer[accelX],
+  &sensorBuffer[accelY],
+  &sensorBuffer[accelZ],
+  &sensorBuffer[gyroX],
+  &sensorBuffer[gyroY],
+  &sensorBuffer[gyroZ]); // read accel and gyro values
+  // TODO: Mit Funktion füllen
 }
 
-void pidControl(pid_t pid, balancer_t bala) {
-  // TODO: PID Controller implementieren
-  // - bala.currentVelocity in Position integrieren (?)
-  // Positionsregelung
+float pidControl(pid_t pid, float diff) 
+{
+  pid.posISum += diff;
+  if (pid.KI == 0) 
+  {
+    pid.ISum = 0;
+  }
+  else 
+  {
+    pid.ISum += pid.posISum;
+  }
+  float result = (pid.KP * pid.posISum) + (pid.KI * pid.ISum * pid.TA) + (pid.KD / pid.TA) * (pid.posISum - pid.inpOld);
+  pid.inpOld = pid.posISum;
+  return result;
 }
