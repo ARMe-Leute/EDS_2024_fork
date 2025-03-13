@@ -6,7 +6,7 @@
  * 					 includes the functionality for an 3DG sensor and the TOF
  * 					 sensor in combination with an TFT display and the rotary
  * 					 push button
- * @date		   : December 2024
+ * @date		   : April 2024
  ******************************************************************************
  */
 
