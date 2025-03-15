@@ -300,9 +300,65 @@ int main(void)
                                  }
                               else if (menuManager_1.activeEntry == &setBaudRateEntry)
                                  {
-                                    static int8_t status = -120;
-                                    status = bluetoothSetBaudRate(&HM17_1, bluetoothBaud_9600, status);
-                                    tftPrintInt(status, 0, 70, 0);
+                                    static uint8_t step = 0;
+                                    static uint8_t fromBaud = 0;
+                                    static uint8_t toBaud = 0;
+
+                                    switch (step)
+                                       {
+                                       case 0:
+                                          tftPrint((char*) "From:", 0, 50, 0);
+                                          tftPrint((char*) "To:", tftGetWidth() / 2, 50, 0);
+                                          step++;
+                                          break;
+                                       case 1:
+                                          if (lastRotaryPosition != getRotaryPosition())
+                                             {
+                                                lastRotaryPosition = getRotaryPosition();
+                                                fromBaud = (uint8_t) getRotaryPosition() % 9;
+                                                tftPrintInt(
+                                                      bluetoothBaudToInt(fromBaud),
+                                                      0, 65, 0);
+                                             }
+                                          break;
+
+                                       case 2:
+                                          if (lastRotaryPosition != getRotaryPosition())
+                                             {
+                                                lastRotaryPosition = getRotaryPosition();
+                                                toBaud = (uint8_t) getRotaryPosition() % 9;
+                                                tftPrintInt(
+                                                      bluetoothBaudToInt(getRotaryPosition() % 9),
+                                                      tftGetWidth() / 2, 65, 0);
+                                             }
+                                          break;
+
+                                       case 3:
+                                          int16_t reply = bluetoothSetBaudRate(&HM17_1, fromBaud, toBaud);
+
+                                          if (reply == 0){
+                                                tftPrint("Done", 0, 70, 0);
+                                                step++;
+                                          }
+                                          break;
+                                       case 4:
+                                          break;
+
+
+                                       default:
+                                          step = 0;
+                                          menuManager_1.activeMode = Page;
+                                          showMenuPage(&menuManager_1,
+                                                menuManager_1.currentPosition);
+
+                                       }
+
+                                    if (getRotaryPushButton() == true){
+                                          step++;
+                                    }
+
+                                    //status = bluetoothSetBaudRate(&HM17_1, bluetoothBaud_9600, status);
+                                    //tftPrintInt(status, 0, 70, 0);
 
                                     if (getRotaryPushButton() == true)
                                        {

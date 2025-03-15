@@ -98,7 +98,10 @@ enum BluetoothState
    getStatus = -10, /**< Initial state for getStatus command. */
    getStatus_2, /**< Secondary state for getStatus command. */
    getMacAddress = -20, /**< Initial state for getMacAddress command. */
-   getMacAddress_2 /**< Secondary state for getMacAddress command. */
+   getMacAddress_2, /**< Secondary state for getMacAddress command. */
+   setBaudRate = -30,
+   setBaudRate_2,
+   setBaudRate_3
    };
 
 
@@ -138,7 +141,7 @@ extern int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK
 extern int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
 
 extern uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate);
-extern uint8_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, BluetoothBaudRate_t baudRate);
+extern int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBaud, uint8_t toBaud);
 
 extern bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data);
 extern DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart);

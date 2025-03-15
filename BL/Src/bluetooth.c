@@ -181,6 +181,21 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
                { // Insufficient data
                   return BluetoothLengthError;
                }
+         case setBaudRate:
+            usartSetCommParams(BluetoothModule->usart, bluetoothBaudToInt(BluetoothModule->baudRate), NO_PARITY, LEN_8BIT, ONE_BIT);
+            return ++BluetoothModule->state;
+
+         case setBaudRate_2:
+            char command [8]= "AT+BAUD";
+            command [7] = BluetoothModule->baudRate + '0';
+            dmacUsartSendString(BluetoothModule, &command);
+            return ++BluetoothModule->state;
+
+         case setBaudRate_3:
+            usartSetCommParams(BluetoothModule->usart, bluetoothBaudToInt(BluetoothModule->baudRate), NO_PARITY, LEN_8BIT, ONE_BIT);
+            BluetoothModule->state = BluetoothFinish;
+            return BluetoothFinish;
+
          default:
             return BluetoothWrongParameter;
          }
@@ -225,6 +240,31 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK)
 
 }
 
+int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBaud, uint8_t toBaud)
+   {
+
+      if (BluetoothModule->state == 0)
+         {
+            BluetoothModule->baudRate = fromBaud;
+         }
+      else
+         {
+            BluetoothModule->baudRate = toBaud;
+         }
+
+      int16_t reply = bluetoothStateHandler(BluetoothModule, setBaudRate);
+      if (reply == 0)
+         {
+            return BluetoothFinish;
+         }
+      else
+         {
+            return reply;
+
+         }
+
+   }
+
 bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
    {
       if (BluetoothModule->TXComplete == false)
@@ -244,10 +284,7 @@ bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
       return true;
    }
 
-uint8_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, BluetoothBaudRate_t baudRate)
-   {
 
-   }
 
 uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate)
    {
