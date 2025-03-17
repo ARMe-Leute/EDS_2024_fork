@@ -218,7 +218,7 @@ int main(void)
                            }
                         if (isSystickExpired(BluetoothTimer))
                            {
-                              initStatus = bluetoothInit(&HM17_1, USART2, 9600, usart2BufferTX);
+                              initStatus = bluetoothInit(&HM17_1, USART2, bluetoothBaud_1200, usart2BufferTX);
                               systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
                            }
                      }
