@@ -112,17 +112,27 @@ int main(void)
 
       uint32_t BluetoothTimer = 0UL;      // Timer for Bluetooth setup steps.
       uint32_t BluetoothFetchTimer = 0UL; // Timer for calling bluetoothFetchBuffer().
+      uint32_t BluetoothLogTimer = 0UL;
       uint32_t Button = 0UL; // Timer for button polling, helps with debouncing.
       uint32_t ButtonLEDOff = 0UL;        // Timer for turning off the button LED.
 
       uint32_t *timerList[] =
          {
-         &BluetoothTimer, &BluetoothFetchTimer, &Button, &ButtonLEDOff, &ST7735_Timer
+         &BluetoothTimer, &BluetoothFetchTimer, &Button, &ButtonLEDOff, &ST7735_Timer, &BluetoothLogTimer
          };
       uint8_t arraySize = sizeof(timerList) / sizeof(timerList[0]);
 
       BluetoothModule_t HM17_1;   // Bluetooth module instance.
       int initStatus = -100;
+
+      uint32_t runtime = 0;
+      int32_t rotaryPosition = 0;
+
+     // HM17_1.logEntrys[0].name = (char*)"runtime\0";
+      HM17_1.logEntrys[0].type = BluetoothLogEntryType_uint32_t;
+      HM17_1.logEntrys[0].data.uint32_ptr = &runtime;
+      HM17_1.logEntrys[1].type = BluetoothLogEntryType_int32_t;
+      HM17_1.logEntrys[1].data.int32_ptr = &rotaryPosition;
 
       int lastRotaryPosition = 0;
 
@@ -222,6 +232,32 @@ int main(void)
                         systickSetTicktime(&BluetoothFetchTimer,
                         BLUETOOTH_FETCH_TIME);
                      }
+                  if (isSystickExpired(BluetoothLogTimer))
+                     {
+                        rotaryPosition = getRotaryPosition();
+                     //   bluetoothCreateLog(&HM17_1);
+                       // systickSetTicktime(&BluetoothLogTimer, 1000);
+                        switch (HM17_1.mode)
+                           {
+                           case bluetoothConfigure:
+                              systickSetTicktime(&BluetoothLogTimer, 5000);
+                              break;
+
+                           case bluetoothTransmit:
+                              bluetoothCreateLog(&HM17_1);
+                              systickSetTicktime(&BluetoothLogTimer, BLUETOOTH_TRANSMIT_TIME);
+
+                              break;
+
+                           default:
+                              systickSetTicktime(&BluetoothLogTimer, 5000);
+                              break;
+
+                           }
+                     }
+
+
+
 
                   if (isSystickExpired(Button))
                      {

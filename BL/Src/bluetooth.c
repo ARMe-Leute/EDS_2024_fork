@@ -314,6 +314,87 @@ uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate)
          }
    }
 
+void bluetoothCreateLog(BluetoothModule_t *BluetoothModule)
+   {
+
+      uint16_t offset = 0;
+
+      for (uint8_t i = 0; i < BLUETOOTH_NUMBER_OF_LOG_ENTRYS; i++)
+         {
+            switch (BluetoothModule->logEntrys[i].type)
+               {
+               case BluetoothLogEntryType_bool:
+                  offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%s;",
+                        *(BluetoothModule->logEntrys[i].data.bool_ptr) ? "true" : "false");
+                  break;
+               case BluetoothLogEntryType_int8_t:
+                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%d;",
+                        *(BluetoothModule->logEntrys[i].data.int8_ptr));
+                  break;
+               case BluetoothLogEntryType_uint8_t:
+                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%u;",
+                        *(BluetoothModule->logEntrys[i].data.uint8_ptr));
+                  break;
+               case BluetoothLogEntryType_int16_t:
+                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%d;",
+                        *(BluetoothModule->logEntrys[i].data.int16_ptr));
+                  break;
+               case BluetoothLogEntryType_uint16_t:
+                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%u;",
+                        *(BluetoothModule->logEntrys[i].data.uint16_ptr));
+                  break;
+               case BluetoothLogEntryType_int32_t:
+                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%ld;",
+                        *(BluetoothModule->logEntrys[i].data.int32_ptr));
+                  break;
+               case BluetoothLogEntryType_uint32_t:
+                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%lu;",
+                        *(BluetoothModule->logEntrys[i].data.uint32_ptr));
+                  break;
+               case BluetoothLogEntryType_int64_t:
+                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%lld;",
+                        *(BluetoothModule->logEntrys[i].data.int64_ptr));
+                  break;
+               case BluetoothLogEntryType_uint64_t:
+                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%llu;",
+                        *(BluetoothModule->logEntrys[i].data.uint64_ptr));
+                  break;
+               case BluetoothLogEntryType_float: // mcu settings
+                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%.6f;",
+                        *(BluetoothModule->logEntrys[i].data.float_ptr));
+                  break;
+               case BluetoothLogEntryType_double:
+                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%.6f;",
+                        *(BluetoothModule->logEntrys[i].data.double_ptr));
+                  break;
+               case BluetoothLogEntryType_char:
+                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%c;",
+                        *(BluetoothModule->logEntrys[i].data.char_ptr));
+                  break;
+               case BluetoothLogEntryType_string:
+                  // For strings, check for NULL to avoid segmentation fault
+                  if (*(BluetoothModule->logEntrys[i].data.string_ptr) != NULL)
+                     {
+                        offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%s;",
+                              *(BluetoothModule->logEntrys[i].data.string_ptr));
+                     }
+                  else
+                     {
+                        offset += snprintf(BluetoothModule->messageBufferTX  + offset, 1, ";");
+                     }
+                  break;
+               default:
+                  // Unknown type, add an empty field
+                //  offset += snprintf(buffer + offset, bufferSize - offset, ";");
+                  break;
+               }
+
+         }
+      BluetoothModule->messageBufferTX[offset] = '\n';
+      dmacUsartSendString(BluetoothModule, BluetoothModule->messageBufferTX);
+   }
+
+
 /**
  * @brief Transfers data from the global USART buffer to the module's buffer.
  *
