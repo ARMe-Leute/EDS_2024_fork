@@ -224,6 +224,7 @@ int main(void)
                      {
                         setRotaryColor(LED_RED);
                         systickUpdateTimerList((uint32_t*) timerList, arraySize);
+                        runtime ++;
                         setRotaryColor(LED_BLACK);
                      }
                   if (isSystickExpired(BluetoothFetchTimer))
