@@ -39,17 +39,18 @@ typedef enum
 typedef struct analogCh
 {
 	ADC_TypeDef *adc;
-	ADC_RESOLUTION_t resolution;
-	size_t listSize;
-	BatStat_t BatStatus;
-	float ratioBatVolt;
-	float BatVolt;
-	float CpuTemp;
-	ADC_CHANNEL_t chnList[];
+	ADC_RESOLUTION_t chnResolution;
+	size_t chnListSize;
+	ADC_CHANNEL_t chnList[18];
+	int chnADCValue[18];
+	float chnVolt[18];
+	bool tempEnable;
+	float tempValue;
 } analogCh_t;
 
-/* Constant for Voltage Conversion */
-#define BATTERY_VOLTAGE_COEFFICIENT 0.80586
+const float chnConversionCoefficient = 0.00080586080586;
+
+const int VSense = 24;
 
 
 /* Functions of BatteryVoltage.c */
@@ -58,7 +59,6 @@ extern uint16_t getBatteryMilliVolts(ADC_TypeDef *adc);
 
 extern void adcActivate(void);
 extern BatStat_t getBatVolt(analogCh_t* pADChn, size_t listSize);
-
 
 
 /* end of BatteryVoltage.h */
