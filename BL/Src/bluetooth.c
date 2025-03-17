@@ -48,6 +48,8 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, B
                   BluetoothModule->messageBufferRX[i] = '\0';
                }
             RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; 		// Enable GPIOA clock
+            gpioSelectPinMode(BLUETOOTH_PIO0, OUTPUT);
+            gpioSetPin(BLUETOOTH_PIO0);
             gpioSelectPinMode(GPIOA, PIN3, ALTFUNC); // PA3: Alternate Function Mode
             gpioSelectAltFunc(GPIOA, PIN3, AF7); 	// PA3: AF7 for USART2 Rx
             gpioSelectPinMode(GPIOA, PIN2, ALTFUNC); // PA2: Alternate Function Mode
@@ -124,6 +126,25 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, B
 
    }
 
+int16_t bluetoothResetModule(BluetoothModule_t *BluetoothModule)
+   {
+
+      int16_t reply = bluetoothStateHandler(BluetoothModule, resetModule);
+      if (reply == 0)
+         {
+            return BluetoothFinish;
+         }
+      else if (reply < 0)
+         {
+            return reply; // Continue
+         }
+      else
+         {
+            return reply; // Pass error or do error handling here
+         }
+
+}
+
 /**
  * @brief Handles the state transitions for the Bluetooth state machine.
  *
@@ -193,6 +214,19 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 
          case setBaudRate_3:
             usartSetCommParams(BluetoothModule->usart, bluetoothBaudToInt(BluetoothModule->baudRate), NO_PARITY, LEN_8BIT, ONE_BIT);
+            BluetoothModule->state = BluetoothFinish;
+            return BluetoothFinish;
+
+         case resetModule:
+            gpioSetPin(BLUETOOTH_PIO0);
+            return ++BluetoothModule->state;
+
+         case resetModule_2:
+            gpioResetPin(BLUETOOTH_PIO0);
+            return ++BluetoothModule->state;
+
+         case resetModule_3:
+            gpioSetPin(BLUETOOTH_PIO0);
             BluetoothModule->state = BluetoothFinish;
             return BluetoothFinish;
 

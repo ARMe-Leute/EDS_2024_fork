@@ -42,6 +42,8 @@
 
 #define BLUETOOTH_NUMBER_OF_LOG_ENTRYS 2
 
+#define BLUETOOTH_PIO0 GPIOA, 4
+
 /**
  * @brief Enable debug mode for the library.
  *
@@ -107,7 +109,10 @@ enum BluetoothState
    getMacAddress_2, /**< Secondary state for getMacAddress command. */
    setBaudRate = -30,
    setBaudRate_2,
-   setBaudRate_3
+   setBaudRate_3,
+   resetModule = -40,
+   resetModule_2,
+   resetModule_3
    };
 
 
@@ -196,6 +201,7 @@ extern int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t
 extern uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate);
 extern int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBaud, uint8_t toBaud);
 extern void bluetoothCreateLog(BluetoothModule_t *BluetoothModule);
+extern int16_t bluetoothResetModule(BluetoothModule_t *BluetoothModule);
 
 extern bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data);
 extern DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart);
