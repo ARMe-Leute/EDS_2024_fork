@@ -65,7 +65,7 @@ MenuManager_t menuManager_1;
 MenuPage_t featuresPage;
 MenuPage_t nestedPage;
 MenuPage_t bluetoothPage;
-MenuPage_t submenu4;
+MenuPage_t bluetoothConfigPage;
 MenuEntry_t feldBack =
    {
    .color = tft_WHITE, .title = "BACK", .type = Back, .page = NULL
@@ -84,7 +84,7 @@ MenuEntry_t bluetoothEntry =
    };
 MenuEntry_t subfeld4 =
    {
-   .color = tft_WHITE, .title = "submenu_4_", .type = Page, .page = &submenu4
+   .color = tft_WHITE, .title = "BL Config", .type = Page, .page = &bluetoothConfigPage
    };
 MenuEntry_t textEntry =
    {
@@ -107,6 +107,12 @@ MenuEntry_t setBaudRateEntry =
    .color = tft_GREEN, .title = "Set BAUD", .type = Entry, .page = NULL
    };
 MenuPage_t menuPage1;
+MenuEntry_t resetModulePage =
+   {
+   .color = tft_RED, .title = "Reset HM17", .type = Entry, .page = NULL
+   };
+
+
 
 int main(void)
    {
@@ -157,10 +163,10 @@ int main(void)
       bluetoothPage.BR = &setBaudRateEntry;
       bluetoothPage.TR = &getStatusEntry;
 
-      submenu4.TL = &feldBack;
-      submenu4.BL = &getStatusEntry;
-      submenu4.BR = &counterEntry;
-      submenu4.TR = &textEntry;
+      bluetoothConfigPage.TL = &feldBack;
+      bluetoothConfigPage.BL = &getStatusEntry;
+      bluetoothConfigPage.BR = &setBaudRateEntry;
+      bluetoothConfigPage.TR = &resetModulePage;
 
       menuManager_1.activeMode = Page;
       menuManager_1.activePage = &menuPage1;
@@ -424,6 +430,49 @@ int main(void)
                                                 showMenuPage(&menuManager_1,
                                                       menuManager_1.currentPosition);
                                              }
+                                       }
+
+                                 }
+                              else if (menuManager_1.activeEntry == &resetModulePage)
+                                 {
+                                    static int status = -127;
+                                    static bool reply;
+                                    static bool active = false;
+
+                                    if (getRotaryPushButton() == true)
+                                       {
+                                          if (status >= 0)
+                                             {
+                                                status = -127;
+                                                active = false;
+                                                menuManager_1.activeMode = Page;
+                                                showMenuPage(&menuManager_1,
+                                                      menuManager_1.currentPosition);
+                                             }
+                                          else
+                                             {
+                                                active = true;
+                                             }
+
+                                       }
+                                    if (active == true)
+                                       {
+                                          status = bluetoothResetModule(&HM17_1);
+                                          systickSetTicktime(&Button, 1100);
+
+                                       }
+                                    if (status == BluetoothFinish )
+                                       {
+
+                                          tftPrintColor((char*) "Done", 0, 60, tft_GREEN);
+
+                                          active = false;
+                                       }
+                                    else if (status > 0)
+                                       {
+                                          tftPrintColor((char*) "Error:", 0, 60, tft_RED);
+                                          tftPrintInt(status, 0, 70, 0);
+                                          active = false;
                                        }
 
                                  }
