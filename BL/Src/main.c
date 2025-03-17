@@ -236,6 +236,19 @@ int main(void)
                   if (isSystickExpired(BluetoothFetchTimer))
                      {
                         bluetoothFetchBuffer(&HM17_1);
+                        if (HM17_1.available > 0)
+                           {
+                              if (strstr(HM17_1.messageBufferRX, (char*) "OK+CONN") != NULL)
+                                 {
+                                    HM17_1.mode = bluetoothTransmit;
+                                    HM17_1.available = 0;
+                                 }
+                              if (strstr(HM17_1.messageBufferRX, (char*) "OK+LOST") != NULL)
+                                 {
+                                    HM17_1.mode = bluetoothConfigure;
+                                    HM17_1.available = 0;
+                                 }
+                           }
 
                         systickSetTicktime(&BluetoothFetchTimer,
                         BLUETOOTH_FETCH_TIME);
