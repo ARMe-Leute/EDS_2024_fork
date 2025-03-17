@@ -55,7 +55,8 @@ bool timerTrigger;
 volatile char usart2BufferRX[USART2_BUFFER_SIZE];
 volatile uint16_t usart2BufferIndex = 0;
 
-volatile char usart2BufferTX[USART2_BUFFER_SIZE];
+//(Length of name plus max size of number + semicolon) times entrys plus + newline +  terminator
+volatile char usart2BufferTX[(BLUETOOTH_MAX_NAME_LENGTH + 21)*BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2];
 volatile bool usart2TXComplete;
 
 uint32_t ST7735_Timer = 0UL;
