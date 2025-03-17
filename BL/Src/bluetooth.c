@@ -440,8 +440,8 @@ bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule)
       if (BluetoothModule->usart == USART2)
          {
             static uint16_t lastIndex;
-            if (usart2BufferIndex == lastIndex && usart2BufferIndex != 0)
-               { // Check if no new characters have been received and the buffer is not empt
+            if ((usart2BufferIndex == lastIndex && usart2BufferIndex != 0) || strchr(BluetoothModule->messageBufferRX, '\n')!= NULL)
+               { // Check if no new characters have been received and the buffer is not empty
                   NVIC_DisableIRQ(USART2_IRQn); // Disable USART2 IRQ during data transfer
                   for (uint16_t x = 0; x < usart2BufferIndex; x++)
                      {
