@@ -28,7 +28,7 @@
  *  @return 0 on successful initialization, negative value if not finished,
  *  or positive value if there is an error.
  */
-int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, uint32_t baudRate,
+int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, BluetoothBaudRate_t baudRate,
       volatile char *txMessageBuffer)
    {
 
