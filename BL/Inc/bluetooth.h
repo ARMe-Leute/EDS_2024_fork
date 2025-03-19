@@ -17,6 +17,7 @@
 #define BLUETOOTH_H_
 
 #include <string.h>
+#include <stdio.h>
 
 #include <mcalUsart.h>
 #include <mcalGPIO.h>
