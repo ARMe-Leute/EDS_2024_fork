@@ -143,6 +143,9 @@ int main(void)
       HM17_1.logEntrys[1].type = BluetoothLogEntryType_int32_t;
       HM17_1.logEntrys[1].data.int32_ptr = &rotaryPosition;
 
+      HM17_1.TXComplete = &usart2TXComplete;
+      *(HM17_1.TXComplete) = true;
+
       int lastRotaryPosition = 0;
 
       menuPage1.TL = &featuresEntry;
