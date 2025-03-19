@@ -369,7 +369,7 @@ void bluetoothCreateLog(BluetoothModule_t *BluetoothModule)
                {
                case BluetoothLogEntryType_bool:
                   offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%s;",
-                        *(BluetoothModule->logEntrys[i].data.bool_ptr) ? "true" : "false");
+                        *(BluetoothModule->logEntrys[i].data.bool_ptr) ? "true;" : "false;");
                   break;
                case BluetoothLogEntryType_int8_t:
                   offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%d;",
