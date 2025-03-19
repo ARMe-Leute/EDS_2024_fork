@@ -503,11 +503,13 @@ DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart)
  * @brief USART2 interrupt handler for receiving data.
  *
  * Handles incoming data on USART2 and stores it in the global interrupt buffer.
+ *
+ * @warning If the buffer is full, new data is ignored
  */
 void USART2_IRQHandler(void)
    {
 #ifndef debugMode
-      if (USART2->SR & USART_SR_RXNE)
+      if (USART2->SR & USART_SR_RXNE && usart2BufferIndex < USART2_BUFFER_SIZE)
          {
             usart2BufferRX[usart2BufferIndex++] = USART2->DR & 0xFF; // Ensure 8-bit data
             usart2BufferRX[usart2BufferIndex] = '\0';
