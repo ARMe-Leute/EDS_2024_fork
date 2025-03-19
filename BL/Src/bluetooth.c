@@ -509,6 +509,7 @@ void USART2_IRQHandler(void)
       if (USART2->SR & USART_SR_RXNE)
          {
             usart2BufferRX[usart2BufferIndex++] = USART2->DR & 0xFF; // Ensure 8-bit data
+            usart2BufferRX[usart2BufferIndex] = '\0';
          }
 #endif
 
