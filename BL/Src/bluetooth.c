@@ -13,6 +13,7 @@
  * Created on: 26.11.2024
  */
 
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
 #include <bluetooth.h>
 
 /**
