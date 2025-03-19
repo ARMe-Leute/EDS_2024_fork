@@ -215,8 +215,8 @@ extern DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart);
  *
  * This buffer is used by the USART2_IRQHandler() to store incoming characters
  */
-extern volatile char usart2BufferRX[];
-extern volatile char usart2BufferTX[];
+extern volatile char usart2BufferRX[USART2_BUFFER_SIZE+1];
+extern volatile char usart2BufferTX[(BLUETOOTH_MAX_NAME_LENGTH + 21) * BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2];
 
 /**
  * @brief Index for the USART2 buffer.
