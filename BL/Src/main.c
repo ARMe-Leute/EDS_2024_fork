@@ -52,11 +52,28 @@ typedef enum
  */
 bool timerTrigger;
 
-volatile char usart2BufferRX[USART2_BUFFER_SIZE];
+/**
+ * @brief Global UART2 RX buffer
+ *
+ * This buffer is filled by the ::USART2_IRQHandler
+ */
+volatile char usart2BufferRX[USART2_BUFFER_SIZE+1];
+
+/**
+ * @brief Global UART2RX buffer Index
+ *
+ * The index indicates the position where the next character is written
+ */
 volatile uint16_t usart2BufferIndex = 0;
 
-//(Length of name plus max size of number + semicolon) times entrys plus + newline +  terminator
-volatile char usart2BufferTX[(BLUETOOTH_MAX_NAME_LENGTH + 21) * BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2];
+/**
+ * @brief Global UART2 TX buffer
+ *
+ * The buffer where the TX message is stored. The message is then send via DMA over USART2.
+ * The buffer size is calculated regarding the maximum log size, which is 20 bytes (printed int64) plus 1 byte (semicolon)
+ * times the number of entrys (::BLUETOOTH_NUMBER_OF_LOG_ENTRYS) plus two bytes (\\n and \0).
+ */
+volatile char usart2BufferTX[ (20 + 1) * BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2];
 volatile bool usart2TXComplete;
 
 uint32_t ST7735_Timer = 0UL;
