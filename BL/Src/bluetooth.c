@@ -348,6 +348,16 @@ uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate)
          }
    }
 
+void bluetoothSendLogTitle(BluetoothModule_t *BluetoothModule){
+
+      for (uint8_t i = 0; i < BLUETOOTH_NUMBER_OF_LOG_ENTRYS; i++){
+            strcat(BluetoothModule->messageBufferTX, BluetoothModule->logEntrys[i].name);
+            strcat(BluetoothModule->messageBufferTX, (char *) ";");
+      }
+      strcat(BluetoothModule->messageBufferTX, (char *) "\n");
+      dmacUsartSendString(BluetoothModule, BluetoothModule->messageBufferTX);
+}
+
 void bluetoothCreateLog(BluetoothModule_t *BluetoothModule)
    {
 

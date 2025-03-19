@@ -135,9 +135,11 @@ int main(void)
       uint32_t runtime = 0;
       int32_t rotaryPosition = 0;
 
-     // HM17_1.logEntrys[0].name = (char*)"runtime\0";
+      strcpy(HM17_1.logEntrys[0].name, "Runtime");
       HM17_1.logEntrys[0].type = BluetoothLogEntryType_uint32_t;
       HM17_1.logEntrys[0].data.uint32_ptr = &runtime;
+
+      strcpy(HM17_1.logEntrys[1].name, "Rot-Pos");
       HM17_1.logEntrys[1].type = BluetoothLogEntryType_int32_t;
       HM17_1.logEntrys[1].data.int32_ptr = &rotaryPosition;
 
@@ -243,6 +245,8 @@ int main(void)
                            {
                               if (strstr(HM17_1.messageBufferRX, (char*) "OK+CONN") != NULL)
                                  {
+                                    HM17_1.messageBufferTX[0] = '\0';
+                                    bluetoothSendLogTitle(&HM17_1);
                                     HM17_1.mode = bluetoothTransmit;
                                     HM17_1.available = 0;
                                  }

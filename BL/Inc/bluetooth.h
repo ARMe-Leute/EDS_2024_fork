@@ -147,7 +147,7 @@ typedef enum BluetoothLogEntryType{
 
 typedef struct BluetoothLogEntry
    {
-      //char name[BLUETOOTH_MAX_NAME_LENGTH];
+      char name[BLUETOOTH_MAX_NAME_LENGTH];
       BluetoothLogEntryType_t type;
       union
          {
@@ -202,6 +202,7 @@ extern uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate);
 extern int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBaud, uint8_t toBaud);
 extern void bluetoothCreateLog(BluetoothModule_t *BluetoothModule);
 extern int16_t bluetoothResetModule(BluetoothModule_t *BluetoothModule);
+extern void bluetoothSendLogTitle(BluetoothModule_t *BluetoothModule);
 
 extern bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data);
 extern DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart);
