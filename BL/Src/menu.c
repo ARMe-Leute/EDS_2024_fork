@@ -31,6 +31,8 @@ void higlightEntry(MenuPosition_t position)
             tftDrawRect(tftGetWidth() / 2, tftGetHeight() / 2, tftGetWidth() - 1,
                   tftGetHeight() - 1, tft_YELLOW);
             break;
+         default:
+            break;
 
          }
 
@@ -80,6 +82,8 @@ void showMenuPage(MenuManager_t *manager, MenuPosition_t position)
                   manager->activePage->BR->color);
             drawGrid();
             higlightEntry(position);
+            break;
+         default:
             break;
 
          }
