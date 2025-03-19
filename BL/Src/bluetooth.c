@@ -435,7 +435,7 @@ void bluetoothCreateLog(BluetoothModule_t *BluetoothModule)
                }
 
          }
-      BluetoothModule->messageBufferTX[offset] = '\n';
+      strcat(BluetoothModule->messageBufferTX, (char *) "\n");
       dmacUsartSendString(BluetoothModule, BluetoothModule->messageBufferTX);
    }
 
