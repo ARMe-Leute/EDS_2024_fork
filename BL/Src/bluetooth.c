@@ -310,7 +310,7 @@ bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
       while (dmaStream->CR & DMA_SxCR_EN);
 
       dmacDisableStream(dmaStream);
-      dmacSetMemoryAddress(dmaStream, MEM_0, BluetoothModule->messageBufferTX);
+      dmacSetMemoryAddress(dmaStream, MEM_0, (uint32_t) BluetoothModule->messageBufferTX);
       dmacSetNumData(dmaStream, strlen(BluetoothModule->messageBufferTX));
       dmacClearAllStreamIrqFlags(DMA1, dmaStream);
       dmacEnableStream(dmaStream);
