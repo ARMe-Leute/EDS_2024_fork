@@ -404,11 +404,11 @@ void bluetoothCreateLog(BluetoothModule_t *BluetoothModule)
                         *(BluetoothModule->logEntrys[i].data.uint64_ptr));
                   break;
                case BluetoothLogEntryType_float: // mcu settings
-                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%.6f;",
+                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%f;",
                         *(BluetoothModule->logEntrys[i].data.float_ptr));
                   break;
                case BluetoothLogEntryType_double:
-                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%.6f;",
+                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%f;",
                         *(BluetoothModule->logEntrys[i].data.double_ptr));
                   break;
                case BluetoothLogEntryType_char:
