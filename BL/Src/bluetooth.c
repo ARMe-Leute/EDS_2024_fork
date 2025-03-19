@@ -29,8 +29,8 @@
  *  @return 0 on successful initialization, negative value if not finished,
  *  or positive value if there is an error.
  */
-int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, BluetoothBaudRate_t baudRate,
-      volatile char *txMessageBuffer)
+int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
+      BluetoothBaudRate_t baudRate, volatile char *txMessageBuffer)
    {
 
       switch (BluetoothModule->initStatus)
@@ -57,7 +57,7 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, B
             gpioSelectAltFunc(GPIOA, PIN2, AF7); 	// PA2: AF7 for USART2 Tx
             usartSelectUsart(usart);
             usartEnableUsart(usart);
-		usartSetCommParams(usart, bluetoothBaudToInt(baudRate), NO_PARITY, LEN_8BIT, ONE_BIT);
+            usartSetCommParams(usart, bluetoothBaudToInt(baudRate), NO_PARITY, LEN_8BIT, ONE_BIT);
 
             usartSetDmaTxMode(USART2, DMA_TRANSMIT_ON);
             usartResetIrqFlag(USART2, USART_TC_FLG);
@@ -145,7 +145,7 @@ int16_t bluetoothResetModule(BluetoothModule_t *BluetoothModule)
             return reply; // Pass error or do error handling here
          }
 
-}
+   }
 
 /**
  * @brief Handles the state transitions for the Bluetooth state machine.
@@ -205,17 +205,19 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
                   return BluetoothLengthError;
                }
          case setBaudRate:
-            usartSetCommParams(BluetoothModule->usart, bluetoothBaudToInt(BluetoothModule->baudRate), NO_PARITY, LEN_8BIT, ONE_BIT);
+            usartSetCommParams(BluetoothModule->usart,
+                  bluetoothBaudToInt(BluetoothModule->baudRate), NO_PARITY, LEN_8BIT, ONE_BIT);
             return ++BluetoothModule->state;
 
          case setBaudRate_2:
-            char command [8]= "AT+BAUD";
-            command [7] = BluetoothModule->baudRate + '0';
+            char command[8] = "AT+BAUD";
+            command[7] = BluetoothModule->baudRate + '0';
             dmacUsartSendString(BluetoothModule, &command);
             return ++BluetoothModule->state;
 
          case setBaudRate_3:
-            usartSetCommParams(BluetoothModule->usart, bluetoothBaudToInt(BluetoothModule->baudRate), NO_PARITY, LEN_8BIT, ONE_BIT);
+            usartSetCommParams(BluetoothModule->usart,
+                  bluetoothBaudToInt(BluetoothModule->baudRate), NO_PARITY, LEN_8BIT, ONE_BIT);
             BluetoothModule->state = BluetoothFinish;
             return BluetoothFinish;
 
@@ -274,7 +276,7 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK)
             return reply; // Pass error or do error handling here
          }
 
-}
+   }
 
 int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBaud, uint8_t toBaud)
    {
@@ -320,8 +322,6 @@ bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
       return true;
    }
 
-
-
 uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate)
    {
       switch (baudRate)
@@ -350,15 +350,17 @@ uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate)
          }
    }
 
-void bluetoothSendLogTitle(BluetoothModule_t *BluetoothModule){
+void bluetoothSendLogTitle(BluetoothModule_t *BluetoothModule)
+   {
 
-      for (uint8_t i = 0; i < BLUETOOTH_NUMBER_OF_LOG_ENTRYS; i++){
+      for (uint8_t i = 0; i < BLUETOOTH_NUMBER_OF_LOG_ENTRYS; i++)
+         {
             strcat(BluetoothModule->messageBufferTX, BluetoothModule->logEntrys[i].name);
-            strcat(BluetoothModule->messageBufferTX, (char *) ";");
-      }
-      strcat(BluetoothModule->messageBufferTX, (char *) "\n");
+            strcat(BluetoothModule->messageBufferTX, (char*) ";");
+         }
+      strcat(BluetoothModule->messageBufferTX, (char*) "\n");
       dmacUsartSendString(BluetoothModule, BluetoothModule->messageBufferTX);
-}
+   }
 
 void bluetoothCreateLog(BluetoothModule_t *BluetoothModule)
    {
@@ -374,72 +376,71 @@ void bluetoothCreateLog(BluetoothModule_t *BluetoothModule)
                         *(BluetoothModule->logEntrys[i].data.bool_ptr) ? "true;" : "false;");
                   break;
                case BluetoothLogEntryType_int8_t:
-                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%d;",
+                  offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%d;",
                         *(BluetoothModule->logEntrys[i].data.int8_ptr));
                   break;
                case BluetoothLogEntryType_uint8_t:
-                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%u;",
+                  offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%u;",
                         *(BluetoothModule->logEntrys[i].data.uint8_ptr));
                   break;
                case BluetoothLogEntryType_int16_t:
-                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%d;",
+                  offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%d;",
                         *(BluetoothModule->logEntrys[i].data.int16_ptr));
                   break;
                case BluetoothLogEntryType_uint16_t:
-                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%u;",
+                  offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%u;",
                         *(BluetoothModule->logEntrys[i].data.uint16_ptr));
                   break;
                case BluetoothLogEntryType_int32_t:
-                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%ld;",
+                  offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%ld;",
                         *(BluetoothModule->logEntrys[i].data.int32_ptr));
                   break;
                case BluetoothLogEntryType_uint32_t:
-                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%lu;",
+                  offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%lu;",
                         *(BluetoothModule->logEntrys[i].data.uint32_ptr));
                   break;
                case BluetoothLogEntryType_int64_t:
-                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%lld;",
+                  offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%lld;",
                         *(BluetoothModule->logEntrys[i].data.int64_ptr));
                   break;
                case BluetoothLogEntryType_uint64_t:
-                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%llu;",
+                  offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%llu;",
                         *(BluetoothModule->logEntrys[i].data.uint64_ptr));
                   break;
                case BluetoothLogEntryType_float: // mcu settings
-                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%f;",
+                  offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%f;",
                         *(BluetoothModule->logEntrys[i].data.float_ptr));
                   break;
                case BluetoothLogEntryType_double:
-                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%f;",
+                  offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%f;",
                         *(BluetoothModule->logEntrys[i].data.double_ptr));
                   break;
                case BluetoothLogEntryType_char:
-                  offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%c;",
+                  offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%c;",
                         *(BluetoothModule->logEntrys[i].data.char_ptr));
                   break;
                case BluetoothLogEntryType_string:
                   // For strings, check for NULL to avoid segmentation fault
                   if (*(BluetoothModule->logEntrys[i].data.string_ptr) != NULL)
                      {
-                        offset += snprintf(BluetoothModule->messageBufferTX  + offset, 21, "%s;",
+                        offset += snprintf(BluetoothModule->messageBufferTX + offset, 21, "%s;",
                               *(BluetoothModule->logEntrys[i].data.string_ptr));
                      }
                   else
                      {
-                        offset += snprintf(BluetoothModule->messageBufferTX  + offset, 1, ";");
+                        offset += snprintf(BluetoothModule->messageBufferTX + offset, 1, ";");
                      }
                   break;
                default:
                   // Unknown type, add an empty field
-                //  offset += snprintf(buffer + offset, bufferSize - offset, ";");
+                  //  offset += snprintf(buffer + offset, bufferSize - offset, ";");
                   break;
                }
 
          }
-      strcat(BluetoothModule->messageBufferTX, (char *) "\n");
+      strcat(BluetoothModule->messageBufferTX, (char*) "\n");
       dmacUsartSendString(BluetoothModule, BluetoothModule->messageBufferTX);
    }
-
 
 /**
  * @brief Transfers data from the global USART buffer to the module's buffer.
@@ -452,7 +453,8 @@ bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule)
       if (BluetoothModule->usart == USART2)
          {
             static uint16_t lastIndex;
-            if ((usart2BufferIndex == lastIndex && usart2BufferIndex != 0) || strchr(usart2BufferRX, '\n')!= NULL)
+            if ((usart2BufferIndex == lastIndex && usart2BufferIndex != 0)
+                  || strchr(usart2BufferRX, '\n') != NULL)
                { // Check if no new characters have been received and the buffer is not empty
                   NVIC_DisableIRQ(USART2_IRQn); // Disable USART2 IRQ during data transfer
                   for (uint16_t x = 0; x < usart2BufferIndex; x++)

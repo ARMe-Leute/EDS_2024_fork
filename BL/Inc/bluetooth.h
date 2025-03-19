@@ -84,8 +84,6 @@
 #endif // !(defined(BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_OK) || defined(BLUETOOTH_STATE_HANDLER_GET_STATUS_RECEIVE_ERROR))
 #endif //debugMode
 
-
-
 /**
  * @brief Enum representing possible Bluetooth errors and status codes.
  */
@@ -116,35 +114,36 @@ enum BluetoothState
    resetModule_3
    };
 
+typedef enum BluetoothBaudRate
+   {
+   bluetoothBaud_9600 = 0,
+   bluetoothBaud_19200,
+   bluetoothBaud_38400,
+   bluetoothBaud_57600,
+   bluetoothBaud_115200,
+   bluetoothBaud_4800,
+   bluetoothBaud_2400,
+   bluetoothBaud_1200,
+   bluetoothBaud_230400
 
-typedef enum BluetoothBaudRate {
-      bluetoothBaud_9600 =0,
-      bluetoothBaud_19200,
-      bluetoothBaud_38400,
-      bluetoothBaud_57600,
-      bluetoothBaud_115200,
-      bluetoothBaud_4800,
-      bluetoothBaud_2400,
-      bluetoothBaud_1200,
-      bluetoothBaud_230400
+   } BluetoothBaudRate_t;
 
-} BluetoothBaudRate_t;
-
-typedef enum BluetoothLogEntryType{
+typedef enum BluetoothLogEntryType
+   {
    BluetoothLogEntryType_bool = 0,
-      BluetoothLogEntryType_int8_t,
-      BluetoothLogEntryType_uint8_t,
-      BluetoothLogEntryType_int16_t,
-      BluetoothLogEntryType_uint16_t,
-      BluetoothLogEntryType_int32_t,
-      BluetoothLogEntryType_uint32_t,
-      BluetoothLogEntryType_int64_t,
-      BluetoothLogEntryType_uint64_t,
-      BluetoothLogEntryType_float,
-      BluetoothLogEntryType_double,
-      BluetoothLogEntryType_char,
-      BluetoothLogEntryType_string
-}BluetoothLogEntryType_t;
+   BluetoothLogEntryType_int8_t,
+   BluetoothLogEntryType_uint8_t,
+   BluetoothLogEntryType_int16_t,
+   BluetoothLogEntryType_uint16_t,
+   BluetoothLogEntryType_int32_t,
+   BluetoothLogEntryType_uint32_t,
+   BluetoothLogEntryType_int64_t,
+   BluetoothLogEntryType_uint64_t,
+   BluetoothLogEntryType_float,
+   BluetoothLogEntryType_double,
+   BluetoothLogEntryType_char,
+   BluetoothLogEntryType_string
+   } BluetoothLogEntryType_t;
 
 typedef struct BluetoothLogEntry
    {
@@ -169,29 +168,31 @@ typedef struct BluetoothLogEntry
          } data;
    } BluetoothLogEntry_t;
 
-typedef enum bluetoothMode{
+typedef enum bluetoothMode
+   {
    bluetoothConfigure = 0,
    bluetoothTransmit
 
-} bluetoothMode_t;
+   } bluetoothMode_t;
 
 /**
  * @brief Structure representing a Bluetooth module instance.
  */
-typedef struct BluetoothModule {
-        const USART_TypeDef *usart;                             /**< USART instance for communication. */
-        int8_t initStatus;                                                      /**< Initialization status of the module. */
-        BluetoothBaudRate_t baudRate;                                                   /**< Baud rate for the USART. */
-        char messageBufferRX[USART2_BUFFER_SIZE + 1]; /**< Buffer for received messages. */
-        volatile char *messageBufferTX;
-        uint16_t available;                                             /**< Number of available characters in the buffer. */
-        uint8_t counter;                                                        /**< Counter for internal operations, e.g., retry count. */
-        int16_t state;                                                          /**< Current state of the state machine. */
-        volatile bool *TXComplete;
-        bluetoothMode_t mode;
-        BluetoothLogEntry_t logEntrys[BLUETOOTH_NUMBER_OF_LOG_ENTRYS];
+typedef struct BluetoothModule
+   {
+      const USART_TypeDef *usart; /**< USART instance for communication. */
+      int8_t initStatus; /**< Initialization status of the module. */
+      BluetoothBaudRate_t baudRate; /**< Baud rate for the USART. */
+      char messageBufferRX[USART2_BUFFER_SIZE + 1]; /**< Buffer for received messages. */
+      volatile char *messageBufferTX;
+      uint16_t available; /**< Number of available characters in the buffer. */
+      uint8_t counter; /**< Counter for internal operations, e.g., retry count. */
+      int16_t state; /**< Current state of the state machine. */
+      volatile bool *TXComplete;
+      bluetoothMode_t mode;
+      BluetoothLogEntry_t logEntrys[BLUETOOTH_NUMBER_OF_LOG_ENTRYS];
 
-} BluetoothModule_t;
+   } BluetoothModule_t;
 
 extern int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART,
       BluetoothBaudRate_t baudRate, volatile char txMessageBuffer[]);
@@ -200,7 +201,8 @@ extern int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK
 extern int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
 
 extern uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate);
-extern int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBaud, uint8_t toBaud);
+extern int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBaud,
+      uint8_t toBaud);
 extern void bluetoothCreateLog(BluetoothModule_t *BluetoothModule);
 extern int16_t bluetoothResetModule(BluetoothModule_t *BluetoothModule);
 extern void bluetoothSendLogTitle(BluetoothModule_t *BluetoothModule);

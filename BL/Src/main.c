@@ -56,7 +56,7 @@ volatile char usart2BufferRX[USART2_BUFFER_SIZE];
 volatile uint16_t usart2BufferIndex = 0;
 
 //(Length of name plus max size of number + semicolon) times entrys plus + newline +  terminator
-volatile char usart2BufferTX[(BLUETOOTH_MAX_NAME_LENGTH + 21)*BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2];
+volatile char usart2BufferTX[(BLUETOOTH_MAX_NAME_LENGTH + 21) * BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2];
 volatile bool usart2TXComplete;
 
 uint32_t ST7735_Timer = 0UL;
@@ -112,8 +112,6 @@ MenuEntry_t resetModulePage =
    .color = tft_RED, .title = "Reset HM17", .type = Entry, .page = NULL
    };
 
-
-
 int main(void)
    {
 
@@ -125,7 +123,12 @@ int main(void)
 
       uint32_t *timerList[] =
          {
-         &BluetoothTimer, &BluetoothFetchTimer, &Button, &ButtonLEDOff, &ST7735_Timer, &BluetoothLogTimer
+               &BluetoothTimer,
+               &BluetoothFetchTimer,
+               &Button,
+               &ButtonLEDOff,
+               &ST7735_Timer,
+               &BluetoothLogTimer
          };
       uint8_t arraySize = sizeof(timerList) / sizeof(timerList[0]);
 
@@ -209,11 +212,11 @@ int main(void)
 
                            }
                         /*if (isSystickExpired(BluetoothTimer))
-                           {
-                              initStatus = bluetoothInit(&HM17_1, USART2, bluetoothBaud_9600,
-                                    usart2BufferTX);
-                              systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
-                           }*/
+                         {
+                         initStatus = bluetoothInit(&HM17_1, USART2, bluetoothBaud_9600,
+                         usart2BufferTX);
+                         systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
+                         }*/
                         if (isSystickExpired(BluetoothFetchTimer))
                            {
                               bluetoothFetchBuffer(&HM17_1);
@@ -223,7 +226,8 @@ int main(void)
                            }
                         if (isSystickExpired(BluetoothTimer))
                            {
-                              initStatus = bluetoothInit(&HM17_1, USART2, bluetoothBaud_1200, usart2BufferTX);
+                              initStatus = bluetoothInit(&HM17_1, USART2, bluetoothBaud_1200,
+                                    usart2BufferTX);
                               systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
                            }
                      }
@@ -238,7 +242,7 @@ int main(void)
                      {
                         setRotaryColor(LED_RED);
                         systickUpdateTimerList((uint32_t*) timerList, arraySize);
-                        runtime ++;
+                        runtime++;
                         setRotaryColor(LED_BLACK);
                      }
                   if (isSystickExpired(BluetoothFetchTimer))
@@ -266,8 +270,8 @@ int main(void)
                   if (isSystickExpired(BluetoothLogTimer))
                      {
                         rotaryPosition = getRotaryPosition();
-                     //   bluetoothCreateLog(&HM17_1);
-                       // systickSetTicktime(&BluetoothLogTimer, 1000);
+                        //   bluetoothCreateLog(&HM17_1);
+                        // systickSetTicktime(&BluetoothLogTimer, 1000);
                         switch (HM17_1.mode)
                            {
                            case bluetoothConfigure:
@@ -286,9 +290,6 @@ int main(void)
 
                            }
                      }
-
-
-
 
                   if (isSystickExpired(Button))
                      {
@@ -383,9 +384,7 @@ int main(void)
                                              {
                                                 lastRotaryPosition = getRotaryPosition();
                                                 fromBaud = (uint8_t) getRotaryPosition() % 9;
-                                                tftPrintInt(
-                                                      bluetoothBaudToInt(fromBaud),
-                                                      0, 65, 0);
+                                                tftPrintInt(bluetoothBaudToInt(fromBaud), 0, 65, 0);
                                              }
                                           break;
 
@@ -401,16 +400,17 @@ int main(void)
                                           break;
 
                                        case 3:
-                                          int16_t reply = bluetoothSetBaudRate(&HM17_1, fromBaud, toBaud);
+                                          int16_t reply = bluetoothSetBaudRate(&HM17_1, fromBaud,
+                                                toBaud);
 
-                                          if (reply == 0){
+                                          if (reply == 0)
+                                             {
                                                 tftPrint("Done", 0, 70, 0);
                                                 step++;
-                                          }
+                                             }
                                           break;
                                        case 4:
                                           break;
-
 
                                        default:
                                           step = 0;
@@ -420,9 +420,10 @@ int main(void)
 
                                        }
 
-                                    if (getRotaryPushButton() == true){
+                                    if (getRotaryPushButton() == true)
+                                       {
                                           step++;
-                                    }
+                                       }
 
                                     //status = bluetoothSetBaudRate(&HM17_1, bluetoothBaud_9600, status);
                                     //tftPrintInt(status, 0, 70, 0);
@@ -484,7 +485,7 @@ int main(void)
                                           systickSetTicktime(&Button, 1100);
 
                                        }
-                                    if (status == BluetoothFinish )
+                                    if (status == BluetoothFinish)
                                        {
 
                                           tftPrintColor((char*) "Done", 0, 60, tft_GREEN);
