@@ -79,6 +79,7 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart, B
             // Set priority and enable transfer complete interrupt
             dmacSetPriorityLevel(DMA1_Stream6, PRIO_MEDIUM);
             dmacEnableInterrupt(DMA1_Stream6, TX_COMPLETE);
+            NVIC_EnableIRQ(DMA1_Stream6_IRQn);
 
             // Clear any pending flags before enabling the stream
             dmacClearAllStreamIrqFlags(DMA1, DMA1_Stream6);
