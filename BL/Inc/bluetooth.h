@@ -188,7 +188,7 @@ typedef struct BluetoothModule {
         uint8_t counter;                                                        /**< Counter for internal operations, e.g., retry count. */
         int16_t state;                                                          /**< Current state of the state machine. */
         volatile bool *TXComplete;
-        uint8_t mode;
+        bluetoothMode_t mode;
         BluetoothLogEntry_t logEntrys[BLUETOOTH_NUMBER_OF_LOG_ENTRYS];
 
 } BluetoothModule_t;
