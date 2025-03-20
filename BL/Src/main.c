@@ -74,11 +74,33 @@ volatile uint16_t usart2BufferIndex = 0;
  * times the number of entrys (::BLUETOOTH_NUMBER_OF_LOG_ENTRYS) plus two bytes (\\n and \0).
  */
 volatile char usart2BufferTX[ (20 + 1) * BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2];
+
+/**
+ * @brief USART2 Transfer finish
+ *
+ * Indicates that transfer over USART2 with DMA is finishd
+ *
+ * @note Interrupt doesn't work, so his does nothing
+ */
 volatile bool usart2TXComplete;
 
+/**
+ * @brief ST7735 Timer
+ *
+ * Timer used for the ST7735 display. The timer needs to be global.
+ */
 uint32_t ST7735_Timer = 0UL;
 
+/**
+ * @brief The menu manager
+ */
 MenuManager_t menuManager_1;
+
+/**
+ *  @brief Features Menu Page
+ *
+ *  Menu Page showing features such as showing static text, updating a number or calling a function
+ */
 MenuPage_t featuresPage;
 MenuPage_t nestedPage;
 MenuPage_t bluetoothPage;
