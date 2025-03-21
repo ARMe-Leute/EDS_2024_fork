@@ -303,11 +303,11 @@ int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBau
 
    }
 
-bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
+BluetoothError_t dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
    {
       if (BluetoothModule->TXComplete == false)
          {
-            return false;
+            return BluetoothTXBusy;
          }
       DMA_Stream_TypeDef *dmaStream = dmacGetStreamFromUSART(BluetoothModule->usart);
       strcpy(BluetoothModule->messageBufferTX, data);
@@ -319,7 +319,7 @@ bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
       dmacClearAllStreamIrqFlags(DMA1, dmaStream);
       dmacEnableStream(dmaStream);
       // BluetoothModule->TXComplete = false;
-      return true;
+      return BluetoothFinish;
    }
 
 uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate)

@@ -207,7 +207,7 @@ extern void bluetoothCreateLog(BluetoothModule_t *BluetoothModule);
 extern int16_t bluetoothResetModule(BluetoothModule_t *BluetoothModule);
 extern void bluetoothSendLogTitle(BluetoothModule_t *BluetoothModule);
 
-extern bool dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data);
+extern BluetoothError_t dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data);
 extern DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart);
 
 /**
