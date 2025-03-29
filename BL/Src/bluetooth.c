@@ -372,58 +372,58 @@ uint16_t bluetoothSendLog(BluetoothModule_t *BluetoothModule)
             switch (BluetoothModule->logEntrys[i].type)
                {
                case BluetoothLogEntryType_bool:
-                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 21,
+                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 22,
                         "%s;", *(BluetoothModule->logEntrys[i].data.bool_ptr) ? "true;" : "false;");
                   break;
                case BluetoothLogEntryType_int8_t:
-                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 21,
+                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 22,
                         "%d;", *(BluetoothModule->logEntrys[i].data.int8_ptr));
                   break;
                case BluetoothLogEntryType_uint8_t:
-                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 21,
+                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 22,
                         "%u;", *(BluetoothModule->logEntrys[i].data.uint8_ptr));
                   break;
                case BluetoothLogEntryType_int16_t:
-                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 21,
+                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 22,
                         "%d;", *(BluetoothModule->logEntrys[i].data.int16_ptr));
                   break;
                case BluetoothLogEntryType_uint16_t:
-                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 21,
+                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 22,
                         "%u;", *(BluetoothModule->logEntrys[i].data.uint16_ptr));
                   break;
                case BluetoothLogEntryType_int32_t:
-                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 21,
+                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 22,
                         "%ld;", *(BluetoothModule->logEntrys[i].data.int32_ptr));
                   break;
                case BluetoothLogEntryType_uint32_t:
-                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 21,
+                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 22,
                         "%lu;", *(BluetoothModule->logEntrys[i].data.uint32_ptr));
                   break;
                case BluetoothLogEntryType_int64_t:
-                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 21,
+                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 22,
                         "%lld;", *(BluetoothModule->logEntrys[i].data.int64_ptr));
                   break;
                case BluetoothLogEntryType_uint64_t:
-                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 21,
+                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 22,
                         "%llu;", *(BluetoothModule->logEntrys[i].data.uint64_ptr));
                   break;
                case BluetoothLogEntryType_float: // mcu settings
-                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 21,
+                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 22,
                         "%f;", *(BluetoothModule->logEntrys[i].data.float_ptr));
                   break;
                case BluetoothLogEntryType_double:
-                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 21,
+                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 22,
                         "%f;", *(BluetoothModule->logEntrys[i].data.double_ptr));
                   break;
                case BluetoothLogEntryType_char:
-                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 21,
+                  offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 22,
                         "%c;", *(BluetoothModule->logEntrys[i].data.char_ptr));
                   break;
                case BluetoothLogEntryType_string:
                   // For strings, check for NULL to avoid segmentation fault
                   if (*(BluetoothModule->logEntrys[i].data.string_ptr) != NULL)
                      {
-                        offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 21,
+                        offset += (uint16_t) snprintf(BluetoothModule->messageBufferTX + offset, 22,
                               "%s;", *(BluetoothModule->logEntrys[i].data.string_ptr));
                      }
                   else
