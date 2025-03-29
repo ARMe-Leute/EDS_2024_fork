@@ -227,7 +227,7 @@ extern int16_t bluetoothResetModule(BluetoothModule_t *BluetoothModule);
 extern void bluetoothSendLogTitle(BluetoothModule_t *BluetoothModule);
 
 extern BluetoothError_t dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data);
-extern DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart);
+extern DMA_Stream_TypeDef* dmacGetStreamFromUSARTTX(USART_TypeDef *usart);
 
 /**
  * @brief Global buffer for USART2 communication.
