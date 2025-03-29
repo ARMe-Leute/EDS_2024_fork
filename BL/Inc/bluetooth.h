@@ -222,7 +222,7 @@ extern int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t
 extern uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate);
 extern int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBaud,
       uint8_t toBaud);
-extern void bluetoothCreateLog(BluetoothModule_t *BluetoothModule);
+extern uint16_t bluetoothSendLog(BluetoothModule_t *BluetoothModule);
 extern int16_t bluetoothResetModule(BluetoothModule_t *BluetoothModule);
 extern void bluetoothSendLogTitle(BluetoothModule_t *BluetoothModule);
 

@@ -318,7 +318,7 @@ int main(void)
                               break;
 
                            case bluetoothTransmit:
-                              bluetoothCreateLog(&HM17_1);
+                              bluetoothSendLog(&HM17_1);
                               systickSetTicktime(&BluetoothLogTimer, BLUETOOTH_TRANSMIT_TIME);
 
                               break;
