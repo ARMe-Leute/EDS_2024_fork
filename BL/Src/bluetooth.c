@@ -499,26 +499,12 @@ DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart)
 
             return DMA1_Stream6;
          }
-      else if (usart == USART3)
-         {
-            return DMA1_Stream3;
-         }
-      else if (usart == USART4)
-         {
-            return DMA1_Stream4;
-         }
-      else if (usart == USART5)
-         {
-            return DMA1_Stream7;
-         }
-
       else if (usart == USART6)
          {
             return DMA2_Stream6;
          }
       else
          {
-            // Todo: Implement support for additional USART instances
             return NULL;
          }
    }
