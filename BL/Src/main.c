@@ -482,7 +482,7 @@ int main(void)
                                           if (active == false)
                                              {
                                                 dmacUsartSendString(&HM17_1,
-                                                      "Das ist ein sehr langer Text der hier verschickt wird, um zu überprüfen ob das Asyncrone senden funktioniert");
+                                                      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
                                                 active = true;
                                                 tftPrint((char*) "Sending test string", 0, 50, 0);
                                              }

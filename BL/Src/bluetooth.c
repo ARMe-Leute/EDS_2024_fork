@@ -326,6 +326,8 @@ int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBau
  * @param data The string to be send
  * @return ::BluetoothFinish on success, ::BluetoothTXBusy when previous transmission isn't finished
  *
+ * @warning ATM it is not checked, if the TX buffer is large enough. The string to be send MUST be smaller
+ *
  * For more details about the process, have a look at R. Jesse, STM32: ARM-Mikrocontroller programmieren für Embedded Systems: das umfassende Praxisbuch. Frechen: mitp, 2021.
  */
 BluetoothError_t dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
