@@ -56,7 +56,7 @@ MenuEntry_t* getEntryFromPosition(MenuManager_t *manager, MenuPosition_t positio
 
          }
    }
-uint8_t getMenuRotaryPosition(int rotaryCounter)
+MenuPosition_t getMenuRotaryPosition(int rotaryCounter)
    {
       return ((uint16_t) rotaryCounter) % 4;
    }
@@ -90,13 +90,12 @@ void showMenuPage(MenuManager_t *manager, MenuPosition_t position)
 
    }
 
-void handleMenu(MenuManager_t *menuManager, int lastRotaryPosition)
+void handleMenu(MenuManager_t *menuManager)
    {
 
       if (getMenuRotaryPosition(getRotaryPosition()) != menuManager->currentPosition)
          {
             menuManager->currentPosition = getMenuRotaryPosition(getRotaryPosition());
-            lastRotaryPosition = getMenuRotaryPosition(getRotaryPosition());
             drawGrid();
             higlightEntry(menuManager->currentPosition);
          }

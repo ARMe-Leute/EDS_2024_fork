@@ -337,7 +337,7 @@ int main(void)
                            {
                            case Page:
 
-                              handleMenu(&menuManager_1, lastRotaryPosition);
+                              handleMenu(&menuManager_1);
                               break;
                            case Entry:
                               if (menuManager_1.activeEntry == &textEntry)
