@@ -273,6 +273,14 @@ int main(void)
 				break;
 			case SCREEN_PAGE2:
 
+/*
+ *
+ * Hier ist der Testabschnitt des 6. Semesters, um testen zu können muss der Controller ganz normal gestartet werden
+ * und anschließend zur Distanz Messung navigiert werden dieser bleibt in der While Schleife hängen und führt dauerhaft
+ * die neue Funktione TOF_read_distance_task aus (s.u.).
+ *
+*/
+/*
 				TOF_start_up_task(&TOF_Sensor_1);
 				while(1)
 					{
@@ -283,7 +291,7 @@ int main(void)
 						visualisationTOF(&TOF_Sensor_1);
 
 					}
-
+*/
 				visualisationTOF(&TOF_Sensor_1);
 
 				break;
