@@ -138,11 +138,11 @@ int16_t bluetoothResetModule(BluetoothModule_t *BluetoothModule)
          }
       else if (reply < 0)
          {
-            return reply; // Continue
+            return reply;
          }
       else
          {
-            return reply; // Pass error or do error handling here
+            return reply;
          }
 
    }
@@ -277,10 +277,27 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK)
          }
 
    }
-
+/**
+ * @brief Set the BAUD rate of the bluetooth module
+ *
+ * Set the BAUD rate of the module. In the procedure the BAUD rate of the microcontroller is first set to ::fromBAUD.
+ * At this speed the command for the new speed is sent. Then the microcontroller is switched to the new address.
+ *
+ * @warning While teststing, switching the BAUD rate resulted in strange behavior after restarting the HM17. Somehow resetting it got it working again,
+ * but I don't know exactly what action resetted it.
+ *
+ * @param BluetoothModule Pointer to the ::BluetoothModule instance.
+ * @param fromBAUD The BAUD rate at which the command is send
+ * @param toBAUD The desired BAUD rate
+ * @return ::BluetoothFinish on success, or a ::BluetoothError code on failure.
+ */
 int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBaud, uint8_t toBaud)
    {
 
+      /*
+       * If ::BluetoothModule::state is 0 means that currently now step is done, which also means that this is the first function call.
+       * If we would be in a different step, we would get an error, so this is really the first call that will work.
+       */
       if (BluetoothModule->state == 0)
          {
             BluetoothModule->baudRate = fromBaud;
@@ -303,13 +320,21 @@ int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBau
 
    }
 
+/**
+ * @brief Send a string over UART with DMA
+ * @param BluetoothModule Pointer to the ::BluetoothModule instance.
+ * @param data The string to be send
+ * @return ::BluetoothFinish on success, ::BluetoothTXBusy when previous transmission isn't finished
+ *
+ * For more details about the process, have a look at R. Jesse, STM32: ARM-Mikrocontroller programmieren für Embedded Systems: das umfassende Praxisbuch. Frechen: mitp, 2021.
+ */
 BluetoothError_t dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
    {
       if (BluetoothModule->TXComplete == false)
          {
             return BluetoothTXBusy;
          }
-      DMA_Stream_TypeDef *dmaStream = dmacGetStreamFromUSART(BluetoothModule->usart);
+      DMA_Stream_TypeDef *dmaStream = dmacGetStreamFromUSARTTX(BluetoothModule->usart);
       strcpy(BluetoothModule->messageBufferTX, data);
       while (dmaStream->CR & DMA_SxCR_EN);
 
@@ -322,6 +347,11 @@ BluetoothError_t dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *d
       return BluetoothFinish;
    }
 
+/**
+ * @brief Convert the BAUD rate from ::BluetoothBaudRate to an int
+ * @param baudRate The BAUD rate to convert
+ * @return The BAUD as an int
+ */
 uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate)
    {
       switch (baudRate)
@@ -350,6 +380,14 @@ uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate)
          }
    }
 
+/**
+ * @brief Send variable names of log entrys
+ *
+ * The title of all logged variables are send, separated with a semicolon and terminated with a newline.
+ * This is esentially for the outputted csv file.
+ *
+ * @param BluetoothModule Pointer to the ::BluetoothModule instance.
+ */
 void bluetoothSendLogTitle(BluetoothModule_t *BluetoothModule)
    {
 
@@ -362,11 +400,29 @@ void bluetoothSendLogTitle(BluetoothModule_t *BluetoothModule)
       dmacUsartSendString(BluetoothModule, BluetoothModule->messageBufferTX);
    }
 
+/**
+ * @brief Create a log and send it
+ *
+ * This function iterates over all log entrys in ::BluetoothModule::logEntrys[], prints the variables to the ::BluetoothModule::messageBufferTX
+ * and then sends it. The values are seperated with a semicolon and terminated with a newline-character. This makes it easy to save the raw transmitted
+ * log to a csv file that can then further be proccessed (Separator: ';', Decimal separator: '.').
+ *
+ * @note The magic number 22 comes from the comes from the maximum length a (u)int64_t has in printed form (which is 21) plus the terminator
+ * @warning The function does not check if the pointer is a nullpointer. If the pointer doesn't contain anything, it should just output nonesense.
+ *
+ * @warning There are no checks that make sure that snprintf() went well. As the return value is casted to uint, if an error happend,
+ * the next entry is written somwhere into the memory.
+ *
+ * @param BluetoothModule Pointer to the ::BluetoothModule instance.
+ * @return Number of send bytes
+ *
+ */
 uint16_t bluetoothSendLog(BluetoothModule_t *BluetoothModule)
    {
 
       uint16_t offset = 0;
 
+      // Iterate over all entrys
       for (uint8_t i = 0; i < BLUETOOTH_NUMBER_OF_LOG_ENTRYS; i++)
          {
             switch (BluetoothModule->logEntrys[i].type)
@@ -447,6 +503,8 @@ uint16_t bluetoothSendLog(BluetoothModule_t *BluetoothModule)
 /**
  * @brief Transfers data from the global USART buffer to the module's buffer.
  *
+ * The transfer is completed if either no new characters are received since the last fetch or there is a newline character.
+ *
  * @param BluetoothModule Pointer to the ::BluetoothModule instance.
  * @return True if data transfer is complete, false otherwise.
  */
@@ -485,12 +543,12 @@ bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule)
          }
    }
 
-#ifndef USART2_BUFFER_SIZE
-#warning USART2_BUFFER_SIZE not defined, using 120 Bytes buffer. This may result in lost characters
-#define USART2_BUFFER_SIZE 120
-#endif
-
-DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart)
+/**
+ * @brief Return DMA stream for given USART TX
+ *
+ * @param usart The USART channel
+ */
+DMA_Stream_TypeDef* dmacGetStreamFromUSARTTX(USART_TypeDef *usart)
    {
       if (usart == USART1)
          {
@@ -511,10 +569,16 @@ DMA_Stream_TypeDef* dmacGetStreamFromUSART(USART_TypeDef *usart)
          }
    }
 
+#ifndef USART2_BUFFER_SIZE
+#warning USART2_BUFFER_SIZE not defined, using 120 Bytes buffer. This may result in lost characters
+#endif
+
+
 /**
  * @brief USART2 interrupt handler for receiving data.
  *
  * Handles incoming data on USART2 and stores it in the global interrupt buffer.
+ * The terminator is added after every new character received so that the parsers (e. g. strchr) can parse the data correctly.
  *
  * @warning If the buffer is full, new data is ignored
  */
@@ -524,12 +588,19 @@ void USART2_IRQHandler(void)
       if (USART2->SR & USART_SR_RXNE && usart2BufferIndex < USART2_BUFFER_SIZE)
          {
             usart2BufferRX[usart2BufferIndex++] = USART2->DR & 0xFF; // Ensure 8-bit data
-            usart2BufferRX[usart2BufferIndex] = '\0';
+            usart2BufferRX[usart2BufferIndex] = '\0'; // Append terminator
          }
 #endif
 
    }
 
+/**
+ * @brief DMA1 Stream 6 interrupt handler
+ *
+ * Handles DMA1 Stream 6 interrupts, which at the moment is the tranfer complete flag
+ *
+ * @warning Not working yet
+ */
 void DMA1_Stream6_IRQHandler(void)
    {
       // Check if transfer complete flag is set
