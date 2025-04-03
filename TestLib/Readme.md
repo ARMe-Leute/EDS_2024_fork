@@ -4,6 +4,7 @@ Inhaltsverzeichnis
 1. Ueberblick
 2. Neuerungen
 3. Sonstiges
+4. MCAL Fehlerbehandlung
 
 Ueberblick: 
 Als Grundlage der Library wurde die bereits 2023 erstellte Version verwendet. Dabei wurden die bestehenden Funktionen ueberarbeitet und angepasst. 
@@ -70,6 +71,58 @@ Im Rahmen der Bearbeitung wurden zu Testzwecken die Dateien visualisation.c und 
 Dies war nicht Teil der Aufgabe, aber es ist relevant, dies zu erwaehnen. Das erstellte Testprogramm konnte nicht vollstaendig fertiggestellt werden, 
 jedoch wurden die einzelnen Funktionen getestet und sind funktionsfaehig. Bei der Erstellung der Kommentare in der Datei SensorTOF.h wurde Kuenstliche Intelligenz verwendet. 
 Die Ergebnisse wurden auf ihre Korrektheit ueberprueft. In der abgegebenen ZIP-Datei befinden sich ausserdem alle verwendeten Bibliotheken sowie das erstellte Testprogramm.
+
+MCAL Fehlerbehandlung:
+Wenn das Testprogramm des TOF Sensors gestartet wird und ein Sensor gefunden wird, haengt sich das Programm bei initlialiserung auf. 
+
+Ueberfunktion: TOF_init(TOFSENS)
+main.c   Zeile: 471 
+
+Bei detaillierter Analyse laesst sich das Problem auf das Unterprogramm eingrenzen. 
+
+Funktion: TOF_init_device(TOFSENS)
+SensorTOF.c    Zeile. 897
+
+Wenn man weiter debuggt, laesst sich das Problem noch genaue lokalisieren.  
+
+Funktion: TOF_perform_ref_calibration(TOFSENS)
+SensorTOF.c    Zeile. 786
+
+In der Funktion treten dann unterschieldiche Kommunikationsfehler auf. 
+
+Funktion: bool TOF_perform_ref_calibration(TOFSensor_t* TOFSENS)
+SensorTOF.c    Zeile. 707
+
+Funktion: TOF_perform_single_ref_calibration(TOFSENS, TOF_CALIBRATION_TYPE_VHV)  funktioniert nach aktuellem Stand. 
+
+Funktion: TOF_perform_single_ref_calibration(TOFSENS, TOF_CALIBRATION_TYPE_PHASE) bleibt dann in der Schleife innerhalb haengen. 
+
+Genaue Funktionsbezeichnung: bool TOF_perform_single_ref_calibration(TOFSensor_t* TOFSENS, TOF_calibration_type_t calib_type)
+SensorTOF.c    Zeile. 620
+
+Schleife in der sich die Kommunikation dann schlussendlich aufhaengt:
+
+    /* Wait for interrupt */
+
+    uint8_t interrupt_status = 0;
+    do {
+        success = i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_RESULT_INTERRUPT_STATUS, &interrupt_status);
+    } while (success == I2C_OK && ((interrupt_status & 0x07) == 0));
+    if (success != I2C_OK)
+    {
+        return false;
+    }
+
+SensorTOF.c    Zeile. 653 bis 662
+
+Wie wurde getestet ? 
+TOF angeschlossen an den PC, im Debug Modus gestartet.
+Resume bis main.c Z.471 ab hier step by step mit Step into, jede einzelne Funktion durch probiert. 
+! Fehler tritt auch auf wenn man das Programm "normal" auf den Controller hochlaedt. 
+! Fehler tritt auch auf wenn verschiedene Kommunikationsgeschwindigkeiten verwendet werden. 
+Wenn der TOF nicht angeschlossen wurde tritt kein Fehler auf, da er nicht initialisiert wurde. 
+ 
+
 
 Autor:
 Philipp Roehlke 
