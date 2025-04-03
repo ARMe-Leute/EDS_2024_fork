@@ -115,6 +115,9 @@ Schleife in der sich die Kommunikation dann schlussendlich aufhaengt:
 
 SensorTOF.c    Zeile. 653 bis 662
 
+Der Befehl i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_RESULT_INTERRUPT_STATUS, &interrupt_status) 
+funktioniert soweit auch noch, jedoch kann kein Ergebnis im Register gelesen werden, was zum abschließen dieser Schleife führt. 
+
 Wie wurde getestet ? 
 TOF angeschlossen an den PC, im Debug Modus gestartet.
 Resume bis main.c Z.471 ab hier step by step mit Step into, jede einzelne Funktion durch probiert. 
