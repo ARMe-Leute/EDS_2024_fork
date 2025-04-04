@@ -163,14 +163,12 @@ int main(void)
       uint32_t BluetoothFetchTimer = 0UL; // Timer for calling bluetoothFetchBuffer().
       uint32_t BluetoothLogTimer = 0UL;
       uint32_t Button = 0UL; // Timer for button polling, helps with debouncing.
-      uint32_t ButtonLEDOff = 0UL;        // Timer for turning off the button LED.
 
       uint32_t *timerList[] =
          {
                &BluetoothTimer,
                &BluetoothFetchTimer,
                &Button,
-               &ButtonLEDOff,
                &ST7735_Timer,
                &BluetoothLogTimer
          };
@@ -560,11 +558,6 @@ int main(void)
 
                }
 
-            if (isSystickExpired(ButtonLEDOff))
-               {
-
-                  setRotaryColor(LED_BLACK); // Turn off LED after timeout.
-               }
 
          }
    }
