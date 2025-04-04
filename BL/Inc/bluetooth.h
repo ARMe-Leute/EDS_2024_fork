@@ -243,7 +243,11 @@ extern volatile char usart2BufferRX[USART2_BUFFER_SIZE + 1];
  * The buffer size is calculated regarding the maximum log size, which is 20 bytes (printed int64) plus 1 byte (semicolon)
  * times the number of entrys (::BLUETOOTH_NUMBER_OF_LOG_ENTRYS) plus two bytes (\\n and \0).
  */
-extern volatile char usart2BufferTX[(20 + 1) * BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2];
+#if ((20 + 1) * BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2) > USART2_MIN_TX_BUFFER_SIZE
+extern volatile char usart2BufferTX[ (20 + 1) * BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2];
+#else
+extern volatile char usart2BufferTX[USART2_MIN_TX_BUFFER_SIZE];
+#endif
 
 /**
  * @brief Index for the USART2 buffer.
