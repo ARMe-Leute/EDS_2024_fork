@@ -101,6 +101,7 @@ uint32_t ST7735_Timer = 0UL;
  */
 MenuManager_t menuManager_1;
 
+MenuPage_t mainMenu;
 /**
  *  @brief Features Menu Page
  *
@@ -126,7 +127,7 @@ MenuEntry_t bluetoothEntry =
    {
    .color = tft_WHITE, .title = "Bluetooth", .type = Page, .page = &bluetoothPage
    };
-MenuEntry_t subfeld4 =
+MenuEntry_t bluetoothConfigEntry =
    {
    .color = tft_WHITE, .title = "BL Config", .type = Page, .page = &bluetoothConfigPage
    };
@@ -150,7 +151,6 @@ MenuEntry_t setBaudRateEntry =
    {
    .color = tft_GREEN, .title = "Set BAUD", .type = Entry, .page = NULL
    };
-MenuPage_t menuPage1;
 MenuEntry_t resetModulePage =
    {
    .color = tft_RED, .title = "Reset HM17", .type = Entry, .page = NULL
@@ -195,10 +195,10 @@ int main(void)
 
       int lastRotaryPosition = 0;
 
-      menuPage1.TL = &featuresEntry;
-      menuPage1.TR = &nestedEntry;
-      menuPage1.BL = &bluetoothEntry;
-      menuPage1.BR = &subfeld4;
+      mainMenu.TL = &featuresEntry;
+      mainMenu.TR = &nestedEntry;
+      mainMenu.BL = &bluetoothEntry;
+      mainMenu.BR = &bluetoothConfigEntry;
 
       featuresPage.TL = &feldBack;
       featuresPage.BL = &textEntry;
@@ -221,7 +221,7 @@ int main(void)
       bluetoothConfigPage.TR = &resetModulePage;
 
       menuManager_1.activeMode = Page;
-      menuManager_1.activePage = &menuPage1;
+      menuManager_1.activePage = &mainMenu;
 
       MAIN_MODE mode = MAIN_INIT;
 
