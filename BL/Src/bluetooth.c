@@ -44,7 +44,7 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
             BluetoothModule->messageBufferTX = txMessageBuffer;
 
             // Clear the buffer during initialization
-            for (uint32_t i = 0; i < USART2_BUFFER_SIZE; i++)
+            for (uint32_t i = 0; i < USART2_RX_BUFFER_SIZE; i++)
                {
                   BluetoothModule->messageBufferRX[i] = '\0';
                }
@@ -587,7 +587,7 @@ DMA_Stream_TypeDef* dmacGetStreamFromUSARTTX(USART_TypeDef *usart)
 void USART2_IRQHandler(void)
    {
 #ifndef debugMode
-      if (USART2->SR & USART_SR_RXNE && usart2BufferIndex < USART2_BUFFER_SIZE)
+      if (USART2->SR & USART_SR_RXNE && usart2BufferIndex < USART2_RX_BUFFER_SIZE)
          {
             usart2BufferRX[usart2BufferIndex++] = USART2->DR & 0xFF; // Ensure 8-bit data
             usart2BufferRX[usart2BufferIndex] = '\0'; // Append terminator

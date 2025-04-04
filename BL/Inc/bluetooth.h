@@ -35,7 +35,9 @@
  *
  * @warning If the size is set too small, received data may be lost.
  */
-#define USART2_BUFFER_SIZE (2*1200*BLUETOOTH_FETCH_TIME)/1000
+#define USART2_RX_BUFFER_SIZE (2*1200*BLUETOOTH_FETCH_TIME)/1000
+
+#define USART2_MIN_TX_BUFFER_SIZE 128
 
 #define BLUETOOTH_TRANSMIT_TIME 100 //ms
 
@@ -202,7 +204,7 @@ typedef struct BluetoothModule
       const USART_TypeDef *usart; /**< USART instance for communication. */
       int8_t initStatus; /**< Initialization status of the module. */
       BluetoothBaudRate_t baudRate; /**< Baud rate for the USART. */
-      char messageBufferRX[USART2_BUFFER_SIZE + 1]; /**< Buffer for received messages. */
+      char messageBufferRX[USART2_RX_BUFFER_SIZE + 1]; /**< Buffer for received messages. */
       volatile char *messageBufferTX;
       uint16_t available; /**< Number of available characters in the buffer. */
       uint8_t counter; /**< Counter for internal operations, e.g., retry count. */
@@ -234,7 +236,7 @@ extern DMA_Stream_TypeDef* dmacGetStreamFromUSARTTX(USART_TypeDef *usart);
  *
  * This buffer is used by the USART2_IRQHandler() to store incoming characters
  */
-extern volatile char usart2BufferRX[USART2_BUFFER_SIZE + 1];
+extern volatile char usart2BufferRX[USART2_RX_BUFFER_SIZE + 1];
 
 /**
  * @brief Global UART2 TX buffer

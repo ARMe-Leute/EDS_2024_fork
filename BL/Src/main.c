@@ -57,7 +57,7 @@ bool timerTrigger;
  *
  * This buffer is filled by the ::USART2_IRQHandler
  */
-volatile char usart2BufferRX[USART2_BUFFER_SIZE+1];
+volatile char usart2BufferRX[USART2_RX_BUFFER_SIZE+1];
 
 /**
  * @brief Global UART2RX buffer Index
