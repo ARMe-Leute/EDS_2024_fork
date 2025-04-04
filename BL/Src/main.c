@@ -306,9 +306,8 @@ int main(void)
                      }
                   if (isSystickExpired(BluetoothLogTimer))
                      {
-                        rotaryPosition = getRotaryPosition();
-                        //   bluetoothCreateLog(&HM17_1);
-                        // systickSetTicktime(&BluetoothLogTimer, 1000);
+                        rotaryPosition = getRotaryPosition(); //Get the position to log
+
                         switch (HM17_1.mode)
                            {
                            case bluetoothConfigure:
