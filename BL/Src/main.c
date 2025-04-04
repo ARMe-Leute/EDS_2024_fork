@@ -162,13 +162,13 @@ int main(void)
       uint32_t BluetoothTimer = 0UL;      // Timer for Bluetooth setup steps.
       uint32_t BluetoothFetchTimer = 0UL; // Timer for calling bluetoothFetchBuffer().
       uint32_t BluetoothLogTimer = 0UL;
-      uint32_t Button = 0UL; // Timer for button polling, helps with debouncing.
+      uint32_t MenuTimer = 0UL;              // Timer for updating the menu
 
       uint32_t *timerList[] =
          {
                &BluetoothTimer,
                &BluetoothFetchTimer,
-               &Button,
+               &MenuTimer,
                &ST7735_Timer,
                &BluetoothLogTimer
          };
@@ -234,7 +234,7 @@ int main(void)
                   HM17_1.initStatus = -10;
                   initRotaryPushButton();
                   initRotaryPushButtonLED();
-                  systickSetTicktime(&Button, 20);
+                  systickSetTicktime(&MenuTimer, 20);
 
                   spiInit();
                   tftInitR(INITR_REDTAB);
@@ -333,9 +333,9 @@ int main(void)
                            }
                      }
 
-                  if (isSystickExpired(Button))
+                  if (isSystickExpired(MenuTimer))
                      {
-                        systickSetTicktime(&Button, 200);
+                        systickSetTicktime(&MenuTimer, 200);
                         switch (menuManager_1.activeMode)
                            {
                            case Page:
@@ -524,7 +524,7 @@ int main(void)
                                     if (active == true)
                                        {
                                           status = bluetoothResetModule(&HM17_1);
-                                          systickSetTicktime(&Button, 1100);
+                                          systickSetTicktime(&MenuTimer, 1100);
 
                                        }
                                     if (status == BluetoothFinish)
