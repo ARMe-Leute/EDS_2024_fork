@@ -253,12 +253,7 @@ int main(void)
                               systickUpdateTimerList((uint32_t*) timerList, arraySize);
 
                            }
-                        /*if (isSystickExpired(BluetoothTimer))
-                         {
-                         initStatus = bluetoothInit(&HM17_1, USART2, bluetoothBaud_9600,
-                         usart2BufferTX);
-                         systickSetTicktime(&BluetoothTimer, BLUETOOTH_SETUP_TIME);
-                         }*/
+
                         if (isSystickExpired(BluetoothFetchTimer))
                            {
                               bluetoothFetchBuffer(&HM17_1);
