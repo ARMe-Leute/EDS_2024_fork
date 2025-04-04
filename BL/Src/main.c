@@ -72,6 +72,9 @@ volatile uint16_t usart2BufferIndex = 0;
  * The buffer where the TX message is stored. The message is then send via DMA over USART2.
  * The buffer size is calculated regarding the maximum log size, which is 20 bytes (printed int64) plus 1 byte (semicolon)
  * times the number of entrys (::BLUETOOTH_NUMBER_OF_LOG_ENTRYS) plus two bytes (\\n and \0).
+ *
+ * If the calculated size is smaller than ::BLUETOOTH_NUMBER_OF_LOG_ENTRYS, this size is used instead.
+ *
  */
 #if ((20 + 1) * BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2) > USART2_MIN_TX_BUFFER_SIZE
 volatile char usart2BufferTX[ (20 + 1) * BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2];
@@ -96,72 +99,145 @@ volatile bool usart2TXComplete;
  */
 uint32_t ST7735_Timer = 0UL;
 
+/**************************************** Menu pages and entrys ****************************************/
+
 /**
  * @brief The menu manager
  */
 MenuManager_t menuManager_1;
 
+/**
+ * @brief The main menu
+ */
 MenuPage_t mainMenu;
+
 /**
  *  @brief Features Menu Page
  *
  *  Menu Page showing features such as showing static text, updating a number or calling a function
  */
 MenuPage_t featuresPage;
+
+/**
+ * @brief Menu page demonstraiting the nested capabilities
+ */
 MenuPage_t nestedPage;
+
+/**
+ * @brief Stuff dedicated to test bluetooth
+ */
 MenuPage_t bluetoothPage;
+
+/**
+ * @brief Stuff for configuring the module
+ */
 MenuPage_t bluetoothConfigPage;
+
+/**
+ * @brief "BACK" field
+ * @warning You have to include this to be able to go back
+ */
 MenuEntry_t feldBack =
    {
    .color = tft_WHITE, .title = "BACK", .type = Back, .page = NULL
    };
+
+/**
+ * @brief Entry for ::featuresPage
+ */
 MenuEntry_t featuresEntry =
    {
    .color = tft_WHITE, .title = "Features", .type = Page, .page = &featuresPage
    };
+
+/**
+ * @brief Entry for ::nestedPage
+ */
 MenuEntry_t nestedEntry =
    {
    .color = tft_WHITE, .title = "Nested", .type = Page, .page = &nestedPage
    };
+
+/**
+ * @brief Entry for ::bluetoothPage
+ */
 MenuEntry_t bluetoothEntry =
    {
    .color = tft_WHITE, .title = "Bluetooth", .type = Page, .page = &bluetoothPage
    };
+
+/**
+ * @brief Entry for ::bluetoothConfigPage
+ */
 MenuEntry_t bluetoothConfigEntry =
    {
    .color = tft_WHITE, .title = "BL Config", .type = Page, .page = &bluetoothConfigPage
    };
+
+/**
+ * @brief Page showing static text
+ */
 MenuEntry_t textEntry =
    {
    .color = tft_BLUE, .title = "Text", .type = Entry, .page = NULL
    };
+
+/**
+ * @brief Page showing the rotButton position
+ */
 MenuEntry_t counterEntry =
    {
    .color = tft_RED, .title = "Counter", .type = Entry, .page = NULL
    };
+
+/**
+ * @brief Check HM17 status
+ *
+ * This page sends "AT" and checks if the answer is "OK"
+ */
 MenuEntry_t getStatusEntry =
    {
    .color = tft_GREEN, .title = "GetStatus", .type = Entry, .page = NULL
    };
+
+/**
+ * @brief Send a predefined string over UART
+ *
+ * This is helpfull for debugging the serial interface or check if a connected device can receive something.
+ */
 MenuEntry_t sendTestStringEntry =
    {
    .color = tft_GREEN, .title = "SendString", .type = Entry, .page = NULL
    };
+
+/**
+ * @brief Set the BAUD rate of HM17
+ *
+ * For detailed description, see ::bluetoothSetBaudRate
+ */
 MenuEntry_t setBaudRateEntry =
    {
    .color = tft_GREEN, .title = "Set BAUD", .type = Entry, .page = NULL
    };
+
+/**
+ * @brief Reset the HM17
+ * @warning Not guaranteed to work
+ *
+ * For detailed description, see ::bluetoothResetModule
+ */
 MenuEntry_t resetModulePage =
    {
    .color = tft_RED, .title = "Reset HM17", .type = Entry, .page = NULL
    };
 
+/**************************************** main() ****************************************/
 int main(void)
    {
 
       uint32_t BluetoothTimer = 0UL;      // Timer for Bluetooth setup steps.
       uint32_t BluetoothFetchTimer = 0UL; // Timer for calling bluetoothFetchBuffer().
-      uint32_t BluetoothLogTimer = 0UL;
+      uint32_t BluetoothLogTimer = 0UL;   // Timer for sending the Log
       uint32_t MenuTimer = 0UL;              // Timer for updating the menu
 
       uint32_t *timerList[] =
@@ -177,22 +253,25 @@ int main(void)
       BluetoothModule_t HM17_1;   // Bluetooth module instance.
       int initStatus = -100;
 
+      /*** Logging ***/
       uint32_t runtime = 0;
       int32_t rotaryPosition = 0;
 
-      strcpy(HM17_1.logEntrys[0].name, "Runtime");
-      HM17_1.logEntrys[0].type = BluetoothLogEntryType_uint32_t;
-      HM17_1.logEntrys[0].data.uint32_ptr = &runtime;
+      strcpy(HM17_1.logEntrys[0].name, "Runtime"); //Assign the name,
+      HM17_1.logEntrys[0].type = BluetoothLogEntryType_uint32_t; //datatype
+      HM17_1.logEntrys[0].data.uint32_ptr = &runtime; // and pointer to variable
 
       strcpy(HM17_1.logEntrys[1].name, "Rot-Pos");
       HM17_1.logEntrys[1].type = BluetoothLogEntryType_int32_t;
       HM17_1.logEntrys[1].data.int32_ptr = &rotaryPosition;
 
-      HM17_1.TXComplete = &usart2TXComplete;
+      HM17_1.TXComplete = &usart2TXComplete; // Assign the complete sign to the HM17 instance
       *(HM17_1.TXComplete) = true;
 
-      int lastRotaryPosition = 0;
+      int lastRotaryPosition = 0; //Stores the last Rotary position
 
+
+      /**************************************** Menu pages ****************************************/
       mainMenu.TL = &featuresEntry;
       mainMenu.TR = &nestedEntry;
       mainMenu.BL = &bluetoothEntry;
@@ -270,16 +349,16 @@ int main(void)
                      }
 
                   mode = MAIN_LOOP; // Transition to main loop
-                  showMenuPage(&menuManager_1, (MenuPosition_t) 0);
+                  showMenuPage(&menuManager_1, (MenuPosition_t) 0); //Show the menu page
                   break;
 
                   // Main application loop
                case MAIN_LOOP:
                   if (timerTrigger == true)
                      {
-                        setRotaryColor(LED_RED);
+                        setRotaryColor(LED_RED); //LED is toggled to make sure timing is correct
                         systickUpdateTimerList((uint32_t*) timerList, arraySize);
-                        runtime++;
+                        runtime++; //Increment the runtime to track the power-on time
                         setRotaryColor(LED_BLACK);
                      }
                   if (isSystickExpired(BluetoothFetchTimer))
@@ -310,10 +389,12 @@ int main(void)
 
                         switch (HM17_1.mode)
                            {
+                           // If the module is not connected, it is checked again after 5 seconds
                            case bluetoothConfigure:
                               systickSetTicktime(&BluetoothLogTimer, 5000);
                               break;
 
+                            // If a device is connected, the log is send and the timer is set to the log interval
                            case bluetoothTransmit:
                               bluetoothSendLog(&HM17_1);
                               systickSetTicktime(&BluetoothLogTimer, BLUETOOTH_TRANSMIT_TIME);
@@ -329,17 +410,29 @@ int main(void)
 
                   if (isSystickExpired(MenuTimer))
                      {
-                        systickSetTicktime(&MenuTimer, 200);
+                        systickSetTicktime(&MenuTimer, 200); // Set the standard timer time for the menu
                         switch (menuManager_1.activeMode)
                            {
                            case Page:
-
                               handleMenu(&menuManager_1);
                               break;
                            case Entry:
+                              /*
+                               * Here happens the handling of the entry pages.
+                               *
+                               * Each entry is in its own condition. In there it can do pretty much everything it likes to do.
+                               * If a higher (or lower) refresh time is needed, it can be done by setting systickSetTicktime again.
+                               *
+                               * It even is possible to not provide the possibility to go back to the menu page and stay in this entry.
+                               * This can be used e. g to only provide the menu while setting up the balancer.
+                               * Once it starts balancing it then shows only a stripped down menu to set the parameters with
+                               * as less delay as possible.
+                               */
                               if (menuManager_1.activeEntry == &textEntry)
                                  {
-                                    tftPrint((char*) "sdofihv", 50, 50, 0);
+                                    tftPrint((char*) "sdofihv", 50, 50, 0); // Just show some static text
+
+                                    // Go back to the menu after a button press
                                     if (getRotaryPushButton() == true)
                                        {
                                           menuManager_1.activeMode = Page;
@@ -546,6 +639,9 @@ int main(void)
                                        }
                                  }
                               break;
+                           case Back:
+                           default:
+                              break; //This should never happen
                            }
 
                      }

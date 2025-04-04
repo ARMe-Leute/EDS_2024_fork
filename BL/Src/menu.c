@@ -7,6 +7,11 @@
 
 #include <menu.h>
 
+/**
+ * @brief Draw a 4x4 grid
+ *
+ * Draw a 4 by 4 grid on the display to segment the  menu entrys
+ */
 void drawGrid()
    {
       tftDrawRect(0, 0, tftGetWidth() - 1, tftGetHeight() - 1, tft_WHITE);
@@ -14,6 +19,13 @@ void drawGrid()
       tftDrawRect(0, tftGetHeight() / 2, tftGetWidth(), tftGetHeight() / 2, tft_WHITE);
    }
 
+/**
+ * @brief Highlight a menu entry
+ *
+ * @param position The field to highlight
+ *
+ * Draws a yellow rectangle to highlight a grid element.
+ */
 void higlightEntry(MenuPosition_t position)
    {
       switch (position)
@@ -38,6 +50,14 @@ void higlightEntry(MenuPosition_t position)
 
    }
 
+/**
+ * @brief Get pointer to entry based on position
+ * @param manager Instance of ::MenuManager_t
+ * @param position The position from where to get the pointer
+ * @return Pointer to ::MenuEntry_t
+ *
+ * Get the pointer to a menu entry based on a position
+ */
 MenuEntry_t* getEntryFromPosition(MenuManager_t *manager, MenuPosition_t position)
    {
 
@@ -56,11 +76,27 @@ MenuEntry_t* getEntryFromPosition(MenuManager_t *manager, MenuPosition_t positio
 
          }
    }
+
+/**
+ * @brief Convert rotary position to menu position
+ * @param rotaryCounter The rotary position to convert
+ * @return menu position
+ *
+ * This functio converts an int coming from the rotary encoder to a menu position. Zero-crossing is not a problem.
+ */
 MenuPosition_t getMenuRotaryPosition(int rotaryCounter)
    {
       return ((uint16_t) rotaryCounter) % 4;
    }
 
+/**
+ * @brief Show the menu page
+ * @param manager Instance of ::MenuManager_t
+ * @param position entry to highlight
+ *
+ * Depending on the active mode either the entry page is shown or the menu page is shown.
+ * The title is printed in the specified color.
+ */
 void showMenuPage(MenuManager_t *manager, MenuPosition_t position)
    {
       tftFillScreen(tft_BLACK);
@@ -90,9 +126,16 @@ void showMenuPage(MenuManager_t *manager, MenuPosition_t position)
 
    }
 
+/**
+ * @brief Do menu stuff
+ * @param menuManager Instance of ::MenuManager_t
+ *
+ * Handles the menu control. If the rotary encoder is turned, the grid ist updated to highlight the new selected entry.
+ * If the button is pressed, the selected submenu or entry page is opend.
+ */
 void handleMenu(MenuManager_t *menuManager)
    {
-
+         // check if button wass turned since last check
       if (getMenuRotaryPosition(getRotaryPosition()) != menuManager->currentPosition)
          {
             menuManager->currentPosition = getMenuRotaryPosition(getRotaryPosition());
@@ -101,24 +144,26 @@ void handleMenu(MenuManager_t *menuManager)
          }
       if (getRotaryPushButton() == true)
          {
-
+               //The selected entry is a menu page
             if (getEntryFromPosition(menuManager, menuManager->currentPosition)->type == Page)
                {
                   getEntryFromPosition(menuManager, menuManager->currentPosition)->page->lastMenu =
-                        menuManager->activePage;
+                        menuManager->activePage; // set the last menu to be able to go back
                   menuManager->activePage = getEntryFromPosition(menuManager,
-                        menuManager->currentPosition)->page;
+                        menuManager->currentPosition)->page; // Set the new page as active
                }
+            //The selected entry is an entry
             else if (getEntryFromPosition(menuManager, menuManager->currentPosition)->type == Entry)
                {
                   menuManager->activeEntry = getEntryFromPosition(menuManager,
-                        menuManager->currentPosition);
-                  menuManager->activeMode = Entry;
+                        menuManager->currentPosition); // Set the selected entry as active
+                  menuManager->activeMode = Entry; // Change mode to entry
                }
+            // The selected menu is the back button
             else
                {
                   menuManager->activePage = menuManager->activePage->lastMenu;
                }
-            showMenuPage(menuManager, menuManager->currentPosition);
+            showMenuPage(menuManager, menuManager->currentPosition); //Render the result
          }
    }
