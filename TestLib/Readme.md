@@ -12,10 +12,10 @@ Uebersichtlichkeit verbessert und Verbesserungen am Code vorgenommen. Allgemein 
 
 Neuerungen: 
 1. Die genauen Aenderungen enthalten ein neues Registersystem in dem alle Adressen einsortiert sind. 
-2. Außerdem sind Standardbefehle fuer die Initialisierung in einem Enum gespeichert. 
+2. Ausserdem sind Standardbefehle fuer die Initialisierung in einem Enum gespeichert. 
 3. Die Adressen von moeglicherweise mehreren TOF Sensoren lassen sich abaendern. 
 4. Die Funktionsbeschreibungen in der SensorTOF.h wurden ueberarbeitet. 
-5. Funktion bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range) wurde überarbeit (Speicherung und Verarbeitung von Daten)
+5. Funktion bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range) wurde ueberarbeit (Speicherung und Verarbeitung von Daten)
 6. Funktionsbeschreibung in der SensorTOF.c wurden ergaenzt. 
 
 
