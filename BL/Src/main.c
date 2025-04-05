@@ -378,18 +378,7 @@ int main(void)
                         bluetoothFetchBuffer(&HM17_1);
                         if (HM17_1.available > 0)
                            {
-                              if (strstr(HM17_1.messageBufferRX, (char*) "OK+CONN") != NULL)
-                                 {
-                                    HM17_1.messageBufferTX[0] = '\0';
-                                    bluetoothSendLogTitle(&HM17_1);
-                                    HM17_1.mode = bluetoothTransmit;
-                                    HM17_1.available = 0;
-                                 }
-                              if (strstr(HM17_1.messageBufferRX, (char*) "OK+LOST") != NULL)
-                                 {
-                                    HM17_1.mode = bluetoothConfigure;
-                                    HM17_1.available = 0;
-                                 }
+                              bluetoothParser(&HM17_1);
                            }
 
                         systickSetTicktime(&BluetoothFetchTimer,

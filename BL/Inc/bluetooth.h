@@ -219,6 +219,7 @@ typedef struct BluetoothModule
 extern int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *USART,
       BluetoothBaudRate_t baudRate, volatile char txMessageBuffer[]);
 extern bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule);
+extern void bluetoothParser(BluetoothModule_t *BluetoothModule);
 extern int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK);
 extern int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state);
 

@@ -555,6 +555,34 @@ bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule)
             return false;
          }
    }
+/**
+ * @brief Parsing incoming bluetooth
+ * @param BluetoothModule Pointer to the ::BluetoothModule instance.
+ *
+ * This function parses data coming from the bluetooth module. As reply to AT commands are treated seperatly,
+ * only commands (and the connection status) are parsed here.
+ */
+void bluetoothParser(BluetoothModule_t *BluetoothModule)
+   {
+      if (strstr(BluetoothModule->messageBufferRX, (char*) "OK+CONN") != NULL)
+         {
+            BluetoothModule->messageBufferTX[0] = '\0';
+            BluetoothModule->bluetoothSendLogTitle = true;
+            BluetoothModule->mode = bluetoothTransmit;
+            BluetoothModule->available = 0;
+         }
+      if (strstr(BluetoothModule->messageBufferRX, (char*) "OK+LOST") != NULL)
+         {
+            BluetoothModule->mode = bluetoothConfigure;
+            BluetoothModule->available = 0;
+         }
+      if (BluetoothModule->mode = bluetoothTransmit)
+         {
+            /*
+             * Do command parsing here
+             */
+         }
+   }
 
 /**
  * @brief Return DMA stream for given USART TX
