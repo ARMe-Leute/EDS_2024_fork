@@ -564,12 +564,12 @@ int main(void)
                                     //status = bluetoothSetBaudRate(&HM17_1, bluetoothBaud_9600, status);
                                     //tftPrintInt(status, 0, 70, 0);
 
-                                    if (getRotaryPushButton() == true)
+                                  /*  if (getRotaryPushButton() == true)
                                        {
                                           menuManager_1.activeMode = Page;
                                           showMenuPage(&menuManager_1,
                                                 menuManager_1.currentPosition);
-                                       }
+                                       }*/
                                  }
                               else if (menuManager_1.activeEntry == &sendTestStringEntry)
                                  {
