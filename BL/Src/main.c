@@ -556,7 +556,7 @@ int main(void)
 
                                        }
 
-                                    if (getRotaryPushButton() == true)
+                                    if (getRotaryPushButton() == true && menuStep != 3)
                                        {
                                           menuStep++;
                                        }
