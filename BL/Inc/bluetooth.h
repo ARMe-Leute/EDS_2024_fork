@@ -249,6 +249,7 @@ extern volatile char usart2BufferRX[USART2_RX_BUFFER_SIZE + 1];
 extern volatile char usart2BufferTX[ (20 + 1) * BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2];
 #else
 extern volatile char usart2BufferTX[USART2_MIN_TX_BUFFER_SIZE];
+#warning Using USART2_MIN_TX_BUFFER_SIZE as buffer size
 #endif
 
 /**
