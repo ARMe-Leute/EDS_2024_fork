@@ -1,6 +1,8 @@
 # Bluetooth Library Using MCAL
 
-This library facilitates communication between an STM32-Nucleo-F401RE and an HM17 Bluetooth module. Currently, it only supports requesting the `getStatus` command.
+This library facilitates communication between an STM32-Nucleo-F401RE and an HM17 Bluetooth module. The most basic AT commands are implemented, so a device can connect to the module. It is possible to log variables to your target device (See [here](#logging)). A basic structure to parse commands is provided.
+
+@warning DONT TRUST THE DATASHEET. The datasheet is a good starting point. However, some things are confusing or partially straight up false (e. g. The reply to `AT+ADDR?`should be `OK+ADDR:12345678910`but in reality it is `OK+Get:12345678910`). If something doesn't work right away, play a bit with the parameters.
 
 ---
 
@@ -149,7 +151,7 @@ To be able to read and send messages via bluetooth from the HM17, you need to co
 After the setup is done, you should be able to connect to the HM17 module.
 
 ```console
-First scan for available devices, the HM17 should show up with the name DSD-Tech.
+First scan for available devices, the HM17 should show up with the name `DSD TECH`.
 # ble-scan
 
 You then can connect to it with the MAC-Address
@@ -192,6 +194,9 @@ If input is to long it is written over the buffer limit -> bad
 
 ## Button problem
 Somtimes the botton keeps beeing registerd as pressed, which results in jumping over steps
+
+## RX Buffer
+Instead of fetching the buffer in a fixed interval, save a pointer to the original buffer (Like the TX buffer). To indicate the that either no new chars where received or a message was terminated witn `\n` you could simply use a bool.
 
 ---
 This documentation was reviewed and improved with the assistance of ChatGPT.
