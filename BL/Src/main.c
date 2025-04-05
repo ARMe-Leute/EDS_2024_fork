@@ -315,6 +315,9 @@ int main(void)
          {
             switch (mode)
                {
+               default:
+                  mode = MAIN_INIT;
+                  break;
                // Initialization mode
                case MAIN_INIT:
                   systickInit(SYSTICK_1MS); // Configure SysTick with a 1 ms interval.
