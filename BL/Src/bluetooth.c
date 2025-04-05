@@ -128,6 +128,16 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
 
    }
 
+/**
+ * @brief Reset the bluetooth module
+ * @param BluetoothModule Pointer to the ::BluetoothModule instance.
+ * @return ::BluetoothFinish on success, or a ::BluetoothError code on failure.
+ *
+ * Reset the bluetooth module by holding the pin A4 high for a brief time.
+ * @warning It is possible that this doesn't work and you have to play a bit with the pins and times.
+ * The datasheet is unfortunally not really helpfull as it stats some contradicting infos and some straight up make no sense.
+ * The only thing that is shure that after a reset you have to disconnect the power to the HM17 and restart it.
+ */
 int16_t bluetoothResetModule(BluetoothModule_t *BluetoothModule)
    {
 

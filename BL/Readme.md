@@ -17,6 +17,21 @@ With each invocation, the function transitions to the next state. Return values 
 
 ---
 
+## Logging
+What can be done with logging functionality
+
+### Logging format
+How does the data get logged
+
+### Add a logging entry
+How to add a logging entry and how to configure it
+
+### Limitations
+
+Char limit, interval limit, size depending on BAUD rate (not automatically recognized)
+
+---
+
 ## Debug Mode
 
 The library includes a debug mode to facilitate debugging and failure testing. When using a debugger, `::USART2_IRQHandler()` may not behave as expected: halting the code will only capture the first character from the USART line, preventing full string reception. To address this, enable debug mode, which allows string injection into the buffer to simulate received strings.
@@ -125,7 +140,24 @@ Adjust the following elements:
 
 ---
 
-## Configuring the Board
+## Setup
+
+### Configuring BLE
+
+To be able to read and send messages via bluetooth from the HM17, you need to connect your device to the module. The HM17 unfortunatly doesn't provide a virtual serial port, so you need additional software. In our case, [ble-serial](https://github.com/Jakeler/ble-serial) worked very well. It should work on Linux, Mac and Windows, though only Windows has been tested. As stated in the Readme, Windows needs additional setup steps. It was a bit trickey to get it working, but it finally worked. What I think was the important key was to download the .exe and not the .zip. 
+
+After the setup is done, you should be able to connect to the HM17 module.
+
+```console
+First scan for available devices, the HM17 should show up with the name DSD-Tech.
+# ble-scan
+
+You then can connect to it with the MAC-Address
+# ble-serial -d 01:23:45:67:89:10
+```
+You then can connect your favorite terminal application to the shown serial port. We recommend using [hterm](https://www.der-hammer.info/pages/terminal.html) as it is feature rich and provides to control many parameters easily. It also can simply save the output to a file. This lets you save the log directly to a csv file.
+
+### Configuring the Board
 
 To use the module with USART2, adjust the solder bridges on the board's underside as follows:
 
@@ -134,6 +166,32 @@ To use the module with USART2, adjust the solder bridges on the board's undersid
 
 @note This disables communication over the Virtual COM port. You may leave `SB13` intact to monitor outgoing messages.
 
+# Menu library
+
+Library for simply creating nested menus
+
+## Adding a menu page
+How to add a menu page
+
+## Adding an entry page
+How to add an entry page
+
+# Known Issues and possible improvements
+## Reset HM17 module
+Inconsistency in datasheet
+
+## Setting BAUD rate
+
+After a restart HM17 stops working properly
+
+## ::usart2TXComplete not working
+Interrupt doesn't fire, so it isn't working
+
+## ::dmacUsartSendString does no input checking
+If input is to long it is written over the buffer limit -> bad
+
+## Button problem
+Somtimes the botton keeps beeing registerd as pressed, which results in jumping over steps
 
 ---
 This documentation was reviewed and improved with the assistance of ChatGPT.
