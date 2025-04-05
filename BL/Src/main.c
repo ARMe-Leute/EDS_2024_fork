@@ -623,15 +623,17 @@ int main(void)
                                           if (menuStatus == BluetoothFinish)
                                              {
 
-                                          tftPrintColor((char*) "Done", 0, 60, tft_GREEN);
+                                                tftPrintColor((char*) "Done", 0, 60, tft_GREEN);
 
-                                          active = false;
-                                       }
-                                    else if (status > 0)
-                                       {
-                                          tftPrintColor((char*) "Error:", 0, 60, tft_RED);
-                                          tftPrintInt(status, 0, 70, 0);
-                                          active = false;
+                                                menuActive = false;
+                                             }
+                                          else if (menuStatus > 0)
+                                             {
+                                                tftPrintColor((char*) "Error:", 0, 60, tft_RED);
+                                                tftPrintInt(menuStatus, 0, 70, 0);
+                                                menuActive = false;
+                                             }
+
                                        }
 
                                  }
