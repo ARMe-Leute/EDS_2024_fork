@@ -42,6 +42,7 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
             BluetoothModule->counter = 0;
             BluetoothModule->state = 0;
             BluetoothModule->messageBufferTX = txMessageBuffer;
+            BluetoothModule->mode = bluetoothConfigure;
 
             // Clear the buffer during initialization
             for (uint32_t i = 0; i < USART2_RX_BUFFER_SIZE; i++)
