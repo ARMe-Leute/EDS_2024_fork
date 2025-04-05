@@ -408,7 +408,15 @@ int main(void)
 
                             // If a device is connected, the log is send and the timer is set to the log interval
                            case bluetoothTransmit:
-                              bluetoothSendLog(&HM17_1);
+                              if (HM17_1.bluetoothSendLogTitle == true)
+                                 {
+                                    HM17_1.bluetoothSendLogTitle = false;
+                                    bluetoothSendLogTitle(&HM17_1);
+                                 }
+                              else
+                                 {
+                                    bluetoothSendLog(&HM17_1);
+                                 }
                               systickSetTicktime(&BluetoothLogTimer, BLUETOOTH_TRANSMIT_TIME);
 
                               break;

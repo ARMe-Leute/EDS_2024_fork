@@ -212,6 +212,7 @@ typedef struct BluetoothModule
       volatile bool *TXComplete; /**< TX data finished transmitting @warning Not working yet*/
       bluetoothMode_t mode; /**< Connection status*/
       BluetoothLogEntry_t logEntrys[BLUETOOTH_NUMBER_OF_LOG_ENTRYS]; /**< Array containing all log entrys*/
+      bool bluetoothSendLogTitle; /**< Indicates that the log title needs to be send*/
 
    } BluetoothModule_t;
 
