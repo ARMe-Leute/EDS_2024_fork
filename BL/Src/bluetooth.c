@@ -571,10 +571,6 @@ DMA_Stream_TypeDef* dmacGetStreamFromUSARTTX(USART_TypeDef *usart)
          }
    }
 
-#ifndef USART2_BUFFER_SIZE
-#warning USART2_BUFFER_SIZE not defined, using 120 Bytes buffer. This may result in lost characters
-#endif
-
 
 /**
  * @brief USART2 interrupt handler for receiving data.
