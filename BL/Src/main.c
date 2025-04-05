@@ -300,6 +300,15 @@ int main(void)
       menuManager_1.activeMode = Page;
       menuManager_1.activePage = &mainMenu;
 
+
+      //This are variables used by various entry pages
+      bool menuActive = false;
+      int menuStatus = -127;
+      bool menuReply = false;
+      uint8_t menuStep = 0;
+      uint8_t menuFromBaud = 0;
+      uint8_t menuToBaud = 0;
+
       MAIN_MODE mode = MAIN_INIT;
 
       for (;;)
@@ -454,66 +463,64 @@ int main(void)
                                  }
                               else if (menuManager_1.activeEntry == &getStatusEntry)
                                  {
-                                    static int status = -127;
-                                    static bool reply;
-                                    static bool active = false;
+                                  //  static int status = -127;
+                                 //   static bool reply;
+                                    //static bool active = false;
 
                                     if (getRotaryPushButton() == true)
                                        {
-                                          if (status >= 0)
+                                          if (menuStatus >= 0)// routine is finished, reset all variables
                                              {
-                                                status = -127;
-                                                active = false;
+                                                menuStatus = -127;
+                                                menuActive = false;
                                                 menuManager_1.activeMode = Page;
                                                 showMenuPage(&menuManager_1,
                                                       menuManager_1.currentPosition);
                                              }
                                           else
                                              {
-                                                active = true;
+                                                menuActive = true;
                                                 tftPrint((char*) "Getting Status...", 0, 50, 0);
                                              }
 
                                        }
-                                    if (active == true)
+                                    if (menuActive == true)
                                        {
-                                          status = bluetoothGetStatus(&HM17_1, &reply);
+                                          menuStatus = bluetoothGetStatus(&HM17_1, &menuReply);
 
                                        }
-                                    if (status == BluetoothFinish && reply == true)
+                                    if (menuStatus == BluetoothFinish && menuReply  == true)
                                        {
 
                                           tftPrintColor((char*) "OK", 0, 60, tft_GREEN);
 
-                                          active = false;
+                                          menuActive = false;
                                        }
-                                    else if (status > 0)
+                                    else if (menuStatus > 0) //There was an error
                                        {
                                           tftPrintColor((char*) "Error:", 0, 60, tft_RED);
-                                          tftPrintInt(status, 0, 70, 0);
-                                          active = false;
+                                          tftPrintInt(menuStatus, 0, 70, 0);
+                                          menuActive = false;
                                        }
 
                                  }
                               else if (menuManager_1.activeEntry == &setBaudRateEntry)
                                  {
-                                    static uint8_t step = 0;
-                                    static uint8_t fromBaud = 0;
-                                    static uint8_t toBaud = 0;
 
-                                    switch (step)
+
+                                    switch (menuStep)
                                        {
                                        case 0:
                                           tftPrint((char*) "From:", 0, 50, 0);
                                           tftPrint((char*) "To:", tftGetWidth() / 2, 50, 0);
-                                          step++;
+                                          menuStep++;
                                           break;
                                        case 1:
                                           if (lastRotaryPosition != getRotaryPosition())
                                              {
                                                 lastRotaryPosition = getRotaryPosition();
-                                                fromBaud = (uint8_t) getRotaryPosition() % 9;
-                                                tftPrintInt(bluetoothBaudToInt(fromBaud), 0, 65, 0);
+                                                menuFromBaud = (uint8_t) getRotaryPosition() % 9;
+                                                tftPrintInt((int)bluetoothBaudToInt(menuFromBaud), 0, 65, 0);
                                              }
                                           break;
 
@@ -521,18 +528,18 @@ int main(void)
                                           if (lastRotaryPosition != getRotaryPosition())
                                              {
                                                 lastRotaryPosition = getRotaryPosition();
-                                                toBaud = (uint8_t) getRotaryPosition() % 9;
-                                                tftPrintInt(
+                                                menuToBaud = (uint8_t) getRotaryPosition() % 9;
+                                                tftPrintInt( (int)
                                                       bluetoothBaudToInt(getRotaryPosition() % 9),
                                                       tftGetWidth() / 2, 65, 0);
                                              }
                                           break;
 
-                                       case 3:
-                                          int16_t reply = bluetoothSetBaudRate(&HM17_1, fromBaud,
-                                                toBaud);
+                                       case 3: //Actually change the rate
+                                           menuStatus = bluetoothSetBaudRate(&HM17_1, menuFromBaud,
+                                                menuToBaud);
 
-                                          if (reply == 0)
+                                          if (menuStatus == 0)
                                              {
                                                 tftPrint("Done", 0, 70, 0);
                                                 step++;
@@ -542,7 +549,7 @@ int main(void)
                                           break;
 
                                        default:
-                                          step = 0;
+                                          menuStep = 0;
                                           menuManager_1.activeMode = Page;
                                           showMenuPage(&menuManager_1,
                                                 menuManager_1.currentPosition);
@@ -551,7 +558,7 @@ int main(void)
 
                                     if (getRotaryPushButton() == true)
                                        {
-                                          step++;
+                                          menuStep++;
                                        }
 
                                     //status = bluetoothSetBaudRate(&HM17_1, bluetoothBaud_9600, status);
@@ -566,19 +573,19 @@ int main(void)
                                  }
                               else if (menuManager_1.activeEntry == &sendTestStringEntry)
                                  {
-                                    static bool active = false;
+                                  //  static bool active = false;
                                     if (getRotaryPushButton() == true)
                                        {
-                                          if (active == false)
+                                          if (menuActive == false) //Send string after first press
                                              {
                                                 dmacUsartSendString(&HM17_1,
                                                       "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-                                                active = true;
+                                                menuActive = true;
                                                 tftPrint((char*) "Sending test string", 0, 50, 0);
                                              }
                                           else
                                              {
-                                                active = false;
+                                                menuStatus = false;
                                                 menuManager_1.activeMode = Page;
                                                 showMenuPage(&menuManager_1,
                                                       menuManager_1.currentPosition);
@@ -588,34 +595,33 @@ int main(void)
                                  }
                               else if (menuManager_1.activeEntry == &resetModulePage)
                                  {
-                                    static int status = -127;
-                                    static bool reply;
-                                    static bool active = false;
+                                    //static int status = -127;
+                                 //   static bool reply;
+                                  //  static bool active = false;
 
                                     if (getRotaryPushButton() == true)
                                        {
-                                          if (status >= 0)
+                                          if (menuStatus >= 0)// finished
                                              {
-                                                status = -127;
-                                                active = false;
+                                                menuStatus = -127;
+                                                menuActive = false;
                                                 menuManager_1.activeMode = Page;
                                                 showMenuPage(&menuManager_1,
                                                       menuManager_1.currentPosition);
                                              }
                                           else
                                              {
-                                                active = true;
+                                                menuActive = true; //Allow the procedure to start
                                              }
 
                                        }
-                                    if (active == true)
+                                    if (menuActive == true)
                                        {
-                                          status = bluetoothResetModule(&HM17_1);
+                                          menuStatus = bluetoothResetModule(&HM17_1);
                                           systickSetTicktime(&MenuTimer, 1100);
 
-                                       }
-                                    if (status == BluetoothFinish)
-                                       {
+                                          if (menuStatus == BluetoothFinish)
+                                             {
 
                                           tftPrintColor((char*) "Done", 0, 60, tft_GREEN);
 
