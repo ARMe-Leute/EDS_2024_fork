@@ -453,9 +453,10 @@ int main(void)
 
                                        }
                                  }
+                              /**************************************** Counter ****************************************/
                               else if (menuManager_1.activeEntry == &counterEntry)
                                  {
-                                    tftPrintInt(getRotaryPosition(), 50, 50, 0);
+                                    tftPrintInt(getRotaryPosition(), 50, 50, 0); // Show the rotary position
                                     if (getRotaryPushButton() == true)
                                        {
                                           menuManager_1.activeMode = Page;
@@ -464,6 +465,7 @@ int main(void)
 
                                        }
                                  }
+                              /**************************************** getStatus ****************************************/
                               else if (menuManager_1.activeEntry == &getStatusEntry)
                                  {
                                   //  static int status = -127;
@@ -480,7 +482,7 @@ int main(void)
                                                 showMenuPage(&menuManager_1,
                                                       menuManager_1.currentPosition);
                                              }
-                                          else
+                                          else // start getting status
                                              {
                                                 menuActive = true;
                                                 tftPrint((char*) "Getting Status...", 0, 50, 0);
@@ -507,6 +509,7 @@ int main(void)
                                        }
 
                                  }
+                              /**************************************** set Baud rate ****************************************/
                               else if (menuManager_1.activeEntry == &setBaudRateEntry)
                                  {
 
@@ -518,16 +521,17 @@ int main(void)
                                           tftPrint((char*) "To:", tftGetWidth() / 2, 50, 0);
                                           menuStep++;
                                           break;
-                                       case 1:
+                                       case 1: // Get the from rate
                                           if (lastRotaryPosition != getRotaryPosition())
                                              {
+                                                // If the rotary position changed, use the new value
                                                 lastRotaryPosition = getRotaryPosition();
                                                 menuFromBaud = (uint8_t) getRotaryPosition() % 9;
                                                 tftPrintInt((int)bluetoothBaudToInt(menuFromBaud), 0, 65, 0);
                                              }
                                           break;
 
-                                       case 2:
+                                       case 2: // Get to rate
                                           if (lastRotaryPosition != getRotaryPosition())
                                              {
                                                 lastRotaryPosition = getRotaryPosition();
@@ -545,10 +549,11 @@ int main(void)
                                           if (menuStatus == 0)
                                              {
                                                 tftPrint("Done", 0, 70, 0);
-                                                step++;
+                                                menuStatus=-127;
+                                                menuStep++;
                                              }
                                           break;
-                                       case 4:
+                                       case 4: //Hang here till the button is pressed again
                                           break;
 
                                        default:
@@ -558,7 +563,7 @@ int main(void)
                                                 menuManager_1.currentPosition);
 
                                        }
-
+                                    //Go to the next step after a button press. 3->4 is done automatically
                                     if (getRotaryPushButton() == true && menuStep != 3)
                                        {
                                           menuStep++;
@@ -574,6 +579,7 @@ int main(void)
                                                 menuManager_1.currentPosition);
                                        }*/
                                  }
+                              /**************************************** send test string ****************************************/
                               else if (menuManager_1.activeEntry == &sendTestStringEntry)
                                  {
                                   //  static bool active = false;
@@ -586,7 +592,7 @@ int main(void)
                                                 menuActive = true;
                                                 tftPrint((char*) "Sending test string", 0, 50, 0);
                                              }
-                                          else
+                                          else // And close on second press
                                              {
                                                 menuStatus = false;
                                                 menuManager_1.activeMode = Page;
@@ -596,6 +602,7 @@ int main(void)
                                        }
 
                                  }
+                              /**************************************** reset module ****************************************/
                               else if (menuManager_1.activeEntry == &resetModulePage)
                                  {
                                     //static int status = -127;
@@ -640,7 +647,7 @@ int main(void)
                                        }
 
                                  }
-                              else
+                              else // If the entry page hasn't been specified, go back to the menu after a button press
                                  {
                                     if (getRotaryPushButton() == true)
                                        {
