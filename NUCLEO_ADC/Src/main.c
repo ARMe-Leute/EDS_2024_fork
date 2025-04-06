@@ -21,13 +21,14 @@
 
 extern bool timerTrigger = false;  								// Necessary for the mcalTimer
 static uint8_t colorcode = 0;									// Variable used for cycling through the colors
-
+/*
 GPIO_TypeDef 			*port  = GPIOA;							// Port which is used for the analog signal
 PIN_NUM_t				*pin   = PIN0;							// Pin which is used for the analog signal
 ADC_TypeDef				*adc   = ADC1;							// ADC which is used
 ADC_RESOLUTION_t 		resolution = ADC_RES_12BIT;				// Resolution of the ADC
-ADC_CHANNEL_t chnList[] = { ADC_CHN_0 };						// List of ADC channels in a sequence
+ADC_CHANNEL_t chnList[] = { ADC_CHN_0 , ADC_CHN_15};						// List of ADC channels in a sequence
 size_t         listSize = sizeof(chnList) / sizeof(chnList[0]);	// Calculate number of channel-list elements
+*/
 
 /* Depending on the Voltage the Color of the RotaryPushButton is changed using the RotaryPushButton library */
 void setColorDependingOnValue(int caseNumber){
@@ -72,12 +73,32 @@ void setColorDependingOnValue(int caseNumber){
     }
 }
 
+void initADC(analogCh_t *configADC){
+	configADC->adc = ADC1;
+	configADC->chnResolution = ADC_RES_12BIT;
+	configADC->chnList[0] = ADC_CHN_0;
+	configADC->chnListSize = 1;
+	configADC->tempEnable = 1;
+}
 
 /* Main Code of the Example Code */
 int main(void) {
-    ADCInit(port, *pin, adc, chnList, listSize, resolution);	// Initialization of the GPIO and the ADC
-    while (1) {
-        colorcode = getBatteryMilliVolts(adc) * 0.003333;			// receiving the voltage and expanding it to the 11 cases of setColorDependingOnValue()
-        setColorDependingOnValue(colorcode);					// Change the color depending on the colorcode value
-    }
+	analogCh_t myADC;
+	initADC(&myADC);
+    ADCInit(&myADC);	// Initialization of the GPIO and the ADC
+    while(1)
+    {
+    	result[0] = adcGetConversionResult(myADC->adc);
+		uint16_t raw = ;
+		float tempC   = ;
+
+		// Hier könnten Sie den Wert z. B. auf ein Display ausgeben
+		// oder über UART senden, LED ansteuern etc.
+		// ...
+		setColorDependingOnValue(colorcode);					// Change the color depending on the colorcode value
+
+		// Einfache Pause
+		for (volatile int i=0; i<1000000; i++) { /* Warten */ }
+	}
+    return 0;
 }

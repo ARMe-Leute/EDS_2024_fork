@@ -19,14 +19,6 @@
 #define halfBatVolt  (float)14
 #define emptyBatVolt (float)13
 
-typedef struct adc
-{
-	ADC_TypeDef *adc;
-	ADC_RESOLUTION_t resolution;
-	float AnalogVoltage;
-	ADC_CHANNEL_t chnList[];
-}adcAnalog_t;
-
 typedef enum
 {
 	okBat = 0,
@@ -56,7 +48,8 @@ const int VSense = 24;
 /* Functions of BatteryVoltage.c */
 extern void ADCInit(GPIO_TypeDef *port, PIN_NUM_t pin, ADC_TypeDef *adc, ADC_CHANNEL_t chnList[], size_t listSize, ADC_RESOLUTION_t resolution);
 extern uint16_t getBatteryMilliVolts(ADC_TypeDef *adc);
-
+InitADCChannels(analogCh_t adc);
+extern void InitADCGPIOPin(GPIO_TypeDef *port, PIN_NUM_t pin);
 extern void adcActivate(void);
 extern BatStat_t getBatVolt(analogCh_t* pADChn, size_t listSize);
 

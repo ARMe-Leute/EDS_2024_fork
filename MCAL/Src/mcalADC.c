@@ -1223,11 +1223,11 @@ bool adcIsConversionFinished(ADC_TypeDef *adc)
  *
  * @note
  *
-
+*/
 void activateTemperatureSensor()
 {
-	ADC1->CCR |= ADC_CCR_TSVREFE;
+	ADC_CCR |= ADC_CCR_TSVREFE;
 }
-*/
+
 
 // EOF
