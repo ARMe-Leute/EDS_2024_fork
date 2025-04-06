@@ -1,7 +1,6 @@
 #include <Wire.h>
 #include <MPU6050.h>
 #include <FreqCount.h>
-#include <avr/wdt.h>
 
 MPU6050 mpu;
 
@@ -66,7 +65,7 @@ void setup()
   //Serial.begin(9600);
   Wire.begin();
   mpu.initialize();
-  FreqCount.begin(100);
+  FreqCount.begin(50);
 
   //MPU Verbindung überprüfen
   if (mpu.testConnection()) 
@@ -105,7 +104,7 @@ void getCurrentVelocity(balancer_t bala)
 {
   if(FreqCount.available) 
   {
-    freq = FreqCount.read()*10; // Zählintervall = 100ms,Umrechnung in Hz
+    freq = FreqCount.read()*20; // Zählintervall = 50ms,Umrechnung in Hz
     bala.currentVelocity = freq * velocityFactor;
   }
 }
