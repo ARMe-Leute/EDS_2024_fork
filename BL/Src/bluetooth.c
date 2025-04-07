@@ -17,11 +17,13 @@
 #include <bluetooth.h>
 
 /**
- * @brief Initializes the Bluetooth module.
+ * @brief Initializes the Bluetooth module with non-blocking implementation.
  *
- * Configures USART and GPIO settings to establish communication
- * with the Bluetooth module. The initialization progresses through multiple states
- * to ensure a non-blocking implementation.
+ * Establishes communication with the HM17 Bluetooth module by configuring:
+ * - USART interface for serial communication
+ * - GPIO pins for control signals
+ * - DMA for efficient data transfer
+ * - Interrupt handlers for asynchronous operation
  *
  * @param BluetoothModule Pointer to the ::BluetoothModule instance.
  * @param usart Pointer to the USART instance, e.g., USART2.
@@ -130,14 +132,17 @@ int8_t bluetoothInit(BluetoothModule_t *BluetoothModule, USART_TypeDef *usart,
    }
 
 /**
- * @brief Reset the bluetooth module
- * @param BluetoothModule Pointer to the ::BluetoothModule instance.
- * @return ::BluetoothFinish on success, or a ::BluetoothError code on failure.
+ * @brief Resets the Bluetooth module to factory defaults.
  *
- * Reset the bluetooth module by holding the pin A4 high for a brief time.
- * @warning It is possible that this doesn't work and you have to play a bit with the pins and times.
- * The datasheet is unfortunally not really helpfull as it stats some contradicting infos and some straight up make no sense.
- * The only thing that is shure that after a reset you have to disconnect the power to the HM17 and restart it.
+ * Performs a hardware reset of the HM17 module by controlling the PIO0 pin
+ * according to the module's reset sequence requirements.
+ *
+ * @param BluetoothModule Pointer to the module configuration structure
+ * @return BluetoothFinish on successful reset, or appropriate error code
+ *
+ * @warning The HM17 datasheet contains contradictory information about the reset procedure.
+ * If this reset fails, you might need to adjust the timing or pins.
+ * After a reset, disconnect and reconnect power to the HM17 module before continuing.
  */
 int16_t bluetoothResetModule(BluetoothModule_t *BluetoothModule)
    {
@@ -159,13 +164,21 @@ int16_t bluetoothResetModule(BluetoothModule_t *BluetoothModule)
    }
 
 /**
- * @brief Handles the state transitions for the Bluetooth state machine.
+ * @brief Manages the Bluetooth state machine for non-blocking operations.
  *
- * Executes commands by transitioning between the states definded in ::BluetoothState.
+ * This is the core of the non-blocking implementation, allowing complex multi-step
+ * procedures to execute without halting the main program. It handles state transitions
+ * based on the current state and specified operation, executing each step in sequence
+ * across multiple function calls.
+ *
+ * Each procedure (e.g., getting status, setting baud rate) is divided into steps
+ * that can be executed incrementally. The function returns after performing a single
+ * step, allowing other operations to occur between steps.
  *
  * @param BluetoothModule Pointer to the ::BluetoothModule instance.
- * @param state Initial state for processing. This must be the first step of a procedure.
- * @return Next ::BluetoothState, or a ::BluetoothError code on failure.
+ * @param state Initial state for the requested procedure (must be a state divisible by 10)
+ * @return Next state value for continuation, ::BluetoothFinish on completion,
+ *         or appropriate error code on failure
  */
 int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
    {
@@ -254,6 +267,12 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
 /**
  * @brief Sends the "AT" command to the Bluetooth module.
  *
+ * Sends the "AT" command to the HM17 module and checks for an "OK" response,
+ * confirming that the module is properly connected and responsive.
+ *
+ * This function utilizes the state machine architecture to send the command
+ * and process the response asynchronously.
+ *
  * @param BluetoothModule Pointer to the ::BluetoothModule instance.
  * @param isOK Pointer to a boolean indicating the command result.
  * @return ::BluetoothFinish on success, or a ::BluetoothError code on failure.
@@ -291,15 +310,18 @@ int16_t bluetoothGetStatus(BluetoothModule_t *BluetoothModule, bool *isOK)
 /**
  * @brief Set the BAUD rate of the bluetooth module
  *
- * Set the BAUD rate of the module. In the procedure the BAUD rate of the microcontroller is first set to ::fromBAUD.
- * At this speed the command for the new speed is sent. Then the microcontroller is switched to the new address.
+ * This function changes the baud rate of both the microcontroller's USART interface
+ * and the HM17 module itself. It follows a three-step process:
+ * 1. First, configures the USART to communicate at the current baud rate (::fromBaud)
+ * 2. Then sends the command to change the module's baud rate to the target value (::toBaud)
+ * 3. Finally, reconfigures the USART to match the new baud rate
  *
- * @warning While teststing, switching the BAUD rate resulted in strange behavior after restarting the HM17. Somehow resetting it got it working again,
- * but I don't know exactly what action resetted it.
+ * @warning Changing baud rates may cause communication issues after module restart.
+ * If problems occur, try resetting the module to restore proper communication.
  *
  * @param BluetoothModule Pointer to the ::BluetoothModule instance.
- * @param fromBAUD The BAUD rate at which the command is send
- * @param toBAUD The desired BAUD rate
+ * @param fromBaud Current baud rate enum value for initial communication
+ * @param toBaud Target baud rate enum value to set
  * @return ::BluetoothFinish on success, or a ::BluetoothError code on failure.
  */
 int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBaud, uint8_t toBaud)
@@ -332,14 +354,21 @@ int16_t bluetoothSetBaudRate(BluetoothModule_t *BluetoothModule, uint8_t fromBau
    }
 
 /**
- * @brief Send a string over UART with DMA
+ * @brief Transmits a string via USART using DMA
+ *
+ * Uses Direct Memory Access (DMA) to send data to the USART peripheral,
+ * freeing the CPU to perform other tasks during transmission. This function
+ * configures the DMA controller to transfer data from the specified buffer
+ * to the USART data register automatically.
+ *
  * @param BluetoothModule Pointer to the ::BluetoothModule instance.
- * @param data The string to be send
- * @return ::BluetoothFinish on success, ::BluetoothTXBusy when previous transmission isn't finished
+ * @param data Null-terminated string to transmit
+ * @return ::BluetoothFinish on successful transmission start, ::BluetoothTXBusy if previous transmission is still in progress
  *
- * @warning ATM it is not checked, if the TX buffer is large enough. The string to be send MUST be smaller
+ * @warning The function does not verify if the destination buffer can hold
+ * the entire string. The caller must ensure that data length does not exceed
+ * the buffer size defined in the configuration.
  *
- * For more details about the process, have a look at R. Jesse, STM32: ARM-Mikrocontroller programmieren für Embedded Systems: das umfassende Praxisbuch. Frechen: mitp, 2021.
  */
 BluetoothError_t dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *data)
    {
@@ -361,9 +390,12 @@ BluetoothError_t dmacUsartSendString(BluetoothModule_t *BluetoothModule, char *d
    }
 
 /**
- * @brief Convert the BAUD rate from ::BluetoothBaudRate to an int
- * @param baudRate The BAUD rate to convert
- * @return The BAUD as an int
+ * @brief Converts baud rate enumeration values (::BluetoothBaudRate) to their actual integer rates.
+ *
+ * Translates the internal enumeration values defined in ::BluetoothBaudRate_t
+ * to the corresponding numerical baud rate values needed for USART configuration.
+ * @param baudRate Enumeration value representing the desired baud rate
+ * @return Actual integer baud rate value (e.g., 9600, 115200), or 0 if invalid
  */
 uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate)
    {
@@ -394,10 +426,14 @@ uint32_t bluetoothBaudToInt(BluetoothBaudRate_t baudRate)
    }
 
 /**
- * @brief Send variable names of log entrys
+ * @brief Transmits headers for logged data variables.
  *
- * The title of all logged variables are send, separated with a semicolon and terminated with a newline.
- * This is esentially for the outputted csv file.
+ * Prepares and sends a CSV-formatted header line containing the names of all
+ * variables that will be logged. This provides column headers for the data
+ * that will be sent through subsequent calls to ::bluetoothSendLog.
+ *
+ * The headers are semicolon-separated (;) and terminated with a newline,
+ * making the output directly compatible with CSV format.
  *
  * @param BluetoothModule Pointer to the ::BluetoothModule instance.
  */
@@ -414,17 +450,26 @@ void bluetoothSendLogTitle(BluetoothModule_t *BluetoothModule)
    }
 
 /**
- * @brief Create a log and send it
+ * @brief Formats and transmits log data for all registered variables.
  *
- * This function iterates over all log entrys in ::BluetoothModule::logEntrys[], prints the variables to the ::BluetoothModule::messageBufferTX
- * and then sends it. The values are seperated with a semicolon and terminated with a newline-character. This makes it easy to save the raw transmitted
- * log to a csv file that can then further be proccessed (Separator: ';', Decimal separator: '.').
+ * Creates a CSV-formatted line containing the current values of all variables
+ * registered in the logEntrys array. Each value is converted to a string
+ * representation according to its data type, and values are separated by
+ * semicolons (;) with a newline terminator.
  *
- * @note The magic number 22 comes from the comes from the maximum length a (u)int64_t has in printed form (which is 21) plus the terminator
- * @warning The function does not check if the pointer is a nullpointer. If the pointer doesn't contain anything, it should just output nonesense.
+ * Supports multiple data types including boolean, integers of various sizes,
+ * floating point values, characters, and strings.
  *
- * @warning There are no checks that make sure that snprintf() went well. As the return value is casted to uint, if an error happend,
- * the next entry is written somwhere into the memory.
+ * @note The magic number 22 is derived from the maximum length of a formatted 64-bit integer (21 characters) plus
+ * the null terminator (`\0`). This ensures sufficient space for the largest possible value representation in decimal form.
+ *
+ * @warning This function assumes all pointers in logEntrys are valid. Null
+ * pointers for string types are handled safely, but other types may cause
+ * unexpected behavior if invalid.
+ *
+ * @warning The return value of `snprintf()` is not checked for errors. If an error occurs during formatting, the cast to `uint16_t`
+ * may result in invalid memory writes, potentially corrupting data or causing undefined behavior. This issue arises because
+ * `snprintf()` returns a negative value on failure, which is incorrectly treated as an unsigned offset.
  *
  * @param BluetoothModule Pointer to the ::BluetoothModule instance.
  * @return Number of send bytes
@@ -514,12 +559,18 @@ uint16_t bluetoothSendLog(BluetoothModule_t *BluetoothModule)
    }
 
 /**
- * @brief Transfers data from the global USART buffer to the module's buffer.
+ * @brief Transfers received data from the global interrupt buffer to the module buffer.
  *
- * The transfer is completed if either no new characters are received since the last fetch or there is a newline character.
+ * Safely copies data from the global USART receive buffer (filled by the interrupt
+ * handler) to the module's internal message buffer. This transfer is performed
+ * when either:
+ * - No new characters have been received since the last check, indicating
+ *   the transmission has paused or completed
+ * - A newline character is detected, indicating a complete message
  *
  * @param BluetoothModule Pointer to the ::BluetoothModule instance.
- * @return True if data transfer is complete, false otherwise.
+ * @return true if data was transferred and processing can continue,
+ *         false if transfer was not performed (waiting for more data)
  */
 bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule)
    {
@@ -556,11 +607,20 @@ bool bluetoothFetchBuffer(BluetoothModule_t *BluetoothModule)
          }
    }
 /**
- * @brief Parsing incoming bluetooth
+ * @brief Processes incoming messages from the Bluetooth module.
+ *
+ * Analyzes the content of the received buffer to identify and handle
+ * special commands and connection status changes. The function recognizes:
+ * - "OK+CONN" to detect when a Bluetooth connection is established
+ * - "OK+LOST" to detect when a connection is terminated
+ *
+ * When a connection is established, the module transitions to transmission mode
+ * and can begin sending log data.
+ *
  * @param BluetoothModule Pointer to the ::BluetoothModule instance.
  *
- * This function parses data coming from the bluetooth module. As reply to AT commands are treated seperatly,
- * only commands (and the connection status) are parsed here.
+ * @note Custom command parsing can be implemented in the bluetoothTransmit mode
+ * section to handle driving commands.
  */
 void bluetoothParser(BluetoothModule_t *BluetoothModule)
    {
@@ -573,10 +633,11 @@ void bluetoothParser(BluetoothModule_t *BluetoothModule)
          }
       if (strstr(BluetoothModule->messageBufferRX, (char*) "OK+LOST") != NULL)
          {
+            BluetoothModule->messageBufferTX[0] = '\0';
             BluetoothModule->mode = bluetoothConfigure;
             BluetoothModule->available = 0;
          }
-      if (BluetoothModule->mode = bluetoothTransmit)
+      if (BluetoothModule->mode == bluetoothTransmit)
          {
             /*
              * Do command parsing here
@@ -585,9 +646,21 @@ void bluetoothParser(BluetoothModule_t *BluetoothModule)
    }
 
 /**
- * @brief Return DMA stream for given USART TX
+ * @brief Maps USART peripherals to their corresponding DMA streams for transmission.
  *
- * @param usart The USART channel
+ * Provides the correct DMA stream for each supported USART peripheral based on
+ * the STM32F4 microcontroller's DMA channel mapping. This abstraction allows
+ * the library to work with multiple USART interfaces without requiring the user
+ * to know the specific hardware connections.
+ *
+ * Currently supports:
+ * - USART1 → DMA2_Stream7
+ * - USART2 → DMA1_Stream6
+ * - USART6 → DMA2_Stream6
+ *
+ * @param usart Pointer to the USART peripheral instance
+ *
+ * @return Pointer to the corresponding DMA stream, or NULL if unsupported
  */
 DMA_Stream_TypeDef* dmacGetStreamFromUSARTTX(USART_TypeDef *usart)
    {
@@ -612,12 +685,14 @@ DMA_Stream_TypeDef* dmacGetStreamFromUSARTTX(USART_TypeDef *usart)
 
 
 /**
- * @brief USART2 interrupt handler for receiving data.
+ * @brief USART2 interrupt service routine for handling received data.
  *
- * Handles incoming data on USART2 and stores it in the global interrupt buffer.
- * The terminator is added after every new character received so that the parsers (e. g. strchr) can parse the data correctly.
+ * Triggered when data is available in the USART receive data register.
+ * Reads the incoming byte and stores it in the global receive buffer,
+ * automatically appending a null terminator to maintain a valid string.
  *
- * @warning If the buffer is full, new data is ignored
+ * @warning If the buffer becomes full (reaches USART2_RX_BUFFER_SIZE),
+ * additional incoming data will be ignored to prevent buffer overflow.
  */
 void USART2_IRQHandler(void)
    {
@@ -632,9 +707,14 @@ void USART2_IRQHandler(void)
    }
 
 /**
- * @brief DMA1 Stream 6 interrupt handler
+ * @brief DMA1 Stream 6 interrupt service routine for handling transmit completion.
  *
- * Handles DMA1 Stream 6 interrupts, which at the moment is the tranfer complete flag
+ * Triggered when the DMA controller has finished transferring data from memory
+ * to the USART transmit register. This indicates that the transmission of a
+ * message has completed.
+ *
+ * Sets the usart2TXComplete flag to true, allowing the application to know
+ * when it's safe to begin another transmission.
  *
  * @warning Not working yet
  */

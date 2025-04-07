@@ -2,9 +2,17 @@
  * @file main.c
  * @brief  Demo program for the Bluetooth library.
  *
- * This program demonstrates the use of the Bluetooth library. After setup, pressing the button
- * on the rotary encoder lights it up blue while checking the HM17 module's status. If the status
- * is OK, the button lights up green; otherwise, it lights up red. After two seconds, the light turns off.
+ * This application showcases the Bluetooth library capabilities through an interactive
+ * menu-driven interface. Users can verify module status, configure settings, and test
+ * communication with the HM17 Bluetooth module. The interface uses a rotary encoder with
+ * integrated RGB LED for input and status indication, and an ST7735 TFT display for output.
+ *
+ * Key features include:
+ * - Real-time module status monitoring
+ * - Baud rate configuration
+ * - Test message transmission
+ * - Module reset functionality
+ * - Data logging and wireless transmission
  *
  * @author c0deberry
  * @author nrs00
@@ -45,7 +53,7 @@ typedef enum
    } MAIN_MODE;
 
 /**
- * @brief Timer trigger flag, updated in the SysTick interrupt handler.
+ * @brief USART2 receive buffer for Bluetooth communication
  *
  * This flag indicates that the base time interval has elapsed, and
  * all timers need to be updated.
@@ -55,7 +63,9 @@ bool timerTrigger;
 /**
  * @brief Global UART2 RX buffer
  *
- * This buffer is filled by the ::USART2_IRQHandler
+ * Stores incoming data from the HM17 Bluetooth module via USART2.
+ * Populated asynchronously by the ::USART2_IRQHandler interrupt service routine.
+ * Includes space for null terminator to facilitate string operations.
  */
 volatile char usart2BufferRX[USART2_RX_BUFFER_SIZE+1];
 
@@ -67,11 +77,13 @@ volatile char usart2BufferRX[USART2_RX_BUFFER_SIZE+1];
 volatile uint16_t usart2BufferIndex = 0;
 
 /**
- * @brief Global UART2 TX buffer
+ * @brief USART2 transmit buffer for outgoing Bluetooth messages
  *
- * The buffer where the TX message is stored. The message is then send via DMA over USART2.
- * The buffer size is calculated regarding the maximum log size, which is 20 bytes (printed int64) plus 1 byte (semicolon)
- * times the number of entrys (::BLUETOOTH_NUMBER_OF_LOG_ENTRYS) plus two bytes (\\n and \0).
+ * Stores data to be transmitted to the HM17 module via DMA-assisted USART2.
+ * Buffer size is dynamically calculated based on logging requirements:
+ * - Maximum 20 bytes per numeric value + 1 byte delimiter
+ * - Multiplied by number of log entries
+ * - Plus 2 bytes for newline and null terminator
  *
  * If the calculated size is smaller than ::BLUETOOTH_NUMBER_OF_LOG_ENTRYS, this size is used instead.
  *
@@ -102,7 +114,11 @@ uint32_t ST7735_Timer = 0UL;
 /**************************************** Menu pages and entrys ****************************************/
 
 /**
- * @brief The menu manager
+@brief Menu system manager
+ *
+ * Central controller for the menu hierarchy, tracking the current state
+ * including active page, selected entry, cursor position, and navigation mode.
+ * Coordinates all user interactions with the menu interface.
  */
 MenuManager_t menuManager_1;
 
@@ -134,8 +150,10 @@ MenuPage_t bluetoothPage;
 MenuPage_t bluetoothConfigPage;
 
 /**
- * @brief "BACK" field
- * @warning You have to include this to be able to go back
+ * @brief Navigation entry for menu hierarchical traversal
+ *
+ * Standard "BACK" option enabling users to return to parent menus.
+ * Must be included in all submenu pages to maintain proper navigation flow.
  */
 MenuEntry_t feldBack =
    {
@@ -235,10 +253,10 @@ MenuEntry_t resetModulePage =
 int main(void)
    {
 
-      uint32_t BluetoothTimer = 0UL;      // Timer for Bluetooth setup steps.
-      uint32_t BluetoothFetchTimer = 0UL; // Timer for calling bluetoothFetchBuffer().
-      uint32_t BluetoothLogTimer = 0UL;   // Timer for sending the Log
-      uint32_t MenuTimer = 0UL;              // Timer for updating the menu
+      uint32_t BluetoothTimer = 0UL;      // Commands to HM17 module
+      uint32_t BluetoothFetchTimer = 0UL; // Data retrieval from module
+      uint32_t BluetoothLogTimer = 0UL;   // Periodic data transmission
+      uint32_t MenuTimer = 0UL;              // User interface updates
 
       uint32_t *timerList[] =
          {
@@ -322,7 +340,8 @@ int main(void)
                case MAIN_INIT:
                   systickInit(SYSTICK_1MS); // Configure SysTick with a 1 ms interval.
 
-                  HM17_1.initStatus = -10;
+                  HM17_1.initStatus = -10; // Set initial status
+
                   initRotaryPushButton();
                   initRotaryPushButtonLED();
                   systickSetTicktime(&MenuTimer, 20);
@@ -366,27 +385,44 @@ int main(void)
 
                   // Main application loop
                case MAIN_LOOP:
+
+
                   if (timerTrigger == true)
                      {
-                        setRotaryColor(LED_RED); //LED is toggled to make sure timing is correct
+                        /*
+                         * System timer event processing
+                         * Updates all active timers and increments runtime counter
+                         * for data logging purposes. LED toggle provides visual
+                         * feedback of timer operation for diagnostic purposes.
+                         */
+                        setRotaryColor(LED_RED); // Visual timing indicator (diagnostic)
                         systickUpdateTimerList((uint32_t*) timerList, arraySize);
-                        runtime++; //Increment the runtime to track the power-on time
-                        setRotaryColor(LED_BLACK);
+                        runtime++; // Track total application uptime for logging
+                        setRotaryColor(LED_BLACK);// Complete timing indicator cycle
                      }
+
                   if (isSystickExpired(BluetoothFetchTimer))
                      {
+                        /*
+                         * Bluetooth communication data acquisition
+                         * Retrieves and processes incoming data from the HM17 module
+                         * at regular intervals. Parser interprets module responses and
+                         * updates application state accordingly.
+                         */
+
                         bluetoothFetchBuffer(&HM17_1);
-                        if (HM17_1.available > 0)
+                        if (HM17_1.available > 0) // Process only when data is available
                            {
-                              bluetoothParser(&HM17_1);
+                              bluetoothParser(&HM17_1); // Parse data
                            }
 
                         systickSetTicktime(&BluetoothFetchTimer,
                         BLUETOOTH_FETCH_TIME);
                      }
+
                   if (isSystickExpired(BluetoothLogTimer))
                      {
-                        rotaryPosition = getRotaryPosition(); //Get the position to log
+                        rotaryPosition = getRotaryPosition(); // Capture current encoder position
 
                         switch (HM17_1.mode)
                            {
@@ -479,7 +515,7 @@ int main(void)
                                                 showMenuPage(&menuManager_1,
                                                       menuManager_1.currentPosition);
                                              }
-                                          else // start getting status
+                                          else // Begin new status check operation
                                              {
                                                 menuActive = true;
                                                 tftPrint((char*) "Getting Status...", 0, 50, 0);
@@ -488,17 +524,20 @@ int main(void)
                                        }
                                     if (menuActive == true)
                                        {
+                                          //Execute Bluetooth status verification
                                           menuStatus = bluetoothGetStatus(&HM17_1, &menuReply);
 
                                        }
                                     if (menuStatus == BluetoothFinish && menuReply  == true)
                                        {
-
+                                          /*  Process status check results
+                                           * Displays appropriate feedback based on command outcome
+                                           */
                                           tftPrintColor((char*) "OK", 0, 60, tft_GREEN);
 
                                           menuActive = false;
                                        }
-                                    else if (menuStatus > 0) //There was an error
+                                    else if (menuStatus > 0) // Error condition
                                        {
                                           tftPrintColor((char*) "Error:", 0, 60, tft_RED);
                                           tftPrintInt(menuStatus, 0, 70, 0);
@@ -514,21 +553,27 @@ int main(void)
                                     switch (menuStep)
                                        {
                                        case 0:
+                                          /*
+                                           *  * Initialize baud rate configuration wizard
+                                           * Creates a two-column layout with labels for current
+                                           * and target baud rate values for intuitive selection
+                                           *
+                                           */
                                           tftPrint((char*) "From:", 0, 50, 0);
                                           tftPrint((char*) "To:", tftGetWidth() / 2, 50, 0);
                                           menuStep++;
                                           break;
-                                       case 1: // Get the from rate
+                                       case 1: // Select current baud rate
                                           if (lastRotaryPosition != getRotaryPosition())
                                              {
-                                                // If the rotary position changed, use the new value
+
                                                 lastRotaryPosition = getRotaryPosition();
                                                 menuFromBaud = (uint8_t) getRotaryPosition() % 9;
                                                 tftPrintInt((int)bluetoothBaudToInt(menuFromBaud), 0, 65, 0);
                                              }
                                           break;
 
-                                       case 2: // Get to rate
+                                       case 2:  // Select target baud rate
                                           if (lastRotaryPosition != getRotaryPosition())
                                              {
                                                 lastRotaryPosition = getRotaryPosition();
@@ -539,28 +584,29 @@ int main(void)
                                              }
                                           break;
 
-                                       case 3: //Actually change the rate
+                                       case 3: // Execute baud rate change
                                            menuStatus = bluetoothSetBaudRate(&HM17_1, menuFromBaud,
                                                 menuToBaud);
 
-                                          if (menuStatus == 0)
+                                          if (menuStatus == 0)// Successful configuration
                                              {
                                                 tftPrint("Done", 0, 70, 0);
                                                 menuStatus=-127;
-                                                menuStep++;
+                                                menuStep++;// Proceed to confirmation step
                                              }
                                           break;
-                                       case 4: //Hang here till the button is pressed again
+                                       case 4: // Wait for user acknowledgment
+                                          // User must confirm by pressing button to return to menu
                                           break;
 
-                                       default:
+                                       default:// Return to menu system
                                           menuStep = 0;
                                           menuManager_1.activeMode = Page;
                                           showMenuPage(&menuManager_1,
                                                 menuManager_1.currentPosition);
 
                                        }
-                                    //Go to the next step after a button press. 3->4 is done automatically
+                                    // Advances through configuration steps on button press, except during the actual rate change operation (step 3)
                                     if (getRotaryPushButton() == true && menuStep != 3)
                                        {
                                           menuStep++;
@@ -582,14 +628,14 @@ int main(void)
                                   //  static bool active = false;
                                     if (getRotaryPushButton() == true)
                                        {
-                                          if (menuActive == false) //Send string after first press
+                                          if (menuActive == false) //Send test pattern
                                              {
                                                 dmacUsartSendString(&HM17_1,
                                                       "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
                                                 menuActive = true;
                                                 tftPrint((char*) "Sending test string", 0, 50, 0);
                                              }
-                                          else // And close on second press
+                                          else // Second button press returns to menu
                                              {
                                                 menuStatus = false;
                                                 menuManager_1.activeMode = Page;
@@ -608,7 +654,7 @@ int main(void)
 
                                     if (getRotaryPushButton() == true)
                                        {
-                                          if (menuStatus >= 0)// finished
+                                          if (menuStatus >= 0)// Reset operation completed
                                              {
                                                 menuStatus = -127;
                                                 menuActive = false;
@@ -616,14 +662,15 @@ int main(void)
                                                 showMenuPage(&menuManager_1,
                                                       menuManager_1.currentPosition);
                                              }
-                                          else
+                                          else                       // Initiate new reset operation
                                              {
-                                                menuActive = true; //Allow the procedure to start
+                                                menuActive = true;
                                              }
 
                                        }
                                     if (menuActive == true)
                                        {
+                                          //Execute module reset sequence
                                           menuStatus = bluetoothResetModule(&HM17_1);
                                           systickSetTicktime(&MenuTimer, 1100);
 

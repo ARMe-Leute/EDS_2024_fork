@@ -1,10 +1,11 @@
 /**
  * @file menu.h
- * @brief Library for creating menus
+ * @brief Header file for creating and managing menu layouts on a graphical display.
  *
-
+ * This library provides functionality for defining menus
+ * on a screen using the ST7735 display driver and RotaryPushButton input handling.
  *
- * Copy this file to the Inc folder of your project.
+ * Copy this file to the `Inc` folder of your project.
  *
  * @author c0deberry
  * @author nrs00
@@ -22,60 +23,76 @@
 #include <RotaryPushButton.h>
 
 /**
- * @brief X Offset for the ::MenuTL
+ * @brief X-axis offset for the top-left corner of the menu grid (::MenuTL).
  *
- * +1 to account for the grid
+ * This offset adds 1 pixel to account for the grid alignment, ensuring proper
+ * positioning of menu elements within the defined layout.
  */
 #define TL_OFFSET_X (0+1)
 
 /**
- * @brief Y Offset for the ::MenuTL
+ * @brief Y-axis offset for the top-left corner of the menu grid (::MenuTL).
+ *
+ * No additional offset is applied here.
  */
 #define TL_OFFSET_Y (0)
 
 
 /**
- * @brief X Offset for the ::MenuTR
+ * @brief X-axis offset for the top-right corner of the menu grid (::MenuTR).
  *
- * Half screed width +1 to account for the grid
+ * The offset is calculated as half of the screen width plus 1 pixel to account
+ * for grid alignment. This ensures that elements in the top-right quadrant
+ * are properly positioned.
  */
 #define TR_OFFSET_X ((tftGetWidth() /2)+1)
 
 /**
- * @brief Y Offset for the ::MenuTR
+ * @brief Y-axis offset for the top-right corner of the menu grid (::MenuTR).
+ *
+ * No additional offset is applied here.
  */
 #define TR_OFFSET_Y (0)
 
 
 /**
- * @brief X Offset for the ::MenuBL
+ * @brief X-axis offset for the bottom-left corner of the menu grid (::MenuBL).
  *
- * +1 to account for the grid
+ * Similar to ::TL_OFFSET_X, this offset adds 1 pixel to account for grid alignment
+ * in the bottom-left quadrant of the screen.
  */
 #define BL_OFFSET_X (0+1)
 
 /**
- * @brief Y Offset for ::MenuBL
+ * @brief Y-axis offset for the bottom-left corner of the menu grid (::MenuBL).
+ *
+ * The offset is calculated as half of the screen height, positioning elements
+ * in the lower half of the display.
  */
 #define BL_OFFSET_Y (tftGetHeight() /2)
 
 
 /**
- * @brief X Offset for the ::MenuBR
+ * @brief X-axis offset for the bottom-right corner of the menu grid (::MenuBR).
  *
- * Half screed width +1 to account for the grid
+ * The offset is calculated as half of the screen width plus 1 pixel to account
+ * for grid alignment in the bottom-right quadrant of the screen.
  */
 #define BR_OFFSET_X ((tftGetWidth() /2)+1)
 
 /**
- * @brief Y Offset for ::MenuBR
+ * @brief Y-axis offset for the bottom-right corner of the menu grid (::MenuBR).
+ *
+ * The offset is calculated as half of the screen height, positioning elements
+ * in the lower half of the display.
  */
 #define BR_OFFSET_Y (tftGetHeight() /2)
 
 /**
- * @brief Available Menu positions
+ * @brief Enumeration of available menu positions.
  *
- * This typedef defines the available menu positions. The position are defined in landscape mode.
+ * This typedef defines the possible positions for menu entries on the screen.
+ * Positions are defined in landscape mode.
  */
 typedef enum MenuPosition
    {
@@ -86,69 +103,76 @@ typedef enum MenuPosition
    } MenuPosition_t;
 
 /**
- * @brief Type of menu entry
+ * @brief Enumeration of menu entry types.
  *
- * This type is used to determine wether a ::MenuEntry_t is menu page (::MenuPage_t) or an entry in a menu page (::MenuEntry_t).
- * ::Back is an menu entry that brings you to a menu page one layer above. It is a seperate type for code simplicity.
+ * This type is used to classify a ::MenuEntry_t as either a menu page (::Page),
+ * an entry within a menu page (::Entry), or a special back entry (::Back) that
+ * navigates to the previous menu layer. The ::Back type simplifies the code.
  *
- *  - A ::Page contains different entrys and is an overview over the options you have. An entry in that page can either be a entry page
- * (e. g. where you set a value) or a submenu where more settings are available.
- *  - An ::Entry opens a page where you e. g. modify a value.
+ * - **Page**: Represents a menu page containing multiple entries. It serves as an overview
+ *   of available options, which can lead to submenus or value-setting pages.
+ * - **Entry**: Represents a specific page where users can modify settings or values.
+ * - **Back**: A special entry that allows navigation to the parent menu page.
  */
 typedef enum MenuType
    {
-   Page,        /**< Entry is a menu page**/
-   Entry,       /**< Entry is a menu entry**/
-   Back         /**< Entry brings you one layer abov**/
+   Page,        /**< Entry represents a menu page */
+   Entry,       /**< Entry represents a menu item */
+   Back         /**< Entry navigates to the previous menu layer */
    } MenuType_t;
 
 
 typedef struct MenuPage MenuPage_t;
 
 /**
- * @brief Menu entry listed in a menu page
+ * @brief Structure representing a single menu entry.
  *
- * A menu entry can either be a Menu page (::Page) or a menu entry (::Entry), only one global instance of type ::Back is needed (If at all)
+ * A menu entry can either represent a submenu (::Page) or an actionable item (::Entry).
+ * If the type is ::Page, the `page` pointer stores the associated submenu. Only one global
+ * instance of type ::Back is required for navigation purposes (if used at all).
  */
 typedef struct MenuEntry
    {
-      uint16_t color; /**< The color in which the title is displayd*/
-      char *title; /**< The title of the entry*/
-      const MenuType_t type; /**< The type of the entry*/
-      MenuPage_t *page; /**< If the type is ::Page, a pointer to the page is stored here*/
+      uint16_t color; /**< Display color for the entry title */
+      char *title; /**< Title text of the menu entry */
+      const MenuType_t type; /**< Type of the menu entry (e.g., Page, Entry, Back) */
+      MenuPage_t *page; /**< Pointer to the submenu if the type is ::Page */
 
    } MenuEntry_t;
 
 /**
- * @brief Menu page containging the Entrys
+ * @brief Structure representing a menu page containing multiple entries.
  *
- * This struct stores a pointer to all entrys.
+ * This struct stores pointers to all entries within a specific menu page. Each
+ * position (Top Left, Top Right, Bottom Left, Bottom Right) must be filled with
+ * valid entries; otherwise, the program may hang when attempting to access an empty field.
  *
- * @warning Each position must be filled, otherwise the the programm hangs once you try to open an emty field.
+ * @warning Ensure all positions are initialized to avoid runtime errors.
  */
 typedef struct MenuPage
    {
-      MenuEntry_t *TL; /**< Menu item Top Left*/
-      MenuEntry_t *TR; /**< Menu item Top Right*/
-      MenuEntry_t *BL; /**< Menu item Bottom Left*/
-      MenuEntry_t *BR; /**< Menu item Bottom Right*/
-      MenuPage_t *lastMenu; /**< The last menu page (one layer above), used by the back field*/
+      MenuEntry_t *TL; /**< Entry at Top Left position */
+      MenuEntry_t *TR; /**< Entry at Top Right position */
+      MenuEntry_t *BL; /**< Entry at Bottom Left position */
+      MenuEntry_t *BR; /**< Entry at Bottom Right position */
+      MenuPage_t *lastMenu; /**< Pointer to the parent menu page (used by Back navigation) */
 
    } MenuPage_t;
 
 /**
- * @brief Stores important information
+ * @brief Structure managing active menu state and navigation.
  *
- * Here are pointers to thee current active menu page and  active entry are stored. Whether we currently are in a menu page or an entry page is
- * determined by ::activeMode. On leaving the active Entry page we go back to ::activePage.
- *
+ * This struct keeps track of important information such as the currently active
+ * menu page and entry. It also determines whether the user is interacting with
+ * a menu page or an entry page via ::activeMode. Upon exiting an active entry page,
+ * navigation returns to ::activePage.
  */
 typedef struct MenuManager
    {
-      MenuPage_t *activePage; /**< The menu age that is active currently*/
-      MenuEntry_t *activeEntry; /**< The entry page that is active currently*/
-      MenuType_t activeMode; /**< The type which is currently open*/
-      MenuPosition_t currentPosition; /**< The current position of the cursor*/
+      MenuPage_t *activePage; /**< Pointer to the currently active menu page */
+      MenuEntry_t *activeEntry; /**< Pointer to the currently active entry page */
+      MenuType_t activeMode; /**< Type indicating whether a page or entry is active */
+      MenuPosition_t currentPosition; /**< Current cursor position within the menu */
    } MenuManager_t;
 
 extern void showMenuPage(MenuManager_t *manager, MenuPosition_t position);

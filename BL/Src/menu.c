@@ -1,30 +1,42 @@
 /*
  * menu.c
  *
- *  Created on: Feb 11, 2025
- *      Author: c0deberry
+ * Copy this file to the `Src` folder of your project.
+ *
+ * @author c0deberry
+ * @author nrs00
+ *
+ *  Created on: 11.02.2025
  */
 
 #include <menu.h>
 
 /**
- * @brief Draw a 4x4 grid
+ * @brief Draws a 4x4 grid on the display.
  *
- * Draw a 4 by 4 grid on the display to segment the  menu entrys
+ * This function renders a 4x4 grid by dividing the screen into four quadrants.
+ * The grid is used to visually segment menu entries on the display.
  */
 void drawGrid()
    {
+      // Draw the outer boundary of the display
       tftDrawRect(0, 0, tftGetWidth() - 1, tftGetHeight() - 1, tft_WHITE);
+
+      // Draw a vertical line to split the screen into left and right halves
       tftDrawRect(tftGetWidth() / 2, 0, tftGetWidth() / 2, tftGetHeight(), tft_WHITE);
+
+      // Draw a horizontal line to split the screen into top and bottom halves
       tftDrawRect(0, tftGetHeight() / 2, tftGetWidth(), tftGetHeight() / 2, tft_WHITE);
    }
 
 /**
- * @brief Highlight a menu entry
+ * @brief Highlights a specific menu entry on the grid.
  *
- * @param position The field to highlight
+ * @param position The position of the menu entry to highlight (top-left, top-right,
+ * bottom-left, or bottom-right).
  *
- * Draws a yellow rectangle to highlight a grid element.
+ * This function visually highlights a menu entry by drawing a yellow rectangle
+ * over the corresponding quadrant of the grid.
  */
 void higlightEntry(MenuPosition_t position)
    {
@@ -51,12 +63,16 @@ void higlightEntry(MenuPosition_t position)
    }
 
 /**
- * @brief Get pointer to entry based on position
- * @param manager Instance of ::MenuManager_t
- * @param position The position from where to get the pointer
- * @return Pointer to ::MenuEntry_t
+ * @brief Retrieves a pointer to a menu entry based on its position.
  *
- * Get the pointer to a menu entry based on a position
+ * @param manager Pointer to an instance of ::MenuManager_t that manages the menu state.
+ * @param position The position of the desired menu entry (top-left, top-right,
+ * bottom-left, or bottom-right).
+ * @return Pointer to ::MenuEntry_t representing the menu entry at the specified position,
+ * or NULL if the position is invalid.
+ *
+ * This function accesses the active page managed by `MenuManager_t` and returns a pointer
+ * to a specific menu entry based on its position within the grid.
  */
 MenuEntry_t* getEntryFromPosition(MenuManager_t *manager, MenuPosition_t position)
    {
@@ -72,17 +88,21 @@ MenuEntry_t* getEntryFromPosition(MenuManager_t *manager, MenuPosition_t positio
          case MenuBR:
             return manager->activePage->BR;
          default:
+            // Return NULL for invalid positions
             return NULL;
 
          }
    }
 
 /**
- * @brief Convert rotary position to menu position
- * @param rotaryCounter The rotary position to convert
- * @return menu position
+ * @brief Converts a rotary encoder position to a menu position.
  *
- * This functio converts an int coming from the rotary encoder to a menu position. Zero-crossing is not a problem.
+ * @param rotaryCounter The current position of the rotary encoder.
+ * @return The corresponding menu position as a value of ::MenuPosition_t.
+ *
+ * This function maps an integer value from the rotary encoder to one of the four
+ * menu positions (top-left, top-right, bottom-left, bottom-right). The typecasting
+ * ensures that the result wraps around correctly, even if the rotary counter crosses zero.
  */
 MenuPosition_t getMenuRotaryPosition(int rotaryCounter)
    {
@@ -90,24 +110,30 @@ MenuPosition_t getMenuRotaryPosition(int rotaryCounter)
    }
 
 /**
- * @brief Show the menu page
- * @param manager Instance of ::MenuManager_t
- * @param position entry to highlight
+ * @brief Displays the menu page and highlights a specific entry.
  *
- * Depending on the active mode either the entry page is shown or the menu page is shown.
- * The title is printed in the specified color.
+ * @param manager Pointer to an instance of ::MenuManager_t managing the menu state.
+ * @param position The menu entry to highlight (e.g., top-left, top-right).
+ *
+ * This function clears the screen and displays the appropriate menu page based on
+ * the active mode. If in `Entry` mode, it displays its title. If in
+ * `Page` mode, it displays all entries on the current page along with their titles
+ * and colors. The specified entry is highlighted for user interaction.
  */
 void showMenuPage(MenuManager_t *manager, MenuPosition_t position)
    {
+      // Clear the screen with a black background
       tftFillScreen(tft_BLACK);
       switch (manager->activeMode)
          {
          case Entry:
+            // Display the title of the active entry in its designated color
             tftPrintColor(manager->activeEntry->title, TL_OFFSET_X, TL_OFFSET_Y,
                   manager->activeEntry->color);
             break;
 
          case Page:
+            // Display titles and colors for all entries on the active page
             tftPrintColor(manager->activePage->TL->title, TL_OFFSET_X, TL_OFFSET_Y,
                   manager->activePage->TL->color);
             tftPrintColor(manager->activePage->TR->title, TR_OFFSET_X, TR_OFFSET_Y,
@@ -116,10 +142,15 @@ void showMenuPage(MenuManager_t *manager, MenuPosition_t position)
                   manager->activePage->BL->color);
             tftPrintColor(manager->activePage->BR->title, BR_OFFSET_X, BR_OFFSET_Y,
                   manager->activePage->BR->color);
+
+            // Draw grid lines and highlight the selected entry
             drawGrid();
             higlightEntry(position);
             break;
+
+         case Back:
          default:
+            // No action for invalid modes
             break;
 
          }
@@ -127,43 +158,56 @@ void showMenuPage(MenuManager_t *manager, MenuPosition_t position)
    }
 
 /**
- * @brief Do menu stuff
- * @param menuManager Instance of ::MenuManager_t
+ * @brief Handles user interaction with the menu system.
  *
- * Handles the menu control. If the rotary encoder is turned, the grid ist updated to highlight the new selected entry.
- * If the button is pressed, the selected submenu or entry page is opend.
+ * @param menuManager Pointer to an instance of ::MenuManager_t managing the menu state.
+ *
+ * This function processes input from a rotary encoder and a push button to control
+ * navigation within the menu. It updates the highlighted grid element when the rotary
+ * encoder is turned and changes pages or modes when the button is pressed. The following
+ * actions are supported:
+ *
+ * - **Rotary Encoder Turned:** Updates the highlighted grid element to reflect the new selection.
+ * - **Button Pressed:** Opens a submenu or entry page based on the selected item. If "Back" is selected,
+ *   it navigates to the previous page.
  */
 void handleMenu(MenuManager_t *menuManager)
    {
-         // check if button wass turned since last check
+      // Check if rotary encoder has moved since last check
       if (getMenuRotaryPosition(getRotaryPosition()) != menuManager->currentPosition)
          {
+            // Update current position and redraw grid with new highlight
             menuManager->currentPosition = getMenuRotaryPosition(getRotaryPosition());
             drawGrid();
             higlightEntry(menuManager->currentPosition);
          }
+
+      // Check if push button has been pressed
       if (getRotaryPushButton() == true)
          {
-               //The selected entry is a menu page
+            // Retrieve selected entry based on current position and handle different types of entries
             if (getEntryFromPosition(menuManager, menuManager->currentPosition)->type == Page)
                {
+                  // Navigate to submenu: set last menu for return navigation and update active page
                   getEntryFromPosition(menuManager, menuManager->currentPosition)->page->lastMenu =
-                        menuManager->activePage; // set the last menu to be able to go back
+                        menuManager->activePage;
                   menuManager->activePage = getEntryFromPosition(menuManager,
                         menuManager->currentPosition)->page; // Set the new page as active
                }
-            //The selected entry is an entry
+            // Open entry: set as active entry and switch mode to Entry
             else if (getEntryFromPosition(menuManager, menuManager->currentPosition)->type == Entry)
                {
                   menuManager->activeEntry = getEntryFromPosition(menuManager,
                         menuManager->currentPosition); // Set the selected entry as active
                   menuManager->activeMode = Entry; // Change mode to entry
                }
-            // The selected menu is the back button
+
             else
                {
+                  // Navigate back to previous page if "Back" is selected
                   menuManager->activePage = menuManager->activePage->lastMenu;
                }
+            // Render updated menu state after action
             showMenuPage(menuManager, menuManager->currentPosition); //Render the result
          }
    }

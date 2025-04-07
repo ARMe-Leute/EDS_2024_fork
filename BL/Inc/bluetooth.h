@@ -5,7 +5,7 @@
  * This file provides the declarations and configurations necessary to use
  * the HM17 Bluetooth module with the STM32-Nucleo-F401RE board.
  *
- * Copy this file to the Inc folder of your project.
+ * Copy this file to the `Inc` folder of your project.
  *
  * @author c0deberry
  * @author nrs00
@@ -24,33 +24,66 @@
 #include <mcalDMAC.h>
 
 /**
- * @brief Interval at which the buffer is fetched, in milliseconds.
+ * @brief Interval for fetching data from the USART buffer, in milliseconds.
+ *
+ * This defines how frequently the buffer is polled for new data during Bluetooth communication.
  */
 #define BLUETOOTH_FETCH_TIME 50 //ms
 
 /**
- * @brief Size of the USART2 buffer, calculated based on the fetch interval.
+ * @brief Size of the USART2 RX buffer based on the fetch interval.
  *
- * The buffer size should be at least twice the fetch interval.
+ * The buffer size is calculated to ensure sufficient space for incoming data
+ * during each fetch cycle. It must be at least twice the fetch interval to avoid
+ * data loss due to overflow.
  *
- * @warning If the size is set too small, received data may be lost.
+ * @warning Setting this value too low may result in dropped or corrupted data.
  */
 #define USART2_RX_BUFFER_SIZE (2*1200*BLUETOOTH_FETCH_TIME)/1000
 
+/**
+ * @brief Minimum size of the USART2 TX buffer used for transmitting data.
+ *
+ * This defines the smallest buffer size allocated for outgoing Bluetooth messages.
+ */
 #define USART2_MIN_TX_BUFFER_SIZE 128
 
-#define BLUETOOTH_TRANSMIT_TIME 100 //ms
+/**
+ * @brief Transmission interval for Bluetooth data, in milliseconds.
+ *
+ * This value specifies how often the log is sent over Bluetooth communication.
+ */
+#define BLUETOOTH_TRANSMIT_TIME 500 //ms
 
+/**
+ * @brief Character limit for Bluetooth log entry identifiers.
+ *
+ * Restricts the maximum length of names assigned to log entries to ensure
+ * efficient packet sizes and readable formatting on receiving devices.
+ */
 #define BLUETOOTH_MAX_NAME_LENGTH 20
 
+/**
+ * @brief Maximum number of simultaneous log entries supported.
+ *
+ * Defines how many distinct variables can be tracked and transmitted
+ * through the Bluetooth logging system.
+ */
 #define BLUETOOTH_NUMBER_OF_LOG_ENTRYS 2
 
+/**
+ * @brief GPIO pin definition for Bluetooth module PIO0 control line.
+ *
+ * Maps the physical connection between the STM32 and the Bluetooth module's
+ * programmable I/O pin 0 for hardware-level control functions.
+ */
 #define BLUETOOTH_PIO0 GPIOA, 4
 
 /**
- * @brief Enable debug mode for the library.
+ * @brief Development and testing configuration flag.
  *
- * This allows you to inject messages and run the debugger.
+ * When defined, enables diagnostic features including message injection
+ * and state simulation for simplified debugging.
  */
 // Uncomment to enable debug mode
 //#define debugMode
@@ -92,11 +125,11 @@
 typedef enum BluetoothError
    {
    BluetoothFinish = 0, /**< Operation completed successfully. */
-   BluetoothBusy, /**< Module is busy with another command. */
-   BluetoothWrongParameter, /**< Invalid parameter provided. */
-   BluetoothRetryError, /**< Retry operation timeout error. */
-   BluetoothLengthError, /**< Reply length mismatch. */
-   BluetoothTXBusy /**< TX is busy, no data can be sent.*/
+   BluetoothBusy, /**< Module is processing another command; retry after appropriate delay. */
+   BluetoothWrongParameter, /**< Function received invalid or out-of-range parameters. */
+   BluetoothRetryError, /**< Operation failed after exhausting maximum retry attempts. */
+   BluetoothLengthError, /**< Response length inconsistency detected; possible data corruption. */
+   BluetoothTXBusy /**< Transmission hardware busy; new transmission must wait for completion. */
    } BluetoothError_t;
 
 /**
@@ -108,15 +141,19 @@ enum BluetoothState
    getStatus_2, /**< Secondary state for getStatus command. */
    getMacAddress = -20, /**< Initial state for getMacAddress command. */
    getMacAddress_2, /**< Secondary state for getMacAddress command. */
-   setBaudRate = -30,
-   setBaudRate_2,
-   setBaudRate_3,
-   resetModule = -40,
-   resetModule_2,
-   resetModule_3
+   setBaudRate = -30,/**< Initial state for baud rate configuration. */
+   setBaudRate_2,/**< Second state for baud rate configuration. */
+   setBaudRate_3,/**< Final state for baud rate configuration. */
+   resetModule = -40,/**< Initial module reset request state. */
+   resetModule_2,/**< Second module reset request state. */
+   resetModule_3/**< Final module reset request state. */
    };
+
 /**
- * @brief Enum defining BAUD rates as stated in the datasheet
+ * @brief Supported baud rate configurations for the Bluetooth module.
+ *
+ * Provides symbolic constants for all valid communication speeds
+ * as specified in the HM17 module datasheet.
  */
 typedef enum BluetoothBaudRate
    {
@@ -133,9 +170,10 @@ typedef enum BluetoothBaudRate
    } BluetoothBaudRate_t;
 
 /**
- * @brief Enum defining valid logging types
+ * @brief Data type specifications for log entry variables.
  *
- * This type is used by ::BluetoothLogEntry identify of which type the pointer is.
+ * Defines all supported data types that can be monitored and transmitted
+ * through the Bluetooth logging system, enabling proper formatting and memory handling.
  */
 typedef enum BluetoothLogEntryType
    {
@@ -155,15 +193,15 @@ typedef enum BluetoothLogEntryType
    } BluetoothLogEntryType_t;
 
 /**
- * @brief Type that defines a log entry
+ * @brief Log entry descriptor structure for variable monitoring.
  *
- * Every log entry has a name, the type of data it logs and a pointer to that.
- * The name is send every time a connection is etablished. As the pointer to the data is stored in a union, we need to know wwhich type the pointer has.
+ * Defines a complete entry in the logging system, containing both metadata
+ * and a typed pointer to the monitored variable for runtime access.
  */
 typedef struct BluetoothLogEntry
    {
-      char name[BLUETOOTH_MAX_NAME_LENGTH]; /**< Name of the logged variable*/
-      BluetoothLogEntryType_t type; /**< Type of the logged variable*/
+      char name[BLUETOOTH_MAX_NAME_LENGTH]; /**< Human-readable identifier for the logged variable. */
+      BluetoothLogEntryType_t type; /**< Data type specifier for proper serialization and formatting. */
       union
          {
             bool *bool_ptr;
@@ -180,24 +218,26 @@ typedef struct BluetoothLogEntry
             char *char_ptr;
             char **string_ptr;
 
-         } data; /**< Pointer to the variable */
+         } data; /**< Type-safe access to the monitored variable. */
    } BluetoothLogEntry_t;
 
 /**
- * @brief Mode of the bluetooth module
+ * @brief Operational modes for the Bluetooth module.
  *
- * This type is used for indicating in which mode the bluetooth module is. If it is not connected, it can be configerd,
- * therefore its mode is ::bluetoothConfigure. While beeing connected, every data is transmitted, therefore its mode is ::bluetoothTransmit.
+ * Defines the distinct operational states that determine available
+ * functionality and communication behavior.
  */
 typedef enum bluetoothMode
    {
-   bluetoothConfigure = 0, /**< Module not connected, configuration possible*/
-   bluetoothTransmit /**< Module connected, transmitting data*/
-
+   bluetoothConfigure = 0, /**< Configuration mode - enabled when disconnected for setup operations. */
+   bluetoothTransmit /**< Transmission mode - active when connected for data streaming. */
    } bluetoothMode_t;
 
 /**
- * @brief Structure representing a Bluetooth module instance.
+ * @brief Complete Bluetooth module instance descriptor.
+ *
+ * Consolidates all state information, configuration parameters, and
+ * communication buffers for a single Bluetooth module instance.
  */
 typedef struct BluetoothModule
    {
@@ -205,14 +245,14 @@ typedef struct BluetoothModule
       int8_t initStatus; /**< Initialization status of the module. */
       BluetoothBaudRate_t baudRate; /**< Baud rate for the USART. */
       char messageBufferRX[USART2_RX_BUFFER_SIZE + 1]; /**< Buffer for received messages. */
-      volatile char *messageBufferTX;
+      volatile char *messageBufferTX;/**< Pointer to transmission buffer for outgoing data. */
       uint16_t available; /**< Number of available characters in the buffer. */
       uint8_t counter; /**< Counter for internal operations, e.g., retry count. */
       int16_t state; /**< Current state of the state machine. */
-      volatile bool *TXComplete; /**< TX data finished transmitting @warning Not working yet*/
-      bluetoothMode_t mode; /**< Connection status*/
-      BluetoothLogEntry_t logEntrys[BLUETOOTH_NUMBER_OF_LOG_ENTRYS]; /**< Array containing all log entrys*/
-      bool bluetoothSendLogTitle; /**< Indicates that the log title needs to be send*/
+      volatile bool *TXComplete; /**< Transmission completion flag. @warning Implementation incomplete. */
+      bluetoothMode_t mode; /**< Current operational mode (configure/transmit). */
+      BluetoothLogEntry_t logEntrys[BLUETOOTH_NUMBER_OF_LOG_ENTRYS]; /**< Registered variables for monitoring. */
+      bool bluetoothSendLogTitle; /**< Flag indicating log headers need transmission. */
 
    } BluetoothModule_t;
 
@@ -241,11 +281,13 @@ extern DMA_Stream_TypeDef* dmacGetStreamFromUSARTTX(USART_TypeDef *usart);
 extern volatile char usart2BufferRX[USART2_RX_BUFFER_SIZE + 1];
 
 /**
- * @brief Global UART2 TX buffer
+ * @brief Global buffer for USART2 transmission.
  *
- * The buffer where the TX message is stored. The message is then send via DMA over USART2.
- * The buffer size is calculated regarding the maximum log size, which is 20 bytes (printed int64) plus 1 byte (semicolon)
- * times the number of entrys (::BLUETOOTH_NUMBER_OF_LOG_ENTRYS) plus two bytes (\\n and \0).
+ * Stores outgoing messages for DMA-based transmission. Size is dynamically
+ * calculated based on maximum log requirements or minimum threshold.
+ *
+ * Buffer sizing considers: 20 bytes per value (max print width) + 1 separator byte
+ * per entry, multiplied by entry count, plus line termination characters.
  */
 #if ((20 + 1) * BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2) > USART2_MIN_TX_BUFFER_SIZE
 extern volatile char usart2BufferTX[ (20 + 1) * BLUETOOTH_NUMBER_OF_LOG_ENTRYS + 2];
@@ -262,11 +304,11 @@ extern volatile char usart2BufferTX[USART2_MIN_TX_BUFFER_SIZE];
 extern volatile uint16_t usart2BufferIndex;
 
 /**
- * @brief USART2 Transfer finish
+ * @brief DMA transmission completion flag for USART2.
  *
- * Indicates that transfer over USART2 with DMA is finishd
+ * Indicates when a DMA-based transmission has completed.
  *
- * @note Interrupt doesn't work, so his does nothing
+ * @note Currently not fully implemented - interrupt functionality pending.
  */
 extern volatile bool usart2TXComplete;
 
