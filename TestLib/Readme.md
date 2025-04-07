@@ -86,8 +86,9 @@ funktioniert soweit, jedoch kann kein Ergebnis aus dem Register ausgelesen werde
 Wie wurde getestet ? 
 TOF angeschlossen an den PC, im Debug Modus gestartet.
 Resume bis main.c Z.471 ab hier step by step mit Step into, jede einzelne Funktion durch probiert. 
-! Fehler tritt auch auf wenn man das Programm "normal" auf den Controller hochlaedt. 
+! Fehler tritt auch auf wenn man das Programm "normal" auf den Controller hochlaedt (mit blinkender LED getestet). 
 ! Fehler tritt auch auf wenn verschiedene Kommunikationsgeschwindigkeiten verwendet werden. 
+
 Wenn der TOF nicht angeschlossen wurde tritt kein Fehler auf, da er nicht initialisiert werden muss. 
  
 

@@ -175,7 +175,8 @@
 typedef enum
 {
 	TOF_ADDR_NONE       = -1,  // No address
-	TOF_ADDR_VL53LOX    = 0x29 // VL53LOX sensor address
+	TOF_ADDR_VL53LOX    = 0x29, // VL53LOX sensor address
+	TOF_REGULAR_ADDRESS = 0x54	// Address noted in datasheet
 } TOF_ADDR_t;
 
 // Enum for calibration phases
@@ -301,13 +302,15 @@ extern void configureTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t,
  *               GPIO interrupt pin as active low, which is compatible with most breakout boards.
  *               The function communicates with the TOF sensor over I2C to apply the required settings.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: true if the configuration is successful, otherwise false.
  */
@@ -324,13 +327,15 @@ extern bool TOF_configure_interrupt(TOFSensor_t* TOFSENS);
  *               to confirm the correct TOF sensor is connected. If the device ID matches the expected value,
  *               the function confirms the presence of the correct sensor.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: true if the correct TOF sensor is connected and communication is successful, otherwise false.
  */
@@ -348,13 +353,15 @@ extern bool TOF_init_address(TOFSensor_t* TOFSENS);
  *               proper communication and operation. If any I2C operation fails, the initialization process
  *               terminates and the function returns false.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: true if the sensor is successfully initialized, otherwise false.
  */
@@ -372,13 +379,15 @@ extern bool TOF_data_init(TOFSensor_t* TOFSENS);
  *               the NVM, and extract the required information. Upon successful execution, the SPAD count and
  *               type information are stored in the provided output parameters.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  *				uint8_t * count 							where the SPAD count will be stored.
  * 				bool * type_is_aperture						indicating whether the SPADs are of the aperture type.
@@ -399,13 +408,15 @@ extern bool TOF_get_spad_info_from_nvm(TOFSensor_t* TOFSENS, uint8_t * count, bo
  *               enable map stored in the sensor's memory to activate the appropriate SPADs. This ensures the sensor
  *               operates optimally according to its hardware configuration.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: true if the SPAD configuration is successful, otherwise false.
  */
@@ -422,13 +433,15 @@ extern bool TOF_set_spads_from_nvm(TOFSensor_t* TOFSENS);
  *               timing, gain, and measurement sensitivity. This default tuning is typically required to
  *               initialize the sensor for accurate and reliable distance measurements.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: true if the tuning configuration was successful, otherwise false.
  */
@@ -445,13 +458,15 @@ extern bool TOF_load_default_tuning_settings(TOFSensor_t* TOFSENS);
  *               operational flow, such as initialization, pre-range, final range, etc. The sequence_step
  *               parameter is a bitmask that determines which steps are enabled.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  *  			 uint8_t sequence_step						Bitmask specifying the sequence steps to enable. Each bit corresponds to 
  *  														specific step in the sensor's operational sequence.
@@ -471,13 +486,15 @@ extern bool TOF_set_sequence_steps_enabled(TOFSensor_t* TOFSENS, uint8_t sequenc
  *               calibration type. The calibration ensures the sensor is accurately configured for
  *               reliable distance measurements.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *                  
  * 				 TOF_calibration_type_t calib_type 			The type of calibration to perform. It can be one of the following:
  *                  - TOF_CALIBRATION_TYPE_VHV  			Calibrates Very High Voltage (VHV) settings.
@@ -499,13 +516,15 @@ extern bool TOF_perform_single_ref_calibration(TOFSensor_t* TOFSENS, TOF_calibra
  *               After the calibration is complete, the function restores the sensor's default
  *               measurement sequence settings to ensure proper operation.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: true if the reference calibration was successfully completed, otherwise false.
  *
@@ -531,13 +550,15 @@ extern bool TOF_perform_ref_calibration(TOFSensor_t* TOFSENS);
  *               - Setting the measurement sequence steps
  *               - Performing a reference calibration
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: true if the initialization is successful, otherwise false.
  * 
@@ -585,13 +606,15 @@ extern bool TOF_getMeasurement(TOFSensor_t* TOFSENS, uint16_t *range);
  *               including setting the I2C address, verifying connectivity, and initializing the device with
  *               default configurations and calibration.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: true if the initialization was successful, otherwise false.
  */
@@ -607,13 +630,15 @@ extern bool TOF_init(TOFSensor_t* TOFSENS);
  *               either timed or back-to-back mode, based on the provided period. It adjusts settings 
  *               for the selected mode and ensures accurate timing by using the oscillator calibration value.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *                  
  * 				uint32_t period_ms							Measurement interval in milliseconds.
  *
@@ -631,13 +656,15 @@ extern bool TOF_start_continuous(TOFSensor_t* TOFSENS);
  *               to a single-shot measurement mode. It resets relevant configuration registers and
  *               ensures that the sensor is ready for other operations.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: true if continuous mode stops successfully, false otherwise.
  */
@@ -653,13 +680,15 @@ extern bool TOF_stop_continuous(TOFSensor_t* TOFSENS);
  *               distanceFromTOF field in the provided TOFSensor_t structure. It assumes that the sensor 
  *               is operating in continuous measurement mode.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: true if the distance is successfully read and updated, otherwise false.
  */
@@ -675,13 +704,15 @@ extern bool TOF_read_continuous_distance(TOFSensor_t* TOFSENS);
  *               to complete, and retrieves the measured distance. The distance is stored in the 
  *               distanceFromTOF field of the TOFSensor_t structure.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: true if the measurement was successfully initiated, completed, and retrieved, false otherwise.
 
@@ -698,13 +729,15 @@ extern bool TOF_read_single_distance(TOFSensor_t* TOFSensor);
  * @details:     This function configures the TOF sensor by sending a series of commands to set up the measuring management,
  *               internal tuning, and ranging start registers.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: Returns true if the TOF sensor was successfully initialized and started, otherwise false.
  */
@@ -721,13 +754,15 @@ extern bool TOF_start_up_task(TOFSensor_t* TOFSENS);
  *               If the data ready flag is set, the new measurement result is processed, and a new measurement is started.
  *               If no new data is available, the measurement age counter is incremented.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     uint16_t: returns current stored distance value.
  */
@@ -743,13 +778,15 @@ extern bool TOF_read_distance_task(TOFSensor_t* TOFSENS);
  *               to the appropriate register on the sensor. The new address is also updated in the 
  *               TOFSensor_t structure for future communication.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: true if the address was successfully updated, otherwise false.
  */
@@ -765,13 +802,15 @@ extern bool TOF_set_address(TOFSensor_t* TOFSENS, uint8_t newAddr);
  *               specified delay. It handles the necessary register configuration for the measurement, 
  *               reads the distance result, and stores it in the provided `range` pointer.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *                  
  *               uint16_t time    							The delay in milliseconds before initiating the measurement.
  * @param[out]:  uint16_t *range							Pointer to store the measured distance in millimeters.
@@ -794,13 +833,15 @@ extern bool TOF_read_distance_timed(TOFSensor_t* TOFSENS, uint16_t time, uint16_
  *               high accuracy, long range, or default mode. The profiles adjust parameters like measurement
  *               timing budgets and signal rate limits to optimize the sensor for specific applications.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @returns:     bool: true if the ranging profile was successfully set, otherwise false.
  */
@@ -815,13 +856,15 @@ extern bool TOF_set_ranging_profile(TOFSensor_t* TOFSENS);
  * @details:     This function adjusts the VCSEL pulse period used for either the pre-range or final-range measurement phase.
  *               It updates related phase settings, timeouts, and applies the necessary calibration adjustments.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * 				vcselPeriodType type						Specifies whether to configure the pre-range (VcselPeriodPreRange) or final-range (VcselPeriodFinalRange) phase.
  * 				 uint8_t period_pclks						The new VCSEL pulse period in PCLKs. Acceptable values vary for pre-range and final-range types:
@@ -846,13 +889,15 @@ extern bool TOF_set_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType typ
  *               It ensures the signal rate limit is within the valid range (0 to 511.99 MCPS) and applies the appropriate conversion
  *               to send the value to the sensor.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * 				float signalRateLimit						The desired signal rate limit in MCPS (megacounts per second). This should be a floating-point value between 0 and 511.99.
  *
@@ -879,13 +924,15 @@ extern bool TOF_set_signal_rate_limit(TOFSensor_t* TOFSENS, float signalRateLimi
  *               extracts the bit values to determine which sequence steps (TCC, DSS, MSRC, PRE_RANGE, and FINAL_RANGE) are enabled.
  *               These steps define the order and conditions for various measurement phases in the sensor's operation.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * @param[out]:  SequenceStepEnables *enables 				Pointer to a SequenceStepEnables structure where the extracted enable values will be stored.
  *
@@ -927,13 +974,15 @@ extern bool TOF_get_sequence_step_timeouts(TOFSensor_t* TOFSENS, SequenceStepEna
  * @details:     This function reads the VCSEL pulse period for either the pre-range or final-range mode of the sensor. The VCSEL period is stored in specific registers, and the function decodes the value to return the period in a readable format.
  *               The VCSEL pulse period determines the time duration of the laser pulses emitted by the sensor, and it can vary based on the measurement mode.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * 				vcselPeriodType type 						Specifies whether to get the VCSEL pulse period for pre-range (`VcselPeriodPreRange`) or final-range (`VcselPeriodFinalRange`).
  *
@@ -957,13 +1006,15 @@ extern uint8_t TOF_get_vcsel_pulse_period(TOFSensor_t* TOFSENS, vcselPeriodType 
  *               This function calculates the required time for enabled steps and adjusts the final range
  *               timeout to meet the specified budget.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  *               uint32_t budget_us							Desired timing budget in microseconds (µs).
  *
@@ -980,13 +1031,15 @@ extern bool TOF_set_measurement_timing_budget(TOFSensor_t* TOFSENS, uint32_t bud
  * @details:     This function reads the VCSEL pulse period for either the pre-range or final-range mode of the sensor. The VCSEL period is stored in specific registers, and the function decodes the value to return the period in a readable format.
  *               The VCSEL pulse period determines the time duration of the laser pulses emitted by the sensor, and it can vary based on the measurement mode.
  *
- * @param[in]:   TOFSENS  									A pointer to a TOFSensor_t struct containing the sensor's configuration:
- *               	- TOF_address_used: 					The I2C address of the TOF sensor.
- *               	- i2c_tof: 								The I2C bus instance used to communicate with the sensor.
- *               	- Ranging_Profiles_t: 					The sensor's ranging profile configuration.
- *                  - measuredRange: 						Variable to store the measured range from the TOF sensor.
- *                  - distanceFromTOF: 						Variable to store the distance from the TOF sensor after calculation.
- *                  - enableTOFSensor: 						Variable to activate or deactivate the TOF sensor.
+ * @param[in]:   TOFSENS
+ * 					- TOF_address_used          			The sensor's I2C address (e.g., 0x29 for VL53LOX)
+ *					- Ranging_Profiles_t        			The sensor's ranging mode (e.g., HIGH_SPEED_MODE_S)
+ *					- distanceFromTOF           			The current distance measurement (in mm)
+ *					- measuredRange             			RAW Data of measured distance
+ *					- enableTOFSensor           			Flag indicating if the sensor is enabled (true/false)
+ *					- Ranging_Profile_time 	  				Time for the execution for readcontinuos in dependence of RangingProfile
+ *					- TOF_readyFlag 			  			Flag indicating if the sensor data is ready to read
+ *					- TOF_measuringage  		  			Age of the measured distance
  *
  * 				vcselPeriodType type 						Specifies whether to get the VCSEL pulse period for pre-range (`VcselPeriodPreRange`) or final-range (`VcselPeriodFinalRange`).
  *
