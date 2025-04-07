@@ -1,8 +1,18 @@
 # Bluetooth Library Using MCAL
 
-This library facilitates communication between an STM32-Nucleo-F401RE and an HM17 Bluetooth module. The most basic AT commands are implemented, so a device can connect to the module. It is possible to log variables to your target device (See [here](#logging)). A basic structure to parse commands is provided.
+This library facilitates seamless communication between an STM32-Nucleo-F401RE microcontroller and an HM17 Bluetooth Low Energy (BLE) module. It's designed around a non-blocking finite state machine architecture that enables reliable communication while maintaining responsive system operation.
 
-@warning DONT TRUST THE DATASHEET. The datasheet is a good starting point. However, some things are confusing or partially straight up false (e. g. The reply to `AT+ADDR?`should be `OK+ADDR:12345678910`but in reality it is `OK+Get:12345678910`). If something doesn't work right away, play a bit with the parameters.
+@warning The HM17 module's datasheet contains significant inconsistencies and errors that can lead to implementation failures. Exercise caution when developing with this module:
+- **Command Response Mismatches:** At least some documented responses don't match actual module behavior.
+    - Example: AT+ADDR? is documented to return OK+ADDR:12345678910 but actually returns OK+Get:12345678910
+    - Always verify actual responses rather than assuming datasheet accuracy
+- **Firmware Version Confusion:** The datasheet references features requiring "firmware version > 500," but
+    - the installed HM17 firmware version is 112 (with latest being 116)
+    - Version numbers above 500 actually refer to HM10 and HM11 modules
+    - Website confirmation: http://www.jnhuamao.cn/bluetooth.asp?id=1
+- **Development Recommendations:**
+    - Test each command and document actual responses before implementation
+    - Use logic analyzer to capture exact response strings
 
 ---
 
@@ -182,21 +192,28 @@ How to add an entry page
 ## Reset HM17 module
 Inconsistency in datasheet
 
-## Setting BAUD rate
+## Baud Rate Configuration
 
-After a restart HM17 stops working properly
+After a restart HM17 stops working properly (as stated in the datasheet, it defaults to BAUD 1200 and ignores AT commands), so you have to reset the module
 
 ## ::usart2TXComplete not working
-Interrupt doesn't fire, so it isn't working
+- The usart2TXComplete flag is not functioning correctly
+- UART transmission complete interrupt doesn't fire as expected
+- Workaround: Don't check the status
 
-## ::dmacUsartSendString does no input checking
-If input is to long it is written over the buffer limit -> bad
+## Buffer Management
+- ::dmacUsartSendString lacks input validation for buffer boundaries
+- Potential buffer overflow if input exceeds allocated space
+- Improvement needed: Add length checking before transmission
 
 ## Button problem
 Somtimes the botton keeps beeing registerd as pressed, which results in jumping over steps
 
 ## RX Buffer
-Instead of fetching the buffer in a fixed interval, save a pointer to the original buffer (Like the TX buffer). To indicate the that either no new chars where received or a message was terminated witn `\n` you could simply use a bool.
+Instead of fetching the buffer (which copies the data), save a pointer to the original buffer (Like the TX buffer). To indicate the that either no new chars where received or a message was terminated witn `\n` you could simply use a bool flag.
+
+---
+PS: If you want something to laugh, have a look at [this](https://docs.qq.com/doc/DUEVrZVhwbWZQdXNm) support document [https://www.deshide.com/product-details.html?pid=1663325&_t=1670572585]
 
 ---
 This documentation was reviewed and improved with the assistance of ChatGPT.
