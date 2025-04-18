@@ -637,7 +637,7 @@ int main(void)
                                              }
                                           else // Second button press returns to menu
                                              {
-                                                menuStatus = false;
+                                                menuActive = false;
                                                 menuManager_1.activeMode = Page;
                                                 showMenuPage(&menuManager_1,
                                                       menuManager_1.currentPosition);
