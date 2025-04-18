@@ -234,7 +234,7 @@ int16_t bluetoothStateHandler(BluetoothModule_t *BluetoothModule, int16_t state)
             return ++BluetoothModule->state;
 
          case setBaudRate_2:
-            char *command = "AT+BAUD ";
+            char *command = "AT+BAUD0";
             command[7] = BluetoothModule->baudRate + '0';
             dmacUsartSendString(BluetoothModule, command);
             return ++BluetoothModule->state;
