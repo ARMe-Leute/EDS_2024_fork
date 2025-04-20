@@ -114,6 +114,7 @@ The total size of a log message is limited by the TX buffer size, which is calcu
 The number of variables and the logging interval must be chosen so that all data can be transmitted within the available bandwidth. If too many variables are logged or the interval is too short for the selected baud rate, data loss or overflow may occur (not automatically detected).
 - **No automatic type or bounds checking:**  
 The library does not automatically verify that pointers are valid or that string lengths fit the buffer. Care must be taken to avoid overflows or invalid memory access.
+
 ---
 
 ## Debug Mode
@@ -331,7 +332,7 @@ systickSetTicktime(&MenuTimer, 100); // 100ms refresh
 - **Always include `::feldBack` in subpages**
 - **Limit menu titles to 10 characters**
 - **Avoid Circular Menu Structures:**
- The menu system's navigation history can be corrupted by circular references. The current implementation stores only the immediate parent page in `MenuPage_t.lastMenu`. Circular structures like:
+ The menu system's navigation history can be corrupted by circular references. The current implementation stores only the immediate parent page in `::MenuPage_t.lastMenu`. Circular structures like:
  `Main Menu → Menu1 → Menu2 → Menu1` will not work.
 
 # Known Issues and possible improvements
