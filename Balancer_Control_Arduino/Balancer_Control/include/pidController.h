@@ -25,7 +25,6 @@ private:
     float KI;      ///< Integralanteil
     float KD;      ///< Differentialanteil
     float ISum;    ///< Aufsummierter Wert für den Integralanteil
-    float posISum; ///< Aufsummierter Wert zur Integration von Geschwindigkeit zu Position
     float TA;      ///< Abtastzeit in Sekunden
     float inpOld;  ///< Vorheriger Regelwert zur Berechnung des Differentialanteils
 

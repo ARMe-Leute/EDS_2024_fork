@@ -18,14 +18,6 @@ void pulseISR()
   pulseCount++;
 }
 
-void debug(const Balancer &bala)
-{
-  Serial.print("Winkel:\t");
-  Serial.print(bala.gyroSensor.pitch);
-  Serial.print("\t");
-  Serial.print("Float PWM:\t");
-  Serial.println(bala.flPWM);
-}
 
 void setup()
 {
@@ -96,6 +88,4 @@ void loop()
     default:     Serial.println("Unknow");    break;
   }
   */
-  
-  // debug(*Balancer::instance);  // als const Referenz übergeben
 }

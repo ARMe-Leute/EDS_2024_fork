@@ -117,7 +117,7 @@ public:
    float flV;             ///< Zwischenergebnis der inneren Regelung (Pitch zu Sollgeschwindigkeit)
    float flPWM;           ///< Endwert der Regelung für Motorsteuerung
    GyroSensor gyroSensor; ///< Objekt zur Erfassung des Pitch-Winkels
-   float currentPitch;                     ///< Aktueller Pitch-Wert
+   float currentPitch;    ///< Aktueller Pitch-Wert
 
 private:
    /**
@@ -134,13 +134,10 @@ private:
     */
    void applyMotor(float val);
 
-   int16_t sensorBuffer[6]; ///< Sensor-Zwischenspeicher (optional)
-
-   PIDController pid_pos; ///< PID-Regler für Position
+   PIDController pid_pos; ///< PID-Regler für Position (nicht verwendet)
    PIDController pid_v;   ///< PID-Regler für Geschwindigkeit
    PIDController pid_phi; ///< PID-Regler für Neigungswinkel (Pitch)
 
-   
    float velocityFactor;                   ///< Umrechnungsfaktor von Pulsen zu Geschwindigkeit
    volatile hallPhases directionBfr[3];    ///< Ringpuffer zur Richtungserkennung
    volatile int directionBfrIncrement = 0; ///< Index für Ringpuffer
