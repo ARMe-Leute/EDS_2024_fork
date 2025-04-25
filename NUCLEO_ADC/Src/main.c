@@ -47,8 +47,8 @@ int main(void)
 	myADC->chnResolution = ADC_RES_12BIT;
 	myADC->chnListSize = 1;
 	myADC->chnList[0] = ADC_CHN_0;
-	myADC->tempEnable = 1;
-	myADC->interruptEnable = 1;
+	myADC->tempEnable = 0;
+	myADC->interruptEnable = 0;
 	myADC->alpha_lowpass = 0.7f;
 	myADC->Prescaler[0] = 1;
 
