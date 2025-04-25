@@ -1,12 +1,10 @@
 /**
  * @file balancer.cpp
- * @author Johannes Mueller, Dominik Berenspoehler
- * @brief Deklaration der Balancer Klasse
+ * @author Johannes Müller, Dominik Berensspöhler
+ * @brief Implementierung der Balancer-Klasse zur Regelung eines selbstbalancierenden Fahrzeugs.
  * @version 0.1
  * @date 2025-04-06
- *
  * @copyright Copyright (c) 2025
- *
  */
 
 #include <Arduino.h>
@@ -14,52 +12,41 @@
 #include "balancer.h"
 
 /**
- * @brief Erzeugt ein neues Objekt der Klasse Balancer
- *
- * Erzeugt neue Objekte der Klassen MPU6050 und PIDController.
- * Diese bekommt die Balancer Klasse als Attribute.
- *
- */
-
-/**
- * @brief
- *
+ * @brief Statische Instanz der Balancer-Klasse für Interruptzugriffe.
  */
 Balancer *Balancer::instance = nullptr;
 
+/**
+ * @brief Konstruktor der Balancer-Klasse.
+ *
+ * Initialisiert Gyroskop und PID-Regler. Beendet das Programm bei Fehler.
+ */
 Balancer::Balancer()
 {
-   GyroSensor _mpu;
-   if (!_mpu.init())
+   if (!gyroSensor.init())
    {
       digitalWrite(CTRLLEDPIN, HIGH);
-      while (1) {}
+      while (1)
+      {
+      }
    }
-   PIDController _pid_pos(0, 0, 0, 1 / PULSECOUNTTIME);
-   PIDController _pid_v(0.8, 1.2, 0, 1 / PULSECOUNTTIME);
-   PIDController _pid_phi(5, 0, 0, 1 / PULSECOUNTTIME);
-   init(_mpu, _pid_pos, _pid_v, _pid_phi);
+   pid_pos.init(0, 0, 0, 1.0f / PULSECOUNTTIME);
+   pid_v.init(0.8, 1.2, 0, 1.0f / PULSECOUNTTIME);
+   pid_phi.init(5, 0, 0, 1.0f / PULSECOUNTTIME);
+   currentVelocity = 0;
+   currentPitch = 0;
+   currentDirection = fwd;
+   flPWM = 0.0;
+   velocityFactor = 3.33333333 / (PULSECOUNTTIME * PULSECOUNTTIME);
 }
 
 /**
- * @brief Erzeugt ein neues Objekt der Klasse Balancer mit vorinitialisertem
- * MPU6050-Sensor und PID-Regler.
+ * @brief Initialisiert interne Zustände der Balancer-Klasse.
  *
- * @param _mpu MPU6050 Sensor
- * @param _pid PID Regler
- */
-Balancer::Balancer(GyroSensor _mpu, PIDController _pid_pos, PIDController _pid_v, PIDController _pid_phi)
-{
-   init(_mpu, _pid_pos, _pid_v, _pid_phi);
-}
-
-/**
- * @brief 
- * 
- * @param _mpu 
- * @param _pid_pos 
- * @param _pid_v 
- * @param _pid_phi 
+ * @param _mpu GyroSensor-Objekt
+ * @param _pid_pos PID-Regler für Position
+ * @param _pid_v PID-Regler für Geschwindigkeit
+ * @param _pid_phi PID-Regler für Neigungswinkel
  */
 void Balancer::init(GyroSensor _mpu, PIDController _pid_pos, PIDController _pid_v, PIDController _pid_phi)
 {
@@ -69,25 +56,28 @@ void Balancer::init(GyroSensor _mpu, PIDController _pid_pos, PIDController _pid_
    pid_phi = _pid_phi;
    currentVelocity = 0;
    currentPitch = 0;
+   currentDirection = fwd;
    flPWM = 0.0;
    velocityFactor = 3.33333333 / (PULSECOUNTTIME * PULSECOUNTTIME);
+   Serial.println("Initialisierung abgeschlossen");
 }
 
 /**
- * @brief Berechnung der aktuellen Geschwindigkeit
+ * @brief Berechnet die aktuelle Geschwindigkeit anhand gezählter Pulse.
  *
- * Rechnet die gezählten Impulse des Geschwindigkeitseingangs in einem festen Intervall in die Drehfrequenz des Motors
- *
- * @param pulsecount Gezählte Pulse im festgelegten Intervall
+ * @param pulsecount Anzahl der Impulse im Messintervall
  */
 void Balancer::getVelocity(int pulsecount)
 {
    currentVelocity = pulsecount * velocityFactor;
+   if (currentDirection == bwd)
+   {
+      currentVelocity = -currentVelocity;
+   }
 }
 
 /**
- * @brief Registriert den Hall Puls der Phase U
- *
+ * @brief ISR-Handler für Hall-Signal Phase U.
  */
 void Balancer::recogniseHallPulseU()
 {
@@ -96,8 +86,7 @@ void Balancer::recogniseHallPulseU()
 }
 
 /**
- * @brief Registriert den Hall Puls der Phase V
- *
+ * @brief ISR-Handler für Hall-Signal Phase V.
  */
 void Balancer::recogniseHallPulseV()
 {
@@ -106,8 +95,7 @@ void Balancer::recogniseHallPulseV()
 }
 
 /**
- * @brief Registriert den Hall Puls der Phase W
- *
+ * @brief ISR-Handler für Hall-Signal Phase W.
  */
 void Balancer::recogniseHallPulseW()
 {
@@ -116,9 +104,9 @@ void Balancer::recogniseHallPulseW()
 }
 
 /**
- * @brief Speichert die erkannte Phase im Ringspeicher für weitere Verwendung.
+ * @brief Speichert erkannte Hallphase im Ringpuffer.
  *
- * @param phase Erkannter Puls der Phase U, V oder W.
+ * @param phase Erkannte Phase (U, V oder W)
  */
 void Balancer::recogniseHallPulse(hallPhases phase)
 {
@@ -128,16 +116,10 @@ void Balancer::recogniseHallPulse(hallPhases phase)
 }
 
 /**
- * @brief Bestimmt die Drehrichtung des Motors anhand der letzten drei Hall-Pulsfolgen.
- *
- * Vergleicht die gespeicherte Reihenfolge der Hallphasen mit bekannten Mustern
- * für Vorwärts- oder Rückwärtsbewegung.
- *
- * @return direction fwd bei Vorwärtsdrehung, bwd bei Rückwärtsdrehung
+ * @brief Ermittelt Drehrichtung anhand der letzten drei Hall-Signale.
  */
 void Balancer::getDirection()
 {
-   // Ringpuffer-Auswertung: letzten drei Einträge in richtiger Reihenfolge lesen
    int i0 = directionBfrIncrement % 3;
    int i1 = (directionBfrIncrement + 1) % 3;
    int i2 = (directionBfrIncrement + 2) % 3;
@@ -146,7 +128,6 @@ void Balancer::getDirection()
    hallPhases b = directionBfr[i1];
    hallPhases c = directionBfr[i2];
 
-   // Mögliche Vorwärtsfolgen (u → v → w, v → w → u, w → u → v)
    if ((a == u && b == v && c == w) ||
        (a == v && b == w && c == u) ||
        (a == w && b == u && c == v))
@@ -154,33 +135,47 @@ void Balancer::getDirection()
       currentDirection = fwd;
    }
 
-   // Mögliche Rückwärtsfolgen (u → w → v, v → u → w, w → v → u)
-   if ((a == u && b == w && c == v) ||
+   else if ((a == u && b == w && c == v) ||
        (a == v && b == u && c == w) ||
        (a == w && b == v && c == u))
    {
       currentDirection = bwd;
    }
-
-   // Default Case
-   currentDirection = unknown;
+   else
+   {
+      currentDirection = unknown;
+   }
 }
 
+/**
+ * @brief Aktualisiert den aktuellen Neigungswinkel über den Gyrosensor.
+ */
 void Balancer::getPitch()
 {
+   gyroSensor.getAcceleration();
+   gyroSensor.getGyro();
    currentPitch = gyroSensor.getWeightedPitch(PULSECOUNTTIME * 0.001);
 }
 
+/**
+ * @brief Führt die Regelung aus und gibt die PWM an den Motor weiter.
+ *
+ * Stoppt bei zu starker Neigung automatisch und setzt Regler zurück.
+ */
 void Balancer::motorOutput()
 {
-   if (abs(currentPitch) > 23.0) // maximaler Aufrichtwinkel 
+   if (abs(currentPitch) > 23.0)
    {
       flPWM = 0.0;
       applyMotor(flPWM);
+      digitalWrite(ENBLPIN, HIGH);
+      pid_phi.reset();
+      pid_v.reset();
       return;
    }
    else
    {
+      digitalWrite(ENBLPIN, LOW);
       flV = pid_phi.pidControl(-currentPitch);
       flPWM = pid_v.pidControl(flV - currentVelocity);
       applyMotor(flPWM);
@@ -188,6 +183,11 @@ void Balancer::motorOutput()
    }
 }
 
+/**
+ * @brief Wendet den berechneten PWM-Wert auf den Motor an.
+ *
+ * @param val PWM-Wert im Bereich [-PWMMAX, PWMMAX]
+ */
 void Balancer::applyMotor(float val)
 {
    val = constrain(val, -PWMMAX, PWMMAX);
@@ -198,12 +198,12 @@ void Balancer::applyMotor(float val)
    }
    else if (val < 0)
    {
-      digitalWrite(DIRPIN, LOW);
-      analogWrite(PWMPIN, -val);
+      digitalWrite(DIRPIN, HIGH);
+      analogWrite(PWMPIN, (uint8_t) -val);
    }
    else if (val > 0)
    {
-      digitalWrite(DIRPIN,HIGH);
-      analogWrite(PWMPIN, val);
+      digitalWrite(DIRPIN, LOW);
+      analogWrite(PWMPIN, (uint8_t) val);
    }
 }

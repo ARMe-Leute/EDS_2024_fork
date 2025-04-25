@@ -1,31 +1,28 @@
 /**
  * @file pidController.cpp
  * @author Johannes Mueller, Dominik Berenspoehler
- * @brief Implementation der Klasse PIDController
+ * @brief Implementation der Klasse PIDController zur Regelung von physikalischen Größen.
  * @version 0.1
  * @date 2025-04-06
- *
  * @copyright Copyright (c) 2025
- *
  */
 
 #include "pidController.h"
 
 /**
- * @brief Default Constructor, notwendig
- *
+ * @brief Standardkonstruktor der PIDController-Klasse.
  */
 PIDController::PIDController() {}
 
 /**
- * @brief Erzeugt ein neues Objekt der Klasse PID-Controller
+ * @brief Konstruktor mit Initialisierungsparametern.
  *
- * Ruft die Funktion init auf.
+ * Erzeugt ein neues PIDController-Objekt und ruft die Initialisierungsfunktion auf.
  *
- * @param kp Proportional Koeffizient
- * @param ki Integral Koeffizient
- * @param kd Differential Koeffizient
- * @param ta Zyklus-Zeit in Sekunden
+ * @param kp Proportionalanteil
+ * @param ki Integralanteil
+ * @param kd Differentialanteil
+ * @param ta Abtastzeit in Sekunden
  */
 PIDController::PIDController(float kp, float ki, float kd, float ta)
 {
@@ -33,12 +30,12 @@ PIDController::PIDController(float kp, float ki, float kd, float ta)
 }
 
 /**
- * @brief Werte des PID Controllers initialisieren
+ * @brief Initialisiert den PID-Controller mit gegebenen Parametern.
  *
- * @param kp Proportional Koeffizient
- * @param ki Integral Koeffizient
- * @param kd Differential Koeffizient
- * @param ta Zyklus Zeit in Sekunden
+ * @param kp Proportionalanteil
+ * @param ki Integralanteil
+ * @param kd Differentialanteil
+ * @param ta Abtastzeit in Sekunden
  */
 void PIDController::init(float kp, float ki, float kd, float ta)
 {
@@ -53,39 +50,37 @@ void PIDController::init(float kp, float ki, float kd, float ta)
 }
 
 /**
- * @brief PID-Regler
+ * @brief Führt die PID-Regelung durch.
  *
- * Hier findet die Mathematische Berechnung des PID-Reglers statt.
+ * Berechnet den Regelausgang auf Basis der Abweichung (Differenz zwischen Soll- und Istwert).
  *
- * @param diff Differenz zwischen Soll- und Istwert der Motorposition
- * @return float
+ * @param diff Regelabweichung (Soll - Ist)
+ * @return float Regelausgang (Stellgröße)
  */
 float PIDController::pidControl(float diff)
 {
-   // TODO: Geschwindigkeit zu Position differenzieren
-   posISum += diff;
    if (KI == 0)
    {
       ISum = 0;
    }
    else
    {
-      ISum += posISum;
+      ISum += diff;
    }
-   float result = (KP * ISum) + (KI * ISum * TA) + (KD / TA) * (ISum - inpOld);
+
+   float result = (KP * diff) + (KI * ISum * TA) + (KD / TA) * (ISum - inpOld);
    inpOld = ISum;
    return result;
 }
 
 /**
- * @brief Reset des PID
- * 
- * Setzt die Werte des PID Controllers auf 0 zurück, beispielsweise nach Umkippen.
- * 
+ * @brief Setzt die internen Zustände des PID-Reglers zurück.
+ *
+ * z.B. nach Störfall oder einem Systemneustart.
  */
 void PIDController::reset()
 {
    ISum = 0;
-    posISum = 0;
-    inpOld = 0;
+   posISum = 0;
+   inpOld = 0;
 }

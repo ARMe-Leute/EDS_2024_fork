@@ -1,66 +1,95 @@
 /**
  * @file mpu6050.cpp
- * @author Johannes Mueller, Dominik Berenspoehler
- * @brief Implementation der Klasse MPU6050
+ * @author Johannes Müller, Dominik Berenspoehler
+ * @brief Implementation der Klasse GyroSensor zur Ansteuerung eines MPU6050-Sensors.
  * @version 0.1
  * @date 2025-04-06
- * 
  * @copyright Copyright (c) 2025
- * 
  */
 
 #include "gyroSensor.h"
 
- //TODO: Code für MPU mit der Wire.h library zum Laufen bekommen
- GyroSensor::GyroSensor() {}
-
- bool GyroSensor::init()
- {
-    Wire.begin();
-    mpu.initialize();
-    bool statusOK = mpu.testConnection();
-    
-    return statusOK;
- }
-
- void GyroSensor::getAcceleration()
- {
-    mpu.getAcceleration(&accelerationValues[x], &accelerationValues[y], &accelerationValues[z]);
-    getPitchfromAccel();
- }
-
- void GyroSensor::getGyro()
- {
-    mpu.getRotation(&gyroscopeValues[x], &gyroscopeValues[y], &gyroscopeValues[z]);
- }
+// TODO: Code für MPU mit der Wire.h library zum Laufen bekommen
 
 /**
- * @brief Berechnung des Pitch-Winkels
- * 
- * Aufgrund der Montageposition dreht der Pitch um die Z-Achse des MPU Sensors.
- * 
+ * @brief Konstruktor der GyroSensor-Klasse.
  */
- float GyroSensor::getPitchfromAccel()
- {
-    float ax = accelerationValues[x] * accelFactor;
-    float ay = accelerationValues[y] * accelFactor;
-    float az = accelerationValues[z] * accelFactor;
+GyroSensor::GyroSensor() {}
 
-    pitch = atan2(ax, sqrt(ay*ay + az*az)) * angleFactor;
+/**
+ * @brief Initialisiert den MPU6050-Sensor.
+ *
+ * Startet die I2C-Kommunikation, initialisiert das MPU-Objekt und prüft die Verbindung.
+ *
+ * @return true bei erfolgreicher Verbindung, sonst false.
+ */
+bool GyroSensor::init()
+{
+   Wire.begin();
+   mpu.initialize();
+   bool statusOK = mpu.testConnection();
 
-    return pitch;
- }
+   return statusOK;
+}
 
- float GyroSensor::getWeightedPitch(float dt)
- {
-    float ax = accelerationValues[x] * accelFactor;
-    float ay = accelerationValues[y] * accelFactor;
-    float az = accelerationValues[z] * accelFactor;
-    float gz = gyroscopeValues[z] * gyroFactor;
+/**
+ * @brief Liest die Beschleunigungswerte aus dem Sensor aus.
+ *
+ * Die Werte werden in das interne Array `accelerationValues` geschrieben.
+ * Anschließend wird der Pitch-Winkel basierend auf der Beschleunigung berechnet.
+ */
+void GyroSensor::getAcceleration()
+{
+   mpu.getAcceleration(&accelerationValues[x], &accelerationValues[y], &accelerationValues[z]);
+   getPitchfromAccel();
+}
 
-    float accelPitch = atan2(ax, sqrt(ay*ay + az*az)) * angleFactor;
+/**
+ * @brief Liest die Gyroskop-Werte aus dem Sensor aus.
+ *
+ * Die Werte werden in das interne Array `gyroscopeValues` geschrieben.
+ */
+void GyroSensor::getGyro()
+{
+   mpu.getRotation(&gyroscopeValues[x], &gyroscopeValues[y], &gyroscopeValues[z]);
+}
 
-    pitch = alpha * (pitch + gz * dt) + (1 - alpha) * accelPitch;
+/**
+ * @brief Berechnet den Pitch-Winkel anhand der aktuellen Beschleunigungswerte.
+ *
+ * Aufgrund der Sensorlage ergibt sich der Pitch um die Y-Achse des MPU6050.
+ *
+ * @return Der berechnete Pitch-Winkel in Grad.
+ */
+float GyroSensor::getPitchfromAccel()
+{
+   float ax = accelerationValues[x] * accelFactor;
+   float ay = accelerationValues[y] * accelFactor;
+   float az = accelerationValues[z] * accelFactor;
 
-    return pitch;
- }
+   pitch = atan2(ay, sqrt(ax * ax + az * az)) * angleFactor;
+
+   return pitch;
+}
+
+/**
+ * @brief Liefert den gefilterten Pitch-Winkel unter Verwendung eines Complementary Filters.
+ *
+ * Kombiniert die Werte des Beschleunigungssensors mit den Gyroskop-Daten zur robusteren Pitch-Schätzung.
+ *
+ * @param dt Zeitdifferenz in Sekunden seit der letzten Messung.
+ * @return Der gefilterte Pitch-Winkel in Grad.
+ */
+float GyroSensor::getWeightedPitch(float dt)
+{
+   float ax = accelerationValues[x] * accelFactor;
+   float ay = accelerationValues[y] * accelFactor;
+   float az = accelerationValues[z] * accelFactor;
+   float gy = gyroscopeValues[y] * gyroFactor;
+
+   float accelPitch = atan2(az, sqrt(ax * ax + ay * ay)) * angleFactor;
+
+   pitch = alpha * (pitch + gy * dt) + (1 - alpha) * accelPitch;
+
+   return pitch;
+}

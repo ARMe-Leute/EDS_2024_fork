@@ -2,7 +2,7 @@
 #include "defines.h"
 #include "balancer.h"
 
-Balancer bala; // dein Balancer-Objekt
+Balancer *balaPtr;
 int pulseCount;
 volatile unsigned long lastMillis = 0;
 float deltaTime = PULSECOUNTTIME * 0.001;
@@ -18,13 +18,23 @@ void pulseISR()
   pulseCount++;
 }
 
+void debug(const Balancer &bala)
+{
+  Serial.print("Winkel:\t");
+  Serial.print(bala.gyroSensor.pitch);
+  Serial.print("\t");
+  Serial.print("Float PWM:\t");
+  Serial.println(bala.flPWM);
+}
+
 void setup()
 {
-  bala = Balancer();
-  Balancer::instance = &bala;
+  Serial.begin(9600);
+  balaPtr = new Balancer();
+  Balancer::instance = balaPtr;
 
-  int inputs[2]{ALMPIN, VELOPIN};
-  int outputs[8]{ENBLPIN, DIRPIN, PWMPIN, BRKPIN, CTRLLEDPIN, PINU, PINV, PINW};
+  int inputs[5]{ALMPIN, VELOPIN, PINU, PINV, PINW};
+  int outputs[5]{ENBLPIN, DIRPIN, PWMPIN, BRKPIN, CTRLLEDPIN};
 
   for (int i = 0; i < 2; i++)
   {
@@ -42,39 +52,50 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(PINW), Balancer::recogniseHallPulseW, RISING);
 
   digitalWrite(BRKPIN, HIGH); // Motorbremse deaktivieren
+  digitalWrite(ENBLPIN, LOW);
 }
 
-void loop()
+void loop() 
 {
-  if (millis() - lastMillis >= PULSECOUNTTIME)
-  {
-    bala.getVelocity(pulseCount);
-    switch (bala.currentDirection)
-    {
-      case fwd:
-        break;
-      case bwd:
-        bala.currentVelocity = -bala.currentVelocity;
-      case unknown:
-        // ggf. Fehlerroutine
-        break;
-    }
-    bala.getPitch();
-    pulseCount = 0;
-    lastMillis = millis();
-    bala.motorOutput();
+  // 1) Zeitbasis prüfen
+  unsigned long now = millis();
+  if (now - lastMillis >= PULSECOUNTTIME) {
+      lastMillis = now;
+
+      // 2) Geschwindigkeit ermitteln (pulseCount wird im ISR inkrementiert)
+      Balancer::instance->getVelocity(pulseCount);
+      pulseCount = 0;  // Zähler zurücksetzen
+
+      // 3) Richtungserkennung wenn neues Hall-Event
+      if (Balancer::instance->newDirectionEvent) {
+          Balancer::instance->getDirection();          // setzt currentDirection
+          Balancer::instance->newDirectionEvent = false;
+      }
+
+      // 4) Pitch neu berechnen
+      Balancer::instance->getPitch();
+
+      // 5) Regelung ausführen und Motor ansteuern
+      Balancer::instance->motorOutput();
   }
 
-  Serial.print("Geschwindigkeit: ");
-  Serial.println(bala.currentVelocity);
-
-  if (Balancer::instance->newDirectionEvent)
-  {
-    Balancer::instance->getDirection();
-    // Serial.print("Drehrichtung: ");
-    // Serial.println(bala.currentDirection == fwd ? "Vorwärts" : "Rückwärts");
-
-    // Event zurücksetzen, nachdem es verarbeitet wurde
-    Balancer::instance->newDirectionEvent = false;
+  // 6) Debug-Ausgaben
+  //Serial.print("Geschwindigkeit:\t");
+  //Serial.println(Balancer::instance->currentVelocity);
+  // Serial.print("Winkel:\t");
+  // Serial.println(Balancer::instance->currentPitch);
+  // Serial.print("flV\t");
+  // Serial.println(Balancer::instance->flV);
+  Serial.print("flPWM\t");
+  Serial.println(constrain(Balancer::instance->flPWM, -PWMMAX, PWMMAX));
+  /*
+  Serial.print("Drehrichtung:\t");
+  switch (Balancer::instance->currentDirection) {
+    case fwd:    Serial.println("Vorwärts");  break;
+    case bwd:    Serial.println("Rückwärts"); break;
+    default:     Serial.println("Unknow");    break;
   }
+  */
+  
+  // debug(*Balancer::instance);  // als const Referenz übergeben
 }
