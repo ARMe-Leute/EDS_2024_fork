@@ -8,59 +8,11 @@
 #include <mcalGPIO.h>
 #include <mcalADC.h>
 
-/*****************************************************************************/
-/* Wichtige Registerdefinitionen und Bitmasken für STM32F4 (Auswahl/Beispiel)*/
-/*****************************************************************************/
-/*
-// (Beispiel-Adressen aus STM32F407/STM32F4xx; bitte für Ihr Modell prüfen)
-#define PERIPH_BASE       (0x40000000UL)
-#define AHB1PERIPH_BASE   (PERIPH_BASE + 0x00020000UL)
-#define APB2PERIPH_BASE   (PERIPH_BASE + 0x00010000UL)
-#define ADC1_BASE         (APB2PERIPH_BASE + 0x2000UL)
-#define ADC_COMMON_BASE   (APB2PERIPH_BASE + 0x2300UL) // "ADC_CCR" liegt im Common-Bereich
-
-// --- RCC (Reset and Clock Control) ---
-#define RCC_BASE               (AHB1PERIPH_BASE + 0x3800UL)
-#define RCC_APB2ENR_OFFSET     0x44
-#define RCC_APB2ENR            (*((volatile uint32_t *)(RCC_BASE + RCC_APB2ENR_OFFSET)))
-
-#define RCC_APB2ENR_ADC1EN     (1UL << 8)  // Bit 8: ADC1-Klock enable
-
-// --- ADC Common Register ---
-#define ADC_CCR        (*((volatile uint32_t *)(ADC_COMMON_BASE + 0x04)))
-// Im Referenzmanual oft ADC->CCR genannt; Offset 0x04 ab ADC_COMMON_BASE.
-
-// Bitmasken für ADC_CCR
-#define ADC_CCR_TSVREFE   (1UL << 23)  // Temperature sensor und V_REFINT einschalten
-
-// --- ADC1 einzelne Register (hier stark vereinfacht) ---
-#define ADC1_SR      (*((volatile uint32_t *)(ADC1_BASE + 0x00))) // Status register
-#define ADC1_CR1     (*((volatile uint32_t *)(ADC1_BASE + 0x04))) // Control register 1
-#define ADC1_CR2     (*((volatile uint32_t *)(ADC1_BASE + 0x08))) // Control register 2
-#define ADC1_SMPR1   (*((volatile uint32_t *)(ADC1_BASE + 0x0C))) // Sample time register 1
-#define ADC1_SMPR2   (*((volatile uint32_t *)(ADC1_BASE + 0x10))) // Sample time register 2
-#define ADC1_SQR1    (*((volatile uint32_t *)(ADC1_BASE + 0x2C))) // Regular seq register 1
-#define ADC1_SQR2    (*((volatile uint32_t *)(ADC1_BASE + 0x30))) // Regular seq register 2
-#define ADC1_SQR3    (*((volatile uint32_t *)(ADC1_BASE + 0x34))) // Regular seq register 3
-#define ADC1_DR      (*((volatile uint32_t *)(ADC1_BASE + 0x4C))) // Data register
-
-// --- ADC1_SR Bits ---
-#define ADC_SR_EOC     (1UL << 1)   // End of conversion
-
-// --- ADC1_CR2 Bits ---
-#define ADC_CR2_ADON   (1UL << 0)   // ADC einschalten
-#define ADC_CR2_SWSTART (1UL << 30) // Software trigger start
-// ... ggf. weitere Bits wie CONT für Continuous Mode, ALIGN, DMA etc.
-*/
 #define SCB_CPACR  (*(volatile uint32_t *)0xE000ED88U)
-#define ADC_COMMON_BASE   (APB2PERIPH_BASE + 0x2300UL) // "ADC_CCR" liegt im Common-Bereich
-#define ADC_CCR        (*((volatile uint32_t *)(ADC_COMMON_BASE + 0x04)))
-#define ADC_CCR_TSVREFE   (1UL << 23)  // Temperature sensor und V_REFINT einschalten
-#define ADC1_SMPR1   (*((volatile uint32_t *)(ADC1_BASE + 0x0C))) // Sample time register 1
-#define ADC1_SMPR2   (*((volatile uint32_t *)(ADC1_BASE + 0x10))) // Sample time register 2
+
 
 ADC_TypeDef *adc = ADC1;
-ADC_Common_TypeDef *adc_CTR = ADC1;
+ADC_Common_TypeDef *adcccr=ADC1_COMMON;
 ADC_CHANNEL_t chnList[] = {ADC_CHN_16};
 size_t seqLen = 1;
 
@@ -86,17 +38,14 @@ void ADC1_Init(void)
     // 1) ADC1-Takt aktivieren
     //RCC_APB2ENR |= RCC_APB2ENR_ADC1EN;
     adcSelectADC(adc);
-    // geht auch mit adcSelectADC(ADC_TypeDef *adc) aus mcalADC
 
     // 2) Temperatur-Sensor in ADC_CCR aktivieren
     //ADC_CCR |= ADC_CCR_TSVREFE;
-    activateTemperatureSensor();
-    // gibts in mcalADC nicht --> CCR-Register-Beschreibung in mcalADC hinzufuegen, wurde durch activateTemperatureSensor gemacht.
+    activateTemperatureSensor(adcccr);
 
     // 3) ADC1 deaktivieren, bevor wir CR1/CR2 einstellen (sicherheitshalber)
     //ADC1_CR2 &= ~ADC_CR2_ADON;
     adcDisableADC(adc);
-    // geht auch mit adcDisableADC(ADC_TypeDef *adc) aus mcalADC
 
     // 4) Sample-Time für Kanal 16 konfigurieren
     //    Kanal 16 wird in SMPR1[ (16-10)*3 ] = SMPR1[18..20 Bits] gesetzt
@@ -105,27 +54,20 @@ void ADC1_Init(void)
     //ADC1_SMPR1 &= ~(7UL << (3 * (16 - 10)));    // vorher nullen
     //ADC1_SMPR1 |=  (7UL << (3 * (16 - 10)));    // 111 => 480 cycles
     adcSetSampleCycles(adc, ADC_CHN_16, SAMPLE_CYCLES_480);
-    // geht vmtl auch mit ADC_CHN_16 in adcSetSampleCycles(ADC_TypeDef *adc, ADC_CHANNEL_t chn, ADC_SAMPLING_CYCLES_t cycles)
 
     // 5) Kanal 16 als einzige Conversion in der Regular Sequence SQR3
     //    Die untersten 5 Bits in SQR3 wählen den Kanal aus.
     //ADC1_SQR3 = 16UL;  // => 16 & 0x1F
     adcSetChannelSequence(adc, chnList, seqLen);
-    // geht auch mit seqLen = 1 in adcSetChannelSequence(ADC_TypeDef *adc, ADC_CHANNEL_t *chnList, size_t seqLen)
 
     // 6) Sequenz-Länge = 1
     //    SQR1[L[3:0]] => 0 => 1 Conversion
     //ADC1_SQR1 = 0; // L=0 => 1 Conversion
-    adcSetChannelSequence(adc, chnList, seqLen);
+    //adcSetChannelSequence(adc, chnList, seqLen);
 
     // 7) ADC1 einschalten (ADON-Bit)
     //ADC1_CR2 |= ADC_CR2_ADON;
     adcEnableADC(adc);
-    // geht auch mit adcEnableADC(ADC_TypeDef *adc) aus mcalADC
-
-    // Kurz warten, damit sich ADC intern einschwingen kann.
-    // Evtl. kleine Software-Pause (z. B. for-Schleife).
-    //for (volatile int i = 0; i < 100000; i++) { /* kleine Wartezeit */ }
 }
 
 /*****************************************************************************/
@@ -137,18 +79,14 @@ uint16_t ADC1_ReadTemperatureRaw(void)
     // 1) Start der Software-Conversion
     //ADC1_CR2 |= ADC_CR2_SWSTART;
     adcStartConversion(adc);
-    // geht auch mit adcStartConversion(ADC_TypeDef *adc) aus mcalADC
 
     // 2) Warten auf End-of-Conversion (EOC)
     while (adcIsConversionFinished(adc) == 0) {
-        // hier optional Watchdog/Timeout
     }
-    // kann man auch abfragen mit: adcIsConversionFinished(ADC_TypeDef *adc)
 
     // 3) ADC-Daten aus dem Data-Register auslesen
     //uint16_t adcValue = (uint16_t)(ADC1_DR & 0xFFFF);
     uint16_t adcValue = adcGetConversionResult(adc);
-    // geht auch mit adcGetConversionResult(ADC_TypeDef *adc)
 
     return adcValue;
 }
@@ -167,6 +105,7 @@ float ConvertTempSensorValueToC(uint16_t adcValue)
     // V25 ~ 0,76V, Avg_Slope ~ 2,5mV/°C => 0,0025V/°C
     float v25        = 0.76f;      // Spannung bei 25°C
     float avg_slope  = 0.0025f;    // Spannung pro °C
+    //zu const variablen verändern, damit nur in ROM gespeichert wird und nicht zusätzlich auch im RAM
 
     // T(°C) = (V25 - Vsense) / Avg_Slope + 25
     // Achtung: Je nach Datenblatt kann die Formel leicht variieren.
@@ -192,14 +131,9 @@ int main(void)
         uint16_t raw = ADC1_ReadTemperatureRaw();
         float tempC   = ConvertTempSensorValueToC(raw);
 
-        // Hier könnten Sie den Wert z. B. auf ein Display ausgeben
-        // oder über UART senden, LED ansteuern etc.
-        // ...
-
         // Einfache Pause
         for (volatile int i=0; i<1000000; i++) { /* Warten */ }
     }
 
-    // Sollte nie hierher kommen
     return 0;
 }

@@ -1,104 +1,74 @@
-/**
- ******************************************************************************
- * @file           : main.c
- * @author         : Erick Schlosser
- * @brief          : This is an example code for using the BatteryVoltage.c library.
- *              	 This code is based on the RotaryPushButton, CMSIS and MCAL library.
- * @date		   : December 02, 2024
- ******************************************************************************
- */
-
-#include <BatteryVoltage.h>
+#include <stm32f401xe.h>
+#include <system_stm32f4xx.h>
 #include <stm32f4xx.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-
+#include <stdlib.h>
 #include <mcalGPIO.h>
 #include <mcalADC.h>
-#include <stdio.h>
-#include <RotaryPushButton.h>
 
-extern bool timerTrigger = false;  								// Necessary for the mcalTimer
-static uint8_t colorcode = 0;									// Variable used for cycling through the colors
-/*
-GPIO_TypeDef 			*port  = GPIOA;							// Port which is used for the analog signal
-PIN_NUM_t				*pin   = PIN0;							// Pin which is used for the analog signal
-ADC_TypeDef				*adc   = ADC1;							// ADC which is used
-ADC_RESOLUTION_t 		resolution = ADC_RES_12BIT;				// Resolution of the ADC
-ADC_CHANNEL_t chnList[] = { ADC_CHN_0 , ADC_CHN_15};						// List of ADC channels in a sequence
-size_t         listSize = sizeof(chnList) / sizeof(chnList[0]);	// Calculate number of channel-list elements
-*/
+#include "BatteryVoltage.h"
+#define SCB_CPACR  (*(volatile uint32_t *)0xE000ED88U)
 
-/* Depending on the Voltage the Color of the RotaryPushButton is changed using the RotaryPushButton library */
-void setColorDependingOnValue(int caseNumber){
 
-    switch (caseNumber) {
-        case 0:
-            setRotaryColor(LED_BLACK);
-            break;
-        case 1:
-            setRotaryColor(LED_WHITE);
-            break;
-        case 2:
-            setRotaryColor(LED_RED);
-            break;
-        case 3:
-            setRotaryColor(LED_GREEN);
-            break;
-        case 4:
-            setRotaryColor(LED_BLUE);
-            break;
-        case 5:
-            setRotaryColor(LED_MAGENTA);
-            break;
-        case 6:
-            setRotaryColor(LED_CYAN);
-            break;
-        case 7:
-            setRotaryColor(LED_YELLOW);
-            break;
-        case 8:
-            setRotaryColor(LED_WHITE);
-            break;
-        case 9:
-            setRotaryColor(LED_RED); // Beispiel für Wiederholung
-            break;
-        case 10:
-            setRotaryColor(LED_GREEN); // Beispiel für Wiederholung
-            break;
-        default:
-            printf("Invalid case number!\n");
-            break;
-    }
+const bool timerTrigger;
+analogSingleCh_t *myADC = NULL;  // globale Definition (sichtbar für ISR)
+/*****************************************************************************/
+/* Funktion:  EnableFPU                                                      */
+/*****************************************************************************/
+void EnableFPU(void)
+{
+    // CP10 und CP11 auf Full Access setzen (Bits 20..23 = 0xF)
+    SCB_CPACR |= (0xF << 20);
+
+    // Daten-/Instruktions-Synchronisierung
+    __DSB();
+    __ISB();
 }
 
-void initADC(analogCh_t *configADC){
-	configADC->adc = ADC1;
-	configADC->chnResolution = ADC_RES_12BIT;
-	configADC->chnList[0] = ADC_CHN_0;
-	configADC->chnListSize = 1;
-	configADC->tempEnable = 1;
+void ADC_IRQHandler(void)
+{
+    // Sofort raus, wenn EOC nicht aktiv ist → ISR tut dann gar nichts
+    if (!adcIsConversionFinished(myADC->adc))
+        return;
+
+    // Konvertierungswert lesen → löscht automatisch EOC-Flag
+    myADC->chnADCValue[0] = adcGetConversionResult(myADC->adc);
+    conversionToVoltsCelsius(myADC);
 }
 
-/* Main Code of the Example Code */
-int main(void) {
-	analogCh_t myADC;
-	initADC(&myADC);
-    ADCInit(&myADC);	// Initialization of the GPIO and the ADC
+int main(void)
+{
+	EnableFPU();
+	myADC = (analogSingleCh_t *)malloc(sizeof(analogSingleCh_t));
+	myADC->adc = ADC1;
+	myADC->adccommon = ADC1_COMMON;
+	myADC->chnResolution = ADC_RES_12BIT;
+	myADC->chnListSize = 1;
+	myADC->chnList[0] = ADC_CHN_0;
+	myADC->tempEnable = 1;
+	myADC->interruptEnable = 1;
+	myADC->alpha_lowpass = 0.7f;
+	myADC->Prescaler[0] = 1;
+
+	ADCInit(myADC);
     while(1)
     {
-    	result[0] = adcGetConversionResult(myADC->adc);
-		uint16_t raw = ;
-		float tempC   = ;
+    	// Polling Betrieb
+    	if(myADC->interruptEnable == 0)
+    	{
+    		getVoltagePinValuePolling(myADC);
+    		myADC->chnVolt[0];
+    		myADC->tempValue;
+    	}
+    	// Interrupt Betrieb
+    	else
+    	{
+    		adcStartConversion(myADC->adc);
+    		__WFI();
+    	}
 
-		// Hier könnten Sie den Wert z. B. auf ein Display ausgeben
-		// oder über UART senden, LED ansteuern etc.
-		// ...
-		setColorDependingOnValue(colorcode);					// Change the color depending on the colorcode value
-
-		// Einfache Pause
-		for (volatile int i=0; i<1000000; i++) { /* Warten */ }
-	}
+    }
     return 0;
 }
