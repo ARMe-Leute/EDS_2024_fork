@@ -20,7 +20,7 @@ extern "C" {
 
 #define ADC_COMMON_BASE   (APB2PERIPH_BASE + 0x2300UL) // "ADC_CCR" liegt im Common-Bereich
 #define ADC_CCR        (*((volatile uint32_t *)(ADC_COMMON_BASE + 0x04)))
-#define ADC_CCR_TSVREFE   (1UL << 23)  // Temperature sensor und V_REFINT einschalten
+//#define ADC_CCR_TSVREFE   (1UL << 23)  // Temperature sensor und V_REFINT einschalten
 
 
 typedef enum

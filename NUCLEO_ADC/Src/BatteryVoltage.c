@@ -1,229 +1,207 @@
 /**
  ******************************************************************************
- * @file           : ReadOutBatteryVoltage.c
+ * @file           : BatteryVoltage.c
  * @author         : Erick Schlosser
- * @brief          : This is the C source code for reading out the Battery Voltage.
- *              	 It includes the implementations of the functions defined in "RotaryPushButton.h."
- *              	 Additionally, this source code contains the implementation of the interrupt functions.
- *              	 This library is based on the CMSIS and MCAL library.
- * @date		   : December 27, 2023
+ * @brief          : This file implements the logic to read analog voltages
+ *                   using the ADC (Analog-to-Digital Converter). It supports
+ *                   single-channel mode, including optional temperature reading,
+ *                   and uses a simple low-pass filter to smooth the results.
+ *
+ *                   Multichannel mode is not supported in this implementation
+ *                   because it requires DMA (Direct Memory Access).
+ *                   Only polling and interrupt-based single-channel modes
+ *                   are currently implemented.
+ *
+ * @date           : April 25, 2025
  ******************************************************************************
  */
-#include <stdint.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <mcalGPIO.h>
-#include <mcalADC.h>
-#include "BatteryVoltage.h"
 
-
-float previousResult = 0.0f;
+#include <stdint.h>        /* Standard integer types (e.g., uint32_t) */
+#include <stdbool.h>       /* Boolean type (true/false) */
+#include <stddef.h>        /* For size_t and NULL */
+#include <mcalGPIO.h>      /* GPIO driver */
+#include <mcalADC.h>       /* ADC driver */
+#include "BatteryVoltage.h" /* Header for voltage conversion functions */
 
 /*
- * InitADCGPIOPin ist dafür da die dazugehörigen GPIO Pins als analoge Eingänge zu konfigurieren.
+ * This static variable stores the previous voltage value.
+ * It is used in the low-pass filter to smooth the signal.
  */
-void InitADCGPIOPin(GPIO_TypeDef *port, PIN_NUM_t pin){
-    gpioSelectPort(port); 									// Activate GPIO clock
-	gpioSelectPinMode(port, pin, ANALOG);					// Setting the GPIO Pin to analog mode
-	gpioSelectPushPullMode(port, pin, NO_PULLUP_PULLDOWN);	// Disable Pull-up or Pull-down resistors
+static float previousResult = 0.0f;
+
+/**
+ * @brief Initializes one GPIO pin for ADC use by setting it to analog mode.
+ *
+ * @param port Pointer to the GPIO port (e.g., GPIOA)
+ * @param pin  Pin number to be configured (e.g., PIN0)
+ */
+void InitADCGPIOPin(GPIO_TypeDef *port, PIN_NUM_t pin)
+{
+    gpioSelectPort(port); /* Enable the clock for the specified GPIO port */
+    gpioSelectPinMode(port, pin, ANALOG); /* Set the pin to analog mode */
+    gpioSelectPushPullMode(port, pin, NO_PULLUP_PULLDOWN); /* Disable pull-up/down resistors */
 }
 
-/*
- * InitADCChannels schaut nach welche ADC Channels verwendet werden und initialisiert die dazugehörigen Pins über InitADCGPIOPin.
- * Ist schon für die MultiChannel-Variante geschrieben. Nur der Übergabe-TypeDef muss auf den MutliChannel TypeDef gewechselt werden.
+/**
+ * @brief Initializes all ADC channels in the configuration list.
+ *        This includes setting GPIO pins and ADC sampling time.
+ *
+ * @param analogCh Pointer to the analogSingleCh_t configuration structure.
+ *
+ * @note Only single-channel operation is supported in this version.
+ *       Multi-channel requires DMA and is not yet implemented.
  */
-void InitADCChannels(analogSingleCh_t *analogCh){
-	for (int i = 0; i < analogCh->chnListSize; i++) {
-		switch (analogCh->chnList[i]) {
-			case ADC_CHN_0:
-				// ADC_CHN_0 -> PA0
-				InitADCGPIOPin(GPIOA, PIN0);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_0, SAMPLE_CYCLES_480);
-				break;
+void InitADCChannels(analogSingleCh_t *analogCh)
+{
+    size_t i;
 
-			case ADC_CHN_1:
-				// ADC_CHN_1 -> PA1
-				InitADCGPIOPin(GPIOA, PIN1);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_1, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_2:
-				// ADC_CHN_2 -> PA2
-				InitADCGPIOPin(GPIOA, PIN2);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_2, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_3:
-				// ADC_CHN_3 -> PA3
-				InitADCGPIOPin(GPIOA, PIN3);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_3, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_4:
-				// ADC_CHN_4 -> PA4
-				InitADCGPIOPin(GPIOA, PIN4);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_4, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_5:
-				// ADC_CHN_5 -> PA5
-				InitADCGPIOPin(GPIOA, PIN5);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_5, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_6:
-				// ADC_CHN_6 -> PA6
-				InitADCGPIOPin(GPIOA, PIN6);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_6, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_7:
-				// ADC_CHN_7 -> PA7
-				InitADCGPIOPin(GPIOA, PIN7);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_7, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_8:
-				// ADC_CHN_8 -> PB0
-				InitADCGPIOPin(GPIOB, PIN0);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_8, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_9:
-				// ADC_CHN_9 -> PB1
-				InitADCGPIOPin(GPIOB, PIN1);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_9, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_10:
-				// ADC_CHN_10 -> PC0
-				InitADCGPIOPin(GPIOC, PIN0);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_10, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_11:
-				// ADC_CHN_11 -> PC1
-				InitADCGPIOPin(GPIOC, PIN1);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_11, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_12:
-				// ADC_CHN_12 -> PC2
-				InitADCGPIOPin(GPIOC, PIN2);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_12, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_13:
-				// ADC_CHN_13 -> PC3
-				InitADCGPIOPin(GPIOC, PIN3);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_13, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_14:
-				// ADC_CHN_14 -> PC4
-				InitADCGPIOPin(GPIOC, PIN4);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_14, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_15:
-				// ADC_CHN_15 -> PC5
-				InitADCGPIOPin(GPIOC, PIN5);
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_15, SAMPLE_CYCLES_480);
-				break;
-
-			case ADC_CHN_16:
-				// Interner Temperatur-Sensor, kein externer Pin
-				activateTemperatureSensor(analogCh->adccommon);		// Aktivieren des internen Temperatursensors
-				adcSetSampleCycles(analogCh->adc, ADC_CHN_16, SAMPLE_CYCLES_480);
-				break;
-
-			default:
-				//printf("Unbekannter ADC-Kanal!\n");
-				break;
-		}
-	}
-}
-
-
-/* ADC Initialization and Configuration for Polling */
-void ADCInit(analogSingleCh_t *analogCh) {
-	adcSelectADC(analogCh->adc); 		// Activate ADC clock
-	// Falls der tempEnable auf True gesetzt ist, soll im SingleChannelMode nur die Temperatur ausgewertet werden.
-    if (analogCh->tempEnable)
+    for (i = 0U; i < analogCh->chnListSize; ++i)
     {
-    	/* Für SingleChannel: */
-    	analogCh->chnList[0] = ADC_CHN_16;			// Channel 16 (interner Temperatursensor) als einzigen Kanal setzen
-    	/* Für MultiChannel:
-    	 * analogCh->chnListSize = analogCh->chnListSize +1;			// Listengröße um 1 erhöhen (weil Kanal 16 hinzugefügt wird)
-    	 * analogCh->chnList[analogCh->chnListSize -1] = ADC_CHN_16 ; 	// Kanal 16 in die Kanalliste einfügen
-    	 */
+        switch (analogCh->chnList[i])
+        {
+            case ADC_CHN_0:
+                InitADCGPIOPin(GPIOA, PIN0); /* Configure GPIO pin PA0 as analog input */
+                adcSetSampleCycles(analogCh->adc, ADC_CHN_0, SAMPLE_CYCLES_480); /* Set ADC sampling time */
+                break;
+
+            /* Additional channels (ADC_CHN_1 to ADC_CHN_15) can be configured here in the same way */
+
+            case ADC_CHN_16:
+                activateTemperatureSensor(analogCh->adccommon); /* Enable internal temperature sensor */
+                adcSetSampleCycles(analogCh->adc, ADC_CHN_16, SAMPLE_CYCLES_480);
+                break;
+
+            default:
+                /* Unknown or unsupported ADC channel */
+                break;
+        }
     }
-    adcDisableADC(analogCh->adc);		// Disable the ADC to configure it
-    InitADCChannels(analogCh);			// ADC Kanäle konfigurieren
-    adcSetChannelSequence(analogCh->adc, analogCh->chnList, analogCh->chnListSize);			// Select the ADC-Channel
-    adcSetResolution(analogCh->adc, analogCh->chnResolution); // Select the ADC Resolution
-    adcEnableADC(analogCh->adc);										// Enable the ADC again after configuration
-    if (analogCh->interruptEnable == 1)
+}
+
+/**
+ * @brief Initializes the ADC peripheral and its settings.
+ *        This function also enables or disables interrupt-based conversion.
+ *
+ * @param analogCh Pointer to the analog configuration structure.
+ */
+void ADCInit(analogSingleCh_t *analogCh)
+{
+    adcSelectADC(analogCh->adc); /* Enable ADC peripheral clock */
+
+    if (analogCh->tempEnable != false)
     {
-    	adcEnableInterrupt(analogCh->adc, ADC_EOC_REGULAR_GRP); // Aktivierung des Interrupts für die End-of-conversion flag
-    	NVIC_EnableIRQ(ADC_IRQn);
+        /* If temperature sensor is enabled, force channel 16 */
+        analogCh->chnList[0U] = ADC_CHN_16;
+    }
+
+    adcDisableADC(analogCh->adc); /* Disable ADC before configuration */
+
+    InitADCChannels(analogCh); /* Configure the GPIOs and channels */
+
+    adcSetChannelSequence(analogCh->adc, analogCh->chnList, analogCh->chnListSize); /* Set active channels */
+
+    adcSetResolution(analogCh->adc, analogCh->chnResolution); /* Set the resolution (e.g., 12-bit) */
+
+    adcEnableADC(analogCh->adc); /* Re-enable ADC after setup */
+
+    if (analogCh->interruptEnable != false)
+    {
+        adcEnableInterrupt(analogCh->adc, ADC_EOC_REGULAR_GRP); /* Enable end-of-conversion interrupt */
+        NVIC_EnableIRQ(ADC_IRQn); /* Enable ADC interrupt in NVIC */
     }
     else
     {
-    	adcDisableInterrupt(analogCh->adc, ADC_EOC_REGULAR_GRP); // Deaktivieren des Interrupts
+        adcDisableInterrupt(analogCh->adc, ADC_EOC_REGULAR_GRP); /* Use polling only */
     }
 }
 
-/* Reading the ADC Value with Polling and writing the ADC Value (0-4095 at 12bit) into analogCh*/
-void getAnalogPinValuePolling(analogSingleCh_t *analogCh) {
-    adcStartConversion(analogCh->adc);
-    while (!adcIsConversionFinished(analogCh->adc)) {
-        ; //waiting for the adc conversion to be finished
-    }
-    analogCh->chnADCValue[0] = adcGetConversionResult(analogCh->adc);
-}
-/*
- * Converting to Volts and Celsius with a lowpass-filter
+/**
+ * @brief Reads one ADC value using polling (blocking wait).
+ *
+ * @param analogCh Pointer to configuration and result structure.
  */
-void conversionToVoltsCelsius(analogSingleCh_t *analogCh){
-	const float v25 = 0.76f; 			// Voltage at 25°C
-	const float avg_slope = 0.0025f;	// Volt per °C
-	const float refVoltage = (analogCh->Prescaler[0]) * 3.3f;
-	previousResult = analogCh->chnVolt[0];
-	switch (analogCh->chnResolution)
-	{
-		/* calculating and writing the result of the lowpass-filter in volts into the typedef
-		*  Calculation of Lowpass-Filter:
-		*	y[n] = α*y[n-1] + (1-α)*x[n]
-		*/
-		case ADC_RES_12BIT:
-			analogCh->chnVolt[0] = analogCh->alpha_lowpass * previousResult + (1.0f - analogCh->alpha_lowpass) * analogCh->chnADCValue[0]/4095.0f * refVoltage;
-			break;
-		case ADC_RES_10BIT:
-			analogCh->chnVolt[0] = analogCh->alpha_lowpass * previousResult + (1.0f - analogCh->alpha_lowpass) * analogCh->chnADCValue[0]/1023.0f * refVoltage;
-			break;
-		case ADC_RES_8BIT:
-			analogCh->chnVolt[0] = analogCh->alpha_lowpass * previousResult + (1.0f - analogCh->alpha_lowpass) * analogCh->chnADCValue[0]/255.0f * refVoltage;
-			break;
-		case ADC_RES_6BIT:
-			analogCh->chnVolt[0] = analogCh->alpha_lowpass * previousResult + (1.0f - analogCh->alpha_lowpass) * analogCh->chnADCValue[0]/63.0f * refVoltage;
-			break;
-	}
-	// Converting the voltage to the temperature in °C if tempEnable is set to true
-	if (analogCh->tempEnable == 1)
-	{
-		analogCh->tempValue = (v25 - analogCh->chnVolt[0]) / avg_slope + 25.0f;
-	}
+void getAnalogPinValuePolling(analogSingleCh_t *analogCh)
+{
+    adcStartConversion(analogCh->adc); /* Start ADC conversion */
+
+    while (!adcIsConversionFinished(analogCh->adc))
+    {
+        /* Wait until conversion is complete */
+    }
+
+    analogCh->chnADCValue[0] = adcGetConversionResult(analogCh->adc); /* Store raw ADC result */
 }
 
-/* Reading the ADC Value with Polling and writing it into analogCh*/
-void getVoltagePinValuePolling(analogSingleCh_t *analogCh){
-	adcStartConversion(analogCh->adc);
-	while (!adcIsConversionFinished(analogCh->adc))
-	{
-		; //waiting for the adc conversion to be finished
-	}
-	analogCh->chnADCValue[0] = adcGetConversionResult(analogCh->adc);
-	conversionToVoltsCelsius(analogCh);
+/**
+ * @brief Converts a raw ADC result into a voltage (and optionally temperature)
+ *        using a digital low-pass filter.
+ *
+ * @param analogCh Pointer to analog channel configuration.
+ */
+void conversionToVoltsCelsius(analogSingleCh_t *analogCh)
+{
+    const float v25 = 0.76f; /* Voltage at 25°C for internal temperature sensor */
+    const float avg_slope = 0.0025f; /* Slope from datasheet (V/°C) */
+    const float refVoltage = analogCh->Prescaler[0] * 3.3f; /* Adjusted voltage reference */
+
+    previousResult = analogCh->chnVolt[0]; /* Get last filtered voltage */
+
+    /* Apply low-pass filter:
+     * new_value = alpha * old_value + (1 - alpha) * new_input
+     */
+    switch (analogCh->chnResolution)
+    {
+        case ADC_RES_12BIT:
+            analogCh->chnVolt[0] =
+                analogCh->alpha_lowpass * previousResult +
+                (1.0f - analogCh->alpha_lowpass) * (analogCh->chnADCValue[0] / 4095.0f) * refVoltage;
+            break;
+
+        case ADC_RES_10BIT:
+            analogCh->chnVolt[0] =
+                analogCh->alpha_lowpass * previousResult +
+                (1.0f - analogCh->alpha_lowpass) * (analogCh->chnADCValue[0] / 1023.0f) * refVoltage;
+            break;
+
+        case ADC_RES_8BIT:
+            analogCh->chnVolt[0] =
+                analogCh->alpha_lowpass * previousResult +
+                (1.0f - analogCh->alpha_lowpass) * (analogCh->chnADCValue[0] / 255.0f) * refVoltage;
+            break;
+
+        case ADC_RES_6BIT:
+            analogCh->chnVolt[0] =
+                analogCh->alpha_lowpass * previousResult +
+                (1.0f - analogCh->alpha_lowpass) * (analogCh->chnADCValue[0] / 63.0f) * refVoltage;
+            break;
+
+        default:
+            /* Invalid resolution */
+            break;
+    }
+
+    /* If temperature sensor is active, convert voltage to °C */
+    if (analogCh->tempEnable != false)
+    {
+        analogCh->tempValue = (v25 - analogCh->chnVolt[0]) / avg_slope + 25.0f;
+    }
 }
 
+/**
+ * @brief Combines ADC read and conversion in one step (polling).
+ *
+ * @param analogCh Pointer to configuration and result structure.
+ */
+void getVoltagePinValuePolling(analogSingleCh_t *analogCh)
+{
+    adcStartConversion(analogCh->adc); /* Start ADC conversion */
+
+    while (!adcIsConversionFinished(analogCh->adc))
+    {
+        /* Wait until done */
+    }
+
+    analogCh->chnADCValue[0] = adcGetConversionResult(analogCh->adc); /* Store raw result */
+
+    conversionToVoltsCelsius(analogCh); /* Convert to voltage and temperature */
+}
