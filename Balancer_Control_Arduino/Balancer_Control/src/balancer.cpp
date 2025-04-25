@@ -30,9 +30,14 @@ Balancer *Balancer::instance = nullptr;
 Balancer::Balancer()
 {
    GyroSensor _mpu;
+   if (!_mpu.init())
+   {
+      digitalWrite(CTRLLEDPIN, HIGH);
+      while (1) {}
+   }
    PIDController _pid_pos(0, 0, 0, 1 / PULSECOUNTTIME);
-   PIDController _pid_v(0, 0, 0, 1 / PULSECOUNTTIME);
-   PIDController _pid_phi(0, 0, 0, 1 / PULSECOUNTTIME);
+   PIDController _pid_v(0.8, 1.2, 0, 1 / PULSECOUNTTIME);
+   PIDController _pid_phi(5, 0, 0, 1 / PULSECOUNTTIME);
    init(_mpu, _pid_pos, _pid_v, _pid_phi);
 }
 
@@ -130,7 +135,7 @@ void Balancer::recogniseHallPulse(hallPhases phase)
  *
  * @return direction fwd bei Vorwärtsdrehung, bwd bei Rückwärtsdrehung
  */
-direction Balancer::getDirection()
+void Balancer::getDirection()
 {
    // Ringpuffer-Auswertung: letzten drei Einträge in richtiger Reihenfolge lesen
    int i0 = directionBfrIncrement % 3;
@@ -146,7 +151,7 @@ direction Balancer::getDirection()
        (a == v && b == w && c == u) ||
        (a == w && b == u && c == v))
    {
-      return fwd;
+      currentDirection = fwd;
    }
 
    // Mögliche Rückwärtsfolgen (u → w → v, v → u → w, w → v → u)
@@ -154,11 +159,11 @@ direction Balancer::getDirection()
        (a == v && b == u && c == w) ||
        (a == w && b == v && c == u))
    {
-      return bwd;
+      currentDirection = bwd;
    }
 
    // Default Case
-   return unknown;
+   currentDirection = unknown;
 }
 
 void Balancer::getPitch()
@@ -168,5 +173,37 @@ void Balancer::getPitch()
 
 void Balancer::motorOutput()
 {
-   
+   if (abs(currentPitch) > 23.0) // maximaler Aufrichtwinkel 
+   {
+      flPWM = 0.0;
+      applyMotor(flPWM);
+      return;
+   }
+   else
+   {
+      flV = pid_phi.pidControl(-currentPitch);
+      flPWM = pid_v.pidControl(flV - currentVelocity);
+      applyMotor(flPWM);
+      return;
+   }
+}
+
+void Balancer::applyMotor(float val)
+{
+   val = constrain(val, -PWMMAX, PWMMAX);
+
+   if (val == 0.0)
+   {
+      analogWrite(PWMPIN, 0);
+   }
+   else if (val < 0)
+   {
+      digitalWrite(DIRPIN, LOW);
+      analogWrite(PWMPIN, -val);
+   }
+   else if (val > 0)
+   {
+      digitalWrite(DIRPIN,HIGH);
+      analogWrite(PWMPIN, val);
+   }
 }

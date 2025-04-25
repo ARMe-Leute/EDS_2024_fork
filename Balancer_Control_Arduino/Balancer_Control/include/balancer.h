@@ -37,7 +37,7 @@ public:
    void init(GyroSensor _mpu, PIDController _pid_pos, PIDController _pid_v, PIDController _pid_phi);
    void getVelocity(int pulsecount);
    void getPitch();
-   direction getDirection();
+   void getDirection();
    void motorOutput();
 
    // Statische ISR-Wrapper
@@ -51,9 +51,11 @@ public:
    volatile bool newDirectionEvent = false;
 
    float currentVelocity; ///< Aktuelle Geschwindigkeit
+   direction currentDirection; ///< Aktuelle Richtung
 
 private:
    void recogniseHallPulse(hallPhases phase);
+   void applyMotor(float val);
 
    int16_t sensorBuffer[6];
    GyroSensor gyroSensor;    // TODO: MPU einbinden
@@ -61,6 +63,7 @@ private:
    PIDController pid_v;   ///< PID-Regler Geschwindigkeit
    PIDController pid_phi; ///< PID-Regler Pitch-Winkel
 
+   float flV;
    float flPWM;                         ///< Ergebnis des Reglers, mit dem der Motor angesteuert wird
    float currentPitch;                  ///< Aktueller Pitch-Wert
    float velocityFactor;                ///< Umrechnungsfaktor für die Geschwindigkeitsberechnung

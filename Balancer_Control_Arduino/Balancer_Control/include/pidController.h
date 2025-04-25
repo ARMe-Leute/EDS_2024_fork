@@ -28,6 +28,7 @@
         PIDController(float kp, float ki, float kd, float ta);
         void init(float kp, float ki, float kd, float ta);
         float pidControl(float diff);
+        void reset();
  };
 
  #endif

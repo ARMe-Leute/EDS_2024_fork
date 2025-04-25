@@ -44,7 +44,7 @@ void PIDController::init(float kp, float ki, float kd, float ta)
 {
    KP = kp;
    KI = ki;
-   KD = kp;
+   KD = kd;
    TA = ta;
 
    ISum = 0;
@@ -75,4 +75,17 @@ float PIDController::pidControl(float diff)
    float result = (KP * ISum) + (KI * ISum * TA) + (KD / TA) * (ISum - inpOld);
    inpOld = ISum;
    return result;
+}
+
+/**
+ * @brief Reset des PID
+ * 
+ * Setzt die Werte des PID Controllers auf 0 zurück, beispielsweise nach Umkippen.
+ * 
+ */
+void PIDController::reset()
+{
+   ISum = 0;
+    posISum = 0;
+    inpOld = 0;
 }

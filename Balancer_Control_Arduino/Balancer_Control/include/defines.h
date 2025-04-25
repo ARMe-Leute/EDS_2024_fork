@@ -20,4 +20,5 @@
 #define PINW 10       ///< Eingang Hall-Signal W
 #define CTRLLEDPIN 13 ///< On-Board LED für Debug-Zwecke
 
-#define PULSECOUNTTIME 100 ///< ms Intervall, in dem die Pulse gezählt werden
+#define PULSECOUNTTIME 25 ///< ms Intervall, in dem die Pulse gezählt werden
+#define PWMMAX 20         ///< Maximaler PWM Wert

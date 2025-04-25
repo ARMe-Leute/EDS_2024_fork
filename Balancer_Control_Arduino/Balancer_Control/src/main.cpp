@@ -23,14 +23,14 @@ void setup()
   bala = Balancer();
   Balancer::instance = &bala;
 
-  int inputs[ALMPIN, VELOPIN];
-  int outputs[ENBLPIN, DIRPIN, PWMPIN, BRKPIN, CTRLLEDPIN, PINU, PINV, PINW];
+  int inputs[2]{ALMPIN, VELOPIN};
+  int outputs[8]{ENBLPIN, DIRPIN, PWMPIN, BRKPIN, CTRLLEDPIN, PINU, PINV, PINW};
 
-  for (int i = 0; i < sizeof(inputs); i++)
+  for (int i = 0; i < 2; i++)
   {
     pinMode(inputs[i], INPUT);
   }
-  for (int i = 0; i < sizeof(outputs); i++)
+  for (int i = 0; i < 8; i++)
   {
     pinMode(outputs[i], OUTPUT);
   }
@@ -40,6 +40,8 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(PINU), Balancer::recogniseHallPulseU, RISING);
   attachInterrupt(digitalPinToInterrupt(PINV), Balancer::recogniseHallPulseV, RISING);
   attachInterrupt(digitalPinToInterrupt(PINW), Balancer::recogniseHallPulseW, RISING);
+
+  digitalWrite(BRKPIN, HIGH); // Motorbremse deaktivieren
 }
 
 void loop()
@@ -47,9 +49,20 @@ void loop()
   if (millis() - lastMillis >= PULSECOUNTTIME)
   {
     bala.getVelocity(pulseCount);
+    switch (bala.currentDirection)
+    {
+      case fwd:
+        break;
+      case bwd:
+        bala.currentVelocity = -bala.currentVelocity;
+      case unknown:
+        // ggf. Fehlerroutine
+        break;
+    }
     bala.getPitch();
     pulseCount = 0;
     lastMillis = millis();
+    bala.motorOutput();
   }
 
   Serial.print("Geschwindigkeit: ");
@@ -57,9 +70,9 @@ void loop()
 
   if (Balancer::instance->newDirectionEvent)
   {
-    direction dir = Balancer::instance->getDirection();
-    Serial.print("Drehrichtung: ");
-    Serial.println(dir == fwd ? "Vorwärts" : "Rückwärts");
+    Balancer::instance->getDirection();
+    // Serial.print("Drehrichtung: ");
+    // Serial.println(bala.currentDirection == fwd ? "Vorwärts" : "Rückwärts");
 
     // Event zurücksetzen, nachdem es verarbeitet wurde
     Balancer::instance->newDirectionEvent = false;
