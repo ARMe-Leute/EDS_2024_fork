@@ -4,45 +4,68 @@
  * @brief Deklaration der Klasse Balancer
  * @version 0.1
  * @date 2025-04-06
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 
- #ifndef BALANCER
- #define BALANCER
+#ifndef BALANCER
+#define BALANCER
 
- #include "pidController.h"
- #include "mpu6050.h"
+#include "pidController.h"
+#include "gyroSensor.h"
 
- enum sensorOutput 
- {
-    accelX,
-    accelY,
-    accelZ,
-    gyroX,
-    gyroY,
-    gyroZ
- };
+typedef enum
+{
+   u,
+   v,
+   w
+} hallPhases;
 
- class Balancer
- {
-    public:
-        Balancer();
-        Balancer(MPU6050 _mpu, PIDController _pid);
-        void init(MPU6050 mpu, PIDController pid);
-        void getVelocity(int pulsecount);
-        void getPitch();
-        void motorOutput();
+typedef enum
+{
+   fwd,
+   bwd,
+   unknown
+} direction;
 
-    private:
-        int16_t sensorBuffer[6];
-        MPU6050 gyroSensor;                 //TODO: MPU einbinden
-        PIDController pid;                  
-        float currentVelocity;              ///< Aktuelle Geschwindigkeit
-        float flPWM;                        ///< Ergebnis des Reglers, mit dem der Motor angesteuert wird
-        float currentPitch;                 ///< Aktueller Pitch-Wert
-        float velocityFactor;               ///< Umrechnungsfaktor für die Geschwindigkeitsberechnung
- };
+class Balancer
+{
+public:
+   Balancer();
+   Balancer(GyroSensor _mpu, PIDController _pid_pos, PIDController _pid_v, PIDController _pid_phi);
+   void init(GyroSensor _mpu, PIDController _pid_pos, PIDController _pid_v, PIDController _pid_phi);
+   void getVelocity(int pulsecount);
+   void getPitch();
+   direction getDirection();
+   void motorOutput();
 
- #endif // BALANCER
+   // Statische ISR-Wrapper
+   static void recogniseHallPulseU();
+   static void recogniseHallPulseV();
+   static void recogniseHallPulseW();
+
+   // Zeiger auf aktuelle Instanz (Singleton)
+   static Balancer *instance;
+
+   volatile bool newDirectionEvent = false;
+
+   float currentVelocity; ///< Aktuelle Geschwindigkeit
+
+private:
+   void recogniseHallPulse(hallPhases phase);
+
+   int16_t sensorBuffer[6];
+   GyroSensor gyroSensor;    // TODO: MPU einbinden
+   PIDController pid_pos; ///< PID-Regler Position
+   PIDController pid_v;   ///< PID-Regler Geschwindigkeit
+   PIDController pid_phi; ///< PID-Regler Pitch-Winkel
+
+   float flPWM;                         ///< Ergebnis des Reglers, mit dem der Motor angesteuert wird
+   float currentPitch;                  ///< Aktueller Pitch-Wert
+   float velocityFactor;                ///< Umrechnungsfaktor für die Geschwindigkeitsberechnung
+   volatile hallPhases directionBfr[3]; ///< Array für Richtungserkennung
+   volatile int directionBfrIncrement = 0;
+};
+
+#endif // BALANCER

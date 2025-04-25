@@ -1,0 +1,49 @@
+# LaTeX intermediate files
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+*.nav
+*.snm
+*.vrb
+*.synctex.gz
+*.fdb_latexmk
+*.blg
+*.bbl
+
+# Bibliography files
+*.bcf
+*.run.xml
+
+# PDF and other output
+*.pdf
+*.dvi
+*.ps
+
+# Editor backups
+*~
+*.swp
+*.bak
+*.backup
+*.tmp
+
+# TeXShop
+*.texpadtmp
+*.synctex(busy)
+
+# MacOS specific
+.DS_Store
+
+# VSCode or other IDEs
+.vscode/
+.idea/
+
+# latexmk specific
+latexmkrc

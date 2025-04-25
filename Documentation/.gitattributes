@@ -1,0 +1,28 @@
+# Alle LaTeX-Dateien als Text behandeln
+*.tex text
+*.bib text
+*.sty text
+*.cls text
+*.txt text
+*.md  text
+
+# Binärdateien – nicht diffen
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.eps binary
+
+# Standardmäßige Zeilenenden auf LF setzen (für Unix-Kompatibilität)
+*.tex text eol=lf
+*.bib text eol=lf
+
+# LaTeX-Logdateien nicht tracken, aber wenn sie doch mal reinkommen:
+*.log text eol=lf
+
+# GitHub linguist: zähle nur diese Dateien zur Spracheinschätzung
+*.tex linguist-language=TeX
+*.bib linguist-language=BibTeX
+
+# Optional: Unicode-normalisierung bei Bedarf
+# *.tex text working-tree-encoding=UTF-8
