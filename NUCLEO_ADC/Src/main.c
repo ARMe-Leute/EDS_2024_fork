@@ -27,7 +27,7 @@
 /* Register for enabling floating-point unit (FPU) access */
 
 extern const bool timerTrigger = false;
-/* Not used in this example, placeholder for future use */
+/* Not used in this example, but due to problems in the compiler process needed*/
 
 analogSingleCh_t *myADC = NULL;
 /* Global pointer to ADC configuration struct (must be global for ISR access) */
@@ -83,6 +83,7 @@ int main(void)
     myADC->interruptEnable = false;       /* Use polling, not interrupt */
     myADC->alpha_lowpass = 0.7f;          /* Set filter strength (0.0 = fast, 1.0 = slow) */
     myADC->Prescaler[0] = 1.0f;           /* default: 1.0 = No voltage divider used */
+
     /*
      * OPTIONAL SETTINGS (Enable if needed for testing):
      * -------------------------------------------------
