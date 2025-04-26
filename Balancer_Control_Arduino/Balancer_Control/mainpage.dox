@@ -1,0 +1,48 @@
+/**
+ * @mainpage Balancer Projekt Dokumentation
+ *
+ * @section intro_sec Einführung
+ *
+ * Dieses Projekt implementiert die Steuerung eines selbstbalancierenden Fahrzeugs ("Balancer")
+ * auf Basis eines Arduino-Controllers.
+ * 
+ * Kernkomponenten:
+ * - PID-Regler für Geschwindigkeit, Position und Pitch
+ * - MPU6050 Gyrosensor zur Lageerkennung
+ * - Geschwindigkeits- und Richtungsbestimmung über Hall-Sensoren
+ * - Ansteuerung eines BLDC-Motorcontrollers (BLDC-8015A) via PWM
+ *
+ * Eine Funktionsüberprüfung wurde mithilfe der Konsolenausgabe durchgeführt.
+ * Aus Gründen, die nicht weiter spezifiziert werden konnten, hängt sich das Programm bei der Ansteuerung des BLDC Controllers auf.
+ * Mit nicht angeklemmtem Motorcontroller werden sinnvolle Werte für den Winkelsensor und die Ausgänge der PID-Regler errechnet und ausgegeben.
+ * Eine Funktion des Gesamtsystems ist dennoch nicht gegeben.
+ * 
+ * @section hardware_sec Hardware
+ * 
+ * - Arduino Uno 
+ * - MPU6050 6-Achsen-Sensor (Gyro + Beschleunigung)
+ * - BLDC-Controller
+ * - Hall-Sensoren zur Erkennung der Motordrehung
+ * - Diverse Eingänge/Ausgänge für Steuerung und Überwachung
+ *
+ * @section structure_sec Projektstruktur
+ * 
+ * - `main.cpp` – Hauptprogrammschleife und Setup
+ * - `balancer.h/.cpp` – Steuerungsklasse für die Balancer-Logik
+ * - `pidController.h/.cpp` – PID-Reglerimplementierung
+ * - `gyroSensor.h/.cpp` – Gyrosensor-Anbindung (MPU6050)
+ * - `defines.h` – Definition aller verwendeten Pins und Konstanten
+ * 
+ * @section disclaimer_sec Hinweis zur Dokumentation
+ *
+ * Ein Teil dieser Dokumentation wurde mithilfe generativer KI (ChatGPT, OpenAI) erstellt.
+ * Alle Inhalte wurden auf ihre Richtigkeit überprüft und angepasst. 
+ *
+ * @section contact_sec Kontakt
+ * 
+ * Erstellt von:
+ * - Johannes Müller
+ * - Dominik Berenspoehler
+ *
+ * Stand: April 2025
+ */

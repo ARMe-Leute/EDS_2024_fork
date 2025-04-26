@@ -9,8 +9,6 @@
 
 #include "gyroSensor.h"
 
-// TODO: Code für MPU mit der Wire.h library zum Laufen bekommen
-
 /**
  * @brief Konstruktor der GyroSensor-Klasse.
  */

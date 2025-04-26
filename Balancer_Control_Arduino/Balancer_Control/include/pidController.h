@@ -29,42 +29,10 @@ private:
     float inpOld;  ///< Vorheriger Regelwert zur Berechnung des Differentialanteils
 
 public:
-    /**
-     * @brief Standardkonstruktor.
-     */
     PIDController();
-
-    /**
-     * @brief Konstruktor mit Initialisierungsparametern.
-     *
-     * @param kp Proportionalanteil
-     * @param ki Integralanteil
-     * @param kd Differentialanteil
-     * @param ta Abtastzeit in Sekunden
-     */
     PIDController(float kp, float ki, float kd, float ta);
-
-    /**
-     * @brief Initialisiert den PID-Regler.
-     *
-     * @param kp Proportionalanteil
-     * @param ki Integralanteil
-     * @param kd Differentialanteil
-     * @param ta Abtastzeit in Sekunden
-     */
     void init(float kp, float ki, float kd, float ta);
-
-    /**
-     * @brief Führt die PID-Regelung mit gegebenem Fehlerwert aus.
-     *
-     * @param diff Regelabweichung (Soll - Ist)
-     * @return float Berechnete Stellgröße
-     */
     float pidControl(float diff);
-
-    /**
-     * @brief Setzt die internen Zustände des PID-Reglers zurück.
-     */
     void reset();
 };
 

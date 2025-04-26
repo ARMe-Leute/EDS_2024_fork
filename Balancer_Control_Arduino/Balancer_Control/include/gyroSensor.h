@@ -25,13 +25,6 @@ enum sensorValueIndex
   z  ///< Index für Z-Achse
 };
 
-/**
- * @brief Klasse zur Verarbeitung von MPU6050-Daten.
- *
- * Diese Klasse kapselt die Initialisierung und das Auslesen von Beschleunigungs-
- * und Gyroskopdaten des MPU6050-Sensors. Zudem bietet sie Methoden zur Berechnung
- * des Pitch-Winkels.
- */
 class GyroSensor
 {
 private:
@@ -44,38 +37,11 @@ private:
   float angleFactor = 57.29577951;      ///< Umrechnung von Bogenmaß in Grad
 
 public:
-  /**
-   * @brief Konstruktor der GyroSensor-Klasse.
-   */
   GyroSensor();
-
-  /**
-   * @brief Initialisiert den MPU6050-Sensor.
-   * @return true bei erfolgreicher Initialisierung, sonst false.
-   */
   bool init();
-
-  /**
-   * @brief Liest die aktuellen Beschleunigungswerte vom Sensor.
-   */
   void getAcceleration();
-
-  /**
-   * @brief Liest die aktuellen Gyroskopwerte vom Sensor.
-   */
   void getGyro();
-
-  /**
-   * @brief Berechnet den Pitch-Winkel auf Basis der Beschleunigungswerte.
-   * @return Der berechnete Pitch-Winkel in Grad.
-   */
   float getPitchfromAccel();
-
-  /**
-   * @brief Berechnet einen gefilterten Pitch-Wert mit Hilfe eines Complementary Filters.
-   * @param dt Zeitdifferenz in Sekunden seit der letzten Abfrage.
-   * @return Der gefilterte Pitch-Wert in Grad.
-   */
   float getWeightedPitch(float dt);
 
   float pitch; ///< Letzter berechneter Pitch-Wert

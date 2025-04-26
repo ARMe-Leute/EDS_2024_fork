@@ -45,7 +45,6 @@ void PIDController::init(float kp, float ki, float kd, float ta)
    TA = ta;
 
    ISum = 0;
-   posISum = 0;
    inpOld = 0;
 }
 
@@ -81,6 +80,5 @@ float PIDController::pidControl(float diff)
 void PIDController::reset()
 {
    ISum = 0;
-   posISum = 0;
    inpOld = 0;
 }

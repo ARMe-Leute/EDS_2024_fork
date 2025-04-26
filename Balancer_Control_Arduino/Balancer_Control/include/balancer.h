@@ -39,66 +39,15 @@ typedef enum
 class Balancer
 {
 public:
-   /**
-    * @brief Konstruktor.
-    */
    Balancer();
-
-   /**
-    * @brief Alternativer Konstruktor zur Initialisierung mit externen Objekten.
-    *
-    * @param _mpu GyroSensor-Objekt
-    * @param _pid_pos PID-Regler für Position
-    * @param _pid_v PID-Regler für Geschwindigkeit
-    * @param _pid_phi PID-Regler für Pitch
-    */
    Balancer(GyroSensor _mpu, PIDController _pid_pos, PIDController _pid_v, PIDController _pid_phi);
-
-   /**
-    * @brief Initialisiert interne Objekte und Parameter.
-    *
-    * @param _mpu GyroSensor-Objekt
-    * @param _pid_pos PID-Regler für Position
-    * @param _pid_v PID-Regler für Geschwindigkeit
-    * @param _pid_phi PID-Regler für Pitch
-    */
    void init(GyroSensor _mpu, PIDController _pid_pos, PIDController _pid_v, PIDController _pid_phi);
-
-   /**
-    * @brief Berechnet die aktuelle Geschwindigkeit.
-    *
-    * @param pulsecount Anzahl gezählter Pulse
-    */
    void getVelocity(int pulsecount);
-
-   /**
-    * @brief Liest den aktuellen Pitch-Winkel über den Gyrosensor aus.
-    */
    void getPitch();
-
-   /**
-    * @brief Bestimmt die Bewegungsrichtung anhand der letzten Hall-Signale.
-    */
    void getDirection();
-
-   /**
-    * @brief Führt die Regelung durch und steuert den Motor entsprechend an.
-    */
    void motorOutput();
-
-   /**
-    * @brief ISR-Wrapper für Hall-Phase U.
-    */
    static void recogniseHallPulseU();
-
-   /**
-    * @brief ISR-Wrapper für Hall-Phase V.
-    */
    static void recogniseHallPulseV();
-
-   /**
-    * @brief ISR-Wrapper für Hall-Phase W.
-    */
    static void recogniseHallPulseW();
 
    /**
@@ -120,18 +69,7 @@ public:
    float currentPitch;    ///< Aktueller Pitch-Wert
 
 private:
-   /**
-    * @brief Interne Methode zum Speichern erkannter Hallpulse.
-    *
-    * @param phase Erkannte Phase (U, V oder W)
-    */
    void recogniseHallPulse(hallPhases phase);
-
-   /**
-    * @brief Wendet den berechneten PWM-Wert am Motor an.
-    *
-    * @param val PWM-Wert im Bereich [-PWMMAX, PWMMAX]
-    */
    void applyMotor(float val);
 
    PIDController pid_pos; ///< PID-Regler für Position (nicht verwendet)

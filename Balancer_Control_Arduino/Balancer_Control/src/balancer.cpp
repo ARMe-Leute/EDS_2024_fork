@@ -41,7 +41,7 @@ Balancer::Balancer()
 }
 
 /**
- * @brief Initialisiert interne Zustände der Balancer-Klasse.
+ * @brief Initialisiert interne Zustände der Balancer-Klasse bei vorinitialisiertem MPU-Sensor und vorinitialisierten PID-Reglern
  *
  * @param _mpu GyroSensor-Objekt
  * @param _pid_pos PID-Regler für Position
