@@ -215,3 +215,86 @@ static int16_t timepos = 0;
 	tftDrawFastVLine(timepos, oszi[0], oszi[1]/2, tft_RED);
 	return timepos;
 }
+
+/*
+ * Darstellung eines byte Value als hexadezimalen String mit zwei ascii Symbolen.
+ * return: pointer auf den String hex[2]
+ */
+uint8_t *convDecByteToHex(uint8_t byte)
+{
+    static  uint8_t hex[2] = { 0 };
+
+    uint8_t temp;
+
+    temp = byte % 16;
+    if (temp < 10)
+    {
+        temp += '0';
+    }
+    else
+    {
+        temp += '7';
+    }
+    hex[1] = temp;
+
+    temp = byte / 16;
+    if (temp < 10)
+    {
+        temp += '0';
+    }
+    else
+    {
+        temp += '7';
+    }
+    hex[0] = temp;
+
+    return hex;
+}
+
+uint8_t I2C_SCAN(I2C_TypeDef *i2c, uint8_t scanAddr)
+{
+	uint8_t 	*outString2 = (uint8_t *) "Addr at: \0";
+	uint8_t     port, *result;
+#define yPosBase 18
+	uint8_t foundAddr = 0;
+	static int xPos[2] = {0,100};
+	static int yPos[2] = {yPosBase, yPosBase};
+
+	if (i2c == I2C1)
+    {
+	   port = 0;
+    }
+    else
+    {
+	   port = 1;
+    }
+    if (scanAddr == 0)
+    {
+    yPos[0] = yPosBase;
+    yPos[1] = yPosBase;
+    }
+
+	foundAddr = i2cFindSlaveAddr(i2c, scanAddr);
+	if (yPos[port] == 0)
+	{
+		tftPrint((char *)outString2,xPos[port],yPos[port],0);
+		yPos[port] = 66;
+	}
+	result = convDecByteToHex(scanAddr);
+	if (foundAddr != 0)
+	{
+		//outString = outString2;
+		tftPrint((char *)result,xPos[port],yPos[port],0);
+		yPos[port] = (int) 14 + yPos[port];
+		if (yPos[port] > 100)
+		{
+			yPos[port] = yPosBase;
+		}
+	}
+	else
+	{
+	//	tftPrint((char *)result,xPos,14,0);
+	}
+	return foundAddr;
+
+}

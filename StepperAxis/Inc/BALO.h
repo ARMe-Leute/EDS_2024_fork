@@ -2,7 +2,9 @@
 #define BALO_H_
 
 // use define BALA2024 for HW DemoBoard Balancer V1.0
-#define BALA2024
+//#define BALA2024
+// use define PIGGYBAG for Board with TFT and Rot Push Buttom
+#define PIGGYBAG
 
 #define DELAY_red      (900)
 #define DELAY_green    (1500)
@@ -33,39 +35,7 @@
 
 extern void BALOsetup(void);
 extern void i2cActivate(void);
-extern void ledActivate(void);
-
-
-#define halfBatVolt  (float)14
-#define emptyBatVolt (float)13
-
-
-typedef enum
-{
-	okBat = 0,
-	halfBat,
-	emptyBat,
-	underVolt,
-	overVolt
-} BatStat_t;
-
-typedef struct analogCh
-{
-	ADC_TypeDef *adc;
-	float BatVolt;
-	BatStat_t BatStatus;
-	float ratioBatVolt;
-	float CpuTemp;
-} analogCh_t;
-
-
-
-extern void adcActivate(void);
-extern BatStat_t getBatVolt(analogCh_t* pADChn);
 
 extern uint16_t AlBeOszi(float *AlphaBeta);
-
-extern uint8_t I2C_SCAN(I2C_TypeDef *i2c, uint8_t scanAddr);
-
 
 #endif /* BALO_H_ */
