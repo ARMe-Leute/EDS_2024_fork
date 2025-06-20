@@ -93,6 +93,10 @@ void BALOsetup(void)
 
    ledActivate();
    i2cActivate();
+#define 	ADC_GPIO		GPIOA
+#define 	PA0				PIN0
+    gpioSelectPort(ADC_GPIO);
+    gpioSelectPinMode(ADC_GPIO, PA0, ANALOG); // PA0 : Analog-Modus
 
 }
 
