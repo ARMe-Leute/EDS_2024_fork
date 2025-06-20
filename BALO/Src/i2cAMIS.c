@@ -453,9 +453,18 @@ uint8_t getAccelShape(Stepper_t* stepper)
  */
 int16_t StepperGetPos(Stepper_t* stepper)
 { // was getActualPosition
+	// it takes at 100KHz I2C Clock 1,16ms
 	uint8_t data[8];
 	int16_t i_ret;
-	getFullStatus2(stepper, data);
+	uint8_t befehl = (uint8_t) 0xFC; // 0xFc is the command to get the FullStatus2
+	I2C_TypeDef   *i2c;
+	uint8_t addr;
+	i2c = stepper->i2cBus.i2c;
+	addr = stepper->i2cAddress.value;
+	i2cBurstWrite(i2c, addr, &befehl, 1);
+	i2cBurstRead(i2c, addr, data, 3);
+
+
 	stepper->position.value = (int16_t) ((((uint16_t) data[1]) << 8) | (uint16_t) data[2]);
 	i_ret = stepper->position.value;
 	return i_ret;
@@ -478,6 +487,7 @@ int16_t StepperGetPos(Stepper_t* stepper)
  */
 void StepperSetPos(Stepper_t* stepper, int16_t value)
 { // was setPosition
+	// it takes at 100KHz I2C Clock 1,18ms
 	stepper->position.value = value;
 	uint8_t befehl = (uint8_t) 0x8B;
 	uint8_t data[5];

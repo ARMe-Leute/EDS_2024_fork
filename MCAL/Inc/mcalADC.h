@@ -17,6 +17,11 @@ extern "C" {
  * @{
  */
 
+#define ADC_COMMON_BASE   (APB2PERIPH_BASE + 0x2300UL) // "ADC_CCR" liegt im Common-Bereich
+#define ADC_CCR        (*((volatile uint32_t *)(ADC_COMMON_BASE + 0x04)))
+//#define ADC_CCR_TSVREFE   (1UL << 23)  // Temperature sensor und V_REFINT einschalten
+
+
 typedef enum
 {
     ADC_OK      = 0,
@@ -62,7 +67,7 @@ typedef enum
     ADC_CHN_13,
     ADC_CHN_14,
     ADC_CHN_15,
-    ADC_CHN_16,
+    ADC_CHN_16,		// cpuTemp
     ADC_CHN_17,
     ADC_CHN_18,
 } ADC_CHANNEL_t;
@@ -123,6 +128,8 @@ extern ADC_RETURN_CODE_t adcEnableWatchdogForAllChannels(ADC_TypeDef *adc);
 extern ADC_RETURN_CODE_t adcDisableWatchdogForAllChannels(ADC_TypeDef *adc);
 
 extern ADC_RETURN_CODE_t adcSetChannelSequence(ADC_TypeDef *adc, ADC_CHANNEL_t *chnList, size_t listSize);
+
+extern void activateTemperatureSensor(ADC_Common_TypeDef *adcccr);
 
 #ifdef __cplusplus
 }

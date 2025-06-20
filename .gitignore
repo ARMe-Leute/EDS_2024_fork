@@ -60,5 +60,4 @@ statistics.txt
 *.out
 *.app
 *.o
-*.elf
 *.xml

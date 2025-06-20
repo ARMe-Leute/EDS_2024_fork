@@ -1199,5 +1199,34 @@ bool adcIsConversionFinished(ADC_TypeDef *adc)
 {
     return (adc->SR & ADC_SR_EOC);
 }
+/**
+
+ *
+ * @brief Setup for using the internal CPU temperature sensor
+ *
+ *
+ * <br>
+ * <b>Affected register and bit(s)</b><br>
+ * <table>
+ *      <tr>
+ *          <th>Register</th>
+ *          <th>Bit name</th>
+ *          <th>Bit(s)</th>
+ *      </tr>
+ *      <tr>
+ *          <td>CCR</td>
+ *          <td TSVREFE </td>
+ *          <td 23</td>
+ *      </tr>
+ * </table>
+ *
+ * @note
+ *
+*/
+void activateTemperatureSensor(ADC_Common_TypeDef *adcccr)
+{
+	adcccr->CCR |= ADC_CCR_TSVREFE;
+}
+
 
 // EOF
