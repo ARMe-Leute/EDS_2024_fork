@@ -12,7 +12,7 @@ Applications
 	BALi
 
 # Archive
-Obsolete branches are removed from active development and preserved as archived tags. Working branches are preserved in their final state at the conclusion of the academic year..
+Obsolete branches are removed from active development and preserved as archived tags. Working branches are preserved in their final state at the end of the academic year..
  - tm22
  	- ```archive/tm22/ADC```
   	- ```archive/tm22/ADC_Sem6```
