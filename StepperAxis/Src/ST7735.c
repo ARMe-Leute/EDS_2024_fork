@@ -1370,3 +1370,6 @@ uint8_t tftGetHeight()
 {
 	return(height); // height depends on Rotation Mode
 }
+
+
+
