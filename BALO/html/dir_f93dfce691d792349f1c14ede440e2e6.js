@@ -2,6 +2,7 @@ var dir_f93dfce691d792349f1c14ede440e2e6 =
 [
     [ "adcBAT.h", "adc_b_a_t_8h.html", "adc_b_a_t_8h" ],
     [ "i2cAMIS.h", "i2c_a_m_i_s_8h.html", "i2c_a_m_i_s_8h" ],
+    [ "i2cDevices.h", "i2c_devices_8h.html", "i2c_devices_8h" ],
     [ "i2cMPU.h", "i2c_m_p_u_8h.html", "i2c_m_p_u_8h" ],
     [ "i2cRFID.h", "i2c_r_f_i_d_8h.html", "i2c_r_f_i_d_8h" ],
     [ "i2cTOF.h", "i2c_t_o_f_8h.html", "i2c_t_o_f_8h" ],

@@ -143,6 +143,7 @@ Enumerations</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:afc12f169b97fca27c4b8e3bc1852ace4" id="r_afc12f169b97fca27c4b8e3bc1852ace4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afc12f169b97fca27c4b8e3bc1852ace4">initRotaryPushButton</a> (const <a class="el" href="#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a> *pPuBioset)</td></tr>
 <tr class="memitem:ad8e604dfc3d1aebb48a5d2e2ce12fc86" id="r_ad8e604dfc3d1aebb48a5d2e2ce12fc86"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad8e604dfc3d1aebb48a5d2e2ce12fc86">initLED</a> (const <a class="el" href="#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a> *_pLED)</td></tr>
+<tr class="memdesc:ad8e604dfc3d1aebb48a5d2e2ce12fc86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the LEDs.  <br /></td></tr>
 <tr class="memitem:a562a32530eb04529817d1c6925d1ed5b" id="r_a562a32530eb04529817d1c6925d1ed5b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a562a32530eb04529817d1c6925d1ed5b">setLED</a> (<a class="el" href="#a2e6f2b264229590debe98b5c71abe9da">LED_COLOR_t</a> color)</td></tr>
 <tr class="memitem:a6aebe12370ad0af823ed5c0feefd8b26" id="r_a6aebe12370ad0af823ed5c0feefd8b26"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6aebe12370ad0af823ed5c0feefd8b26">getRotaryPushButton</a> (void)</td></tr>
 <tr class="memdesc:a6aebe12370ad0af823ed5c0feefd8b26"><td class="mdescLeft">&#160;</td><td class="mdescRight">: Returns the state of the Push Button. Returns true if the button is pressed, false otherwise. Additionally, it clears the internal flag if the button was pressed.  <br /></td></tr>
@@ -152,11 +153,12 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a0562d3d8794334f06870fc75ea1412c7" id="r_a0562d3d8794334f06870fc75ea1412c7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0562d3d8794334f06870fc75ea1412c7">LEDpgb</a></td></tr>
-<tr class="memitem:a9222623564fba0f2e9fc01d1b92771ba" id="r_a9222623564fba0f2e9fc01d1b92771ba"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9222623564fba0f2e9fc01d1b92771ba">LEDbala</a></td></tr>
 <tr class="memitem:a3f2370f926f4afa1c8c25f62840b3da1" id="r_a3f2370f926f4afa1c8c25f62840b3da1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3f2370f926f4afa1c8c25f62840b3da1">PuBio_pgb</a></td></tr>
 <tr class="memdesc:a3f2370f926f4afa1c8c25f62840b3da1"><td class="mdescLeft">&#160;</td><td class="mdescRight">exsamples of IO-connected RotPushButtom  <br /></td></tr>
 <tr class="memitem:adc65ecaa33b77fac7adc0b606045adff" id="r_adc65ecaa33b77fac7adc0b606045adff"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc65ecaa33b77fac7adc0b606045adff">PuBio_bala</a></td></tr>
+<tr class="memitem:a0562d3d8794334f06870fc75ea1412c7" id="r_a0562d3d8794334f06870fc75ea1412c7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0562d3d8794334f06870fc75ea1412c7">LEDpgb</a></td></tr>
+<tr class="memdesc:a0562d3d8794334f06870fc75ea1412c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">configurations for Piggyback and Balancer  <br /></td></tr>
+<tr class="memitem:a9222623564fba0f2e9fc01d1b92771ba" id="r_a9222623564fba0f2e9fc01d1b92771ba"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9222623564fba0f2e9fc01d1b92771ba">LEDbala</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This is the header file for controlling the rotary encoder with a built-in push button. It includes functions for initializing the rotary push button, reading the rotary position and button state, as well as controlling the module's LED-color. </p>
@@ -330,6 +332,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initializes the LEDs. </p>
+<p>@function initLED </p>
+
 </div>
 </div>
 <a id="afc12f169b97fca27c4b8e3bc1852ace4" name="afc12f169b97fca27c4b8e3bc1852ace4"></a>
@@ -354,6 +359,7 @@ Variables</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Initializes the whole rotary push button module </p>
 
 </div>
 </div>
@@ -445,6 +451,8 @@ Variables</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>configurations for Piggyback and Balancer </p>
 <p>Define, LEDs IO-Pinning BALA2024 Piggyback LED_RED GPIOB, PIN15 GPIOB, PIN3 LED_GREEN GPIOB, PIN14 GPIOB, PIN4 LED_BLUE GPIOB, PIN13 GPIOB, PIN1 </p>
 
 </div>

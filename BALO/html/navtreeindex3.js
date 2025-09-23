@@ -1,5 +1,13 @@
 var NAVTREEINDEX3 =
 {
+"struct_m_p_u6050.html#a3f6f96d7d09f001ea3e233059b21fa9e":[3,0,6,4],
+"struct_m_p_u6050.html#a430110f4afccd8eaf3e7c9183dcbaea8":[3,0,6,8],
+"struct_m_p_u6050.html#a45541d9e47d1dcd2eba1930fa73a504e":[3,0,6,18],
+"struct_m_p_u6050.html#a4a1f56b2a29ed47dd0be8e99069496f9":[3,0,6,12],
+"struct_m_p_u6050.html#a55c37f1ced84424a61e2462e703e4f64":[3,0,6,20],
+"struct_m_p_u6050.html#a6f79aa4ad2ab8df964558f4d6e60b849":[3,0,6,10],
+"struct_m_p_u6050.html#a8bd95ae27103eede34e64c3bb19bb1f1":[3,0,6,11],
+"struct_m_p_u6050.html#a9858ff9abef12e111fff8cc5914c0d9f":[3,0,6,15],
 "struct_m_p_u6050.html#acade84ecb6420fda2e20e5717b0d32aa":[3,0,6,7],
 "struct_m_p_u6050.html#acde6967965fba6efee4edcbad2dd7b4b":[3,0,6,16],
 "struct_m_p_u6050.html#ad3d8047e104c0aeb9337e53571be9ae5":[3,0,6,6],

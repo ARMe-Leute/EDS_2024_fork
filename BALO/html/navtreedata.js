@@ -71,8 +71,8 @@ var NAVTREEINDEX =
 [
 "_rotary_push_button_8c.html",
 "globals_a.html",
-"i2c_t_o_f_8c.html#ab309a00f895a2c6e4bd7fe8d3f540541",
-"struct_m_p_u6050.html#acade84ecb6420fda2e20e5717b0d32aa"
+"i2c_t_o_f_8c.html#a702016e82d78b4037bf6fd1983d9f31d",
+"struct_m_p_u6050.html#a3f6f96d7d09f001ea3e233059b21fa9e"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';
