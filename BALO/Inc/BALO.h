@@ -1,6 +1,8 @@
 #ifndef BALO_H_
 #define BALO_H_
 
+#include <stm32f4xx.h>
+
 // use define BALA2024 for HW DemoBoard Balancer V1.0
 #define BALA2024
 
@@ -49,7 +51,8 @@ typedef enum
 	overVolt
 } BatStat_t;
 
-typedef struct analogCh
+
+typedef struct
 {
 	ADC_TypeDef *adc;
 	float BatVolt;
@@ -58,7 +61,7 @@ typedef struct analogCh
 	float CpuTemp;
 } analogCh_t;
 
-
+extern analogCh_t analogCh;
 
 extern void adcActivate(void);
 extern BatStat_t getBatVolt(analogCh_t* pADChn);

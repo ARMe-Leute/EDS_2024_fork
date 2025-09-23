@@ -13,8 +13,8 @@
   MIT license, all text above must be included in any redistribution
  ****************************************************/
 
-#ifndef _ADAFRUIT_ST7735H_
-#define _ADAFRUIT_ST7735H_
+#ifndef _ST7735H_
+#define _ST7735H_
 
 //#include "stm32f30x.h"
 #include <stm32f4xx.h>

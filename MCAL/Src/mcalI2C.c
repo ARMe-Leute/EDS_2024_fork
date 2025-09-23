@@ -551,7 +551,7 @@ I2C_RETURN_CODE_t i2cBurstRegRead(I2C_TypeDef *i2c, uint8_t saddr, uint8_t regAd
             num--;
         }
     }
-    //__i2c_dummy_read_SR1_SR2(i2c);
+    __i2c_dummy_read_SR1_SR2(i2c);
     //I2C_BYTE_TRANSFER_FINISHED(i2c);
     __i2c_stop(i2c);
 

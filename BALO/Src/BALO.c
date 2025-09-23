@@ -14,6 +14,17 @@
 #include <ST7735.h>
 #include <BALO.h>
 
+
+
+
+
+
+
+analogCh_t analogCh;
+
+
+
+
 // Init hardware
 
 void ADCInit(GPIO_TypeDef *port, PIN_NUM_t pin, ADC_TypeDef *adc, ADC_CHANNEL_t chnList[], size_t listSize, ADC_RESOLUTION_t resolution) {
@@ -73,7 +84,7 @@ void i2cActivate()
     gpioSetOutputType(portB, PIN10, OPENDRAIN);   // Immer externe Pull-up-
     gpioSetOutputType(portB, PIN3, OPENDRAIN);   // Widerstaende verwenden!!!
     // Initialisierung des I2C-Controllers
-    i2cInitI2C(i2c2, IC2_DUTY_CYCLE_16_9, 15, I2C_CLOCK_1Mz);
+    i2cInitI2C(i2c2, IC2_DUTY_CYCLE_16_9, 15, I2C_CLOCK_200);
     i2cEnableDevice(i2c2);                        // MCAL I2C2 activ
 #endif /* BALA2024 */
 }

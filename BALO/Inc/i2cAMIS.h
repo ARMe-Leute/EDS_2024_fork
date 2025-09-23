@@ -90,7 +90,7 @@ void StepperResetToDefault(Stepper_t*);
 void StepperGoToSecurePosition(Stepper_t*);
 void StepperSetDualPosition(Stepper_t*, uint16_t, uint16_t);
 int16_t StepperGetTargetPosition(Stepper_t*);
-uint16_t StepperGetRPM(Stepper_t*);
+uint16_t StepperMaxGetRPM(Stepper_t*);
 
 // ******************** Stepper ********************
 extern const Stepper_t stepper;

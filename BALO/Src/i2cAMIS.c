@@ -643,7 +643,7 @@ int16_t StepperGetTargetPosition(Stepper_t* stepper) { // falls probleme auftret
  * @param Stepper_t* stepper - the stepper instance
  * @returns int rpm
  */
-uint16_t   StepperGetRPM(Stepper_t* stepper) {
+uint16_t   StepperGetMaxRPM(Stepper_t* stepper) {
 	uint16_t rpm;
 	uint16_t data = (uint16_t) stepper->vMax.value;
 
