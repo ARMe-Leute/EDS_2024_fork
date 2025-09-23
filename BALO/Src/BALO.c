@@ -251,6 +251,13 @@ uint8_t *convDecByteToHex(uint8_t byte)
     return hex;
 }
 
+/* scanAdr. 7Bit Adresse value
+ * return	0 if no device found on scanAdr
+ *			if yes  return the scanAdr.
+ *			and display on the ST7735 Display
+ *
+ *
+ */
 uint8_t I2C_SCAN(I2C_TypeDef *i2c, uint8_t scanAddr)
 {
 	uint8_t 	*outString2 = (uint8_t *) "Addr at: \0";
@@ -296,5 +303,15 @@ uint8_t I2C_SCAN(I2C_TypeDef *i2c, uint8_t scanAddr)
 	//	tftPrint((char *)result,xPos,14,0);
 	}
 	return foundAddr;
+}
 
+// Tiefpassfilterung der drei Richtungsvektoren xyz
+void low_pass(int16_t raw_data[3], int16_t filt_data[3], int16_t _tp)
+{
+	static long _sto_xyz[3];
+	uint8_t i;
+	for (i=1;i<=3;i++)
+	{
+  	 	_sto_xyz[i] += (long) raw_data[i] - (filt_data[i] = _sto_xyz[i]/_tp);
+	}
 }

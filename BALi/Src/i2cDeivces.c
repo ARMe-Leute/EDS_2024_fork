@@ -8,6 +8,7 @@
 #include <mcalGPIO.h>
 #include <mcalI2C.h>
 #include <mcalSysTick.h>
+#include <BALO.h>
 #include "i2cDevices.h"
 
 
@@ -20,36 +21,6 @@
 	uint8_t  RFIDcmd_getMifareUID[2] = {0x01, 0x01};
 
 
-uint8_t *convDecByteToHex(uint8_t byte)
-{
-    static  uint8_t hex[2] = { 0 };
-
-    uint8_t temp;
-
-    temp = byte % 16;
-    if (temp < 10)
-    {
-        temp += '0';
-    }
-    else
-    {
-        temp += '7';
-    }
-    hex[1] = temp;
-
-    temp = byte / 16;
-    if (temp < 10)
-    {
-        temp += '0';
-    }
-    else
-    {
-        temp += '7';
-    }
-    hex[0] = temp;
-
-    return hex;
-}
 
 /*
 void setBMA020_Shadow(I2C_TypeDef *i2c, uint8_t ShadowDis)										// Ändern des Shadowbits (Genauigkeit)
@@ -283,15 +254,4 @@ int8_t RFID_readFWVersion(I2C_TypeDef *i2c, char *strFirmware)
 
 
 
-
-// Tiefpassfilterung der drei Richtungsvektoren xyz
-void low_pass(int16_t raw_data[3], int16_t filt_data[3], int16_t _tp)
-{
-	static long _sto_xyz[3];
-	uint8_t i;
-	for (i=1;i<=3;i++)
-	{
-  	 	_sto_xyz[i] += (long) raw_data[i] - (filt_data[i] = _sto_xyz[i]/_tp);
-	}
-}
 

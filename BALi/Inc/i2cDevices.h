@@ -10,7 +10,7 @@
 
 
 
-extern uint8_t *convDecByteToHex(uint8_t byte);
+
 extern void i2c_activate_pb89(I2C_TypeDef *i2c);
 
 /* RFID SL018 Function
@@ -25,11 +25,6 @@ extern int8_t RFID_readCard(I2C_TypeDef *i2c, char *CardID);
 extern int8_t RFID_readFWVersion(I2C_TypeDef *i2c, char *strFirmware);
 
 #define _OK 1
-
-
-extern void low_pass(int16_t raw_data[3], int16_t filt_data[3], int16_t _tp);
-
-
 
 
 #define i2cAddr_LIDAR	0x29

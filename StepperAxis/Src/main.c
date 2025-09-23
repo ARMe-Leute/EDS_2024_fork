@@ -20,7 +20,7 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 */
-#define SWVerTxt "StAxis1.1 \0"
+#define SWVerTxt "StAxis1.2 \0"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -46,6 +46,7 @@
 
 
 #define i2cAddr_mot 0x60
+#define i2cAddr_mot1 0x61
 struct Stepper Step;
 const uint8_t iHold = 6;			// Stiffnes of Axis to Body rotation
 const int16_t rad2step =  520;		// Ratio step-counts (200 Full-Steps div 1/16 Steps) per rotation at rad:  509.4 =  200* 16 / (2 PI) or 1600/PI
@@ -63,6 +64,7 @@ const bool stepRotDir = true;
 typedef enum
 {
 	ParamInit = 0,
+	I2C_Scan,
 	ResetPos,
 	InitRun,
 	AutoRun,
@@ -112,13 +114,15 @@ TaskModus Task100ms(TaskModus RunMode)
 	const int16_t manStep = 800;			// viertel Umdrehung
 	const float maxStep = 32000;
 	static int16_t setPos = 0, setPosOld = 0;
-	char strT[8];
+	char strT[16];
+	static int texty =1;
+	static uint8_t i2cAddr = i2cAddr_mot;
 	float ADC_0;
 	float AlphaBeta[2];  // Wertepaar
 	uint8_t foundAddr = 0;
 	switch (RunMode)
     {
-   	   case ParamInit:  //I2C Scan
+   	   case ParamInit:  //ADC Init
    	   {
 
    		   setRotaryColor(LED_BLUE);
@@ -133,13 +137,17 @@ TaskModus Task100ms(TaskModus RunMode)
    		    adcSetChannelSequence(adc, chnList, listSize);
    		    adcEnableADC(adc);
    		    adcStartConversion(adc);
-
-   		//   foundAddr = i2cFindSlaveAddr(i2c, i2cAddr_mot);
-   		   if ( foundAddr == 0)
+   			RunMode = I2C_Scan;
+   	   }
+   	   break;
+   	   case I2C_Scan:
+   	   {
+   		   foundAddr = i2cFindSlaveAddr(i2c, i2cAddr);
+   		   if ((foundAddr == i2cAddr_mot)||( foundAddr == i2cAddr_mot1))
    		   {
    			   tftPrint((char *)"Active\0",110,0,0);
    			   //StepL.init(... 						iRun,	iHold, 	vMin,  	vMax, 	stepMode, 							rotDir, acceleration, securePosition)
-   			   StepperInit(&Step, i2c, i2cAddr_mot,StepPaValue[0], StepPaValue[1], StepPaValue[2],StepPaValue[3],stepMode,(uint8_t)!stepRotDir,StepPaValue[4], secPos);
+   			   StepperInit(&Step, i2c, i2cAddr,StepPaValue[0], StepPaValue[1], StepPaValue[2],StepPaValue[3],stepMode,(uint8_t)!stepRotDir,StepPaValue[4], secPos);
    			   stepper.pwmFrequency.set(&Step, 0);
 
    			RunMode = ResetPos;
@@ -148,6 +156,17 @@ TaskModus Task100ms(TaskModus RunMode)
    		   else
    		   {
    			  setRotaryColor(LED_CYAN);
+   			  if  ( foundAddr == 0 )
+   			  {
+   				sprintf(strT, "missed I2C %3x", i2cAddr);
+   				tftPrintColor((char *)strT,0,10*texty,tft_CYAN);
+   			  }
+   			  else
+   			  {
+   				sprintf(strT, ">found I2C %3x", i2cAddr);
+   				tftPrintColor((char *)strT,0,10*texty++,tft_GREEN);
+  			  }
+   			  if (++i2cAddr > 0x7f) { i2cAddr = 0; texty = 1;}
    		   }
    	   }
    	   break;

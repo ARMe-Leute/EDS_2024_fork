@@ -15,7 +15,7 @@
  * @brief       mcalI2C.c is part of the MCAL library for STM32F4xx.
  * @author      Dipl.-Ing. Ralf Jesse (embedded@ralf-jesse.de)
  * @date        Nov. 12, 2020
- * @updated		by Prof Flaemig 2025-01-15
+ * @updated		by Prof Flaemig 2025-07-10
  *
  * I2C-Address used only with 7Bit Format
  * @version     0.3
@@ -253,6 +253,9 @@ I2C_RETURN_CODE_t i2cInitI2C(I2C_TypeDef *i2c, I2C_DUTY_CYCLE_t duty, uint8_t tr
     i2cSetClkSpd(i2c, clock);			// set I2C Clockrate
 
     //i2c->CR1 |= I2C_CR1_PE;            // Re-renable I2C component
+
+    i2cFindSlaveAddr(i2c, 1);			// first run find routine for Adr 0, work arround for result failure at first search run
+
 
     return I2C_OK;
 }

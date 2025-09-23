@@ -66,6 +66,11 @@ extern BatStat_t getBatVolt(analogCh_t* pADChn);
 extern uint16_t AlBeOszi(float *AlphaBeta);
 
 extern uint8_t I2C_SCAN(I2C_TypeDef *i2c, uint8_t scanAddr);
+extern uint8_t *convDecByteToHex(uint8_t byte);
+
+// Tiefpassfilterung der drei Richtungsvektoren xyz
+extern void low_pass(int16_t raw_data[3], int16_t filt_data[3], int16_t _tp);
+
 
 
 #endif /* BALO_H_ */
