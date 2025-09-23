@@ -17,7 +17,7 @@
  ******************************************************************************
 
  */
-#define SwVersion "DHBW Bala-V1.2b(c)Fl"
+#define SwVersion "DHBW Bala-V1.5a(c)Fl"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -26,14 +26,15 @@
 
 #include <mcalSysTick.h>
 #include <mcalGPIO.h>
-#include <mcalSPI.h>
+//#include <mcalSPI.h>
 #include <mcalI2C.h>
-#include <mcalADC.h>
+//#include <mcalADC.h>
 #include <ST7735.h>
 #include <RotaryPushButton.h>
-#include <BALO.h>
+#include <adcBAT.h>
 #include <i2cMPU.h>
 #include <i2cAMIS.h>
+#include <i2cTOF.h>
 #include <regler.h>
 #include "route.h"
 
@@ -41,9 +42,10 @@
 
 
 /* uncomment the following line #define oszi
- * for display pitzch value
+ * for display pitch value
 */
 //#define Oszi
+
 
 
 bool timerTrigger = false;
@@ -53,34 +55,65 @@ bool timerTrigger = false;
 // 				ST7725_Timer delay Counter
 uint32_t	DispTaskTimer = 0UL;
 uint32_t    ST7735_Timer = 0UL;
-uint32_t    I2C_Timer = 0UL;
+uint32_t    StepTaskTimer = 0UL;
 
 #ifdef Oszi
-	#define StepTaskTime 20
+	#define StepTaskTimeSet 20
 #else
-	#define StepTaskTime 7			// the communicatin to stepper takes <1ms therefore total StepTaskTime = 7ms
+	#define StepTaskTimeSet 7UL			// the communication to stepper takes <1ms therefore total StepTaskTime = 7ms
 #endif
-#define DispTaskTime 700			// Task for Postion control and Display Status
+#define DispTaskTimeSet 700			// Task for Position control and Display Status
+
+/**
+ * typedef for Task-Modes
+ *
+ */
+typedef enum
+{
+	M_InitBat = 0,
+	M_DispMpuData,  // 1
+	M_DispTofData,
+	M_CheckI2cSlaves,  	//prüfen welche I2C Slaves vorhanden sind
+	M_StepFollowPitch,  // open loop control - stepper follows the pitch
+	M_3DGinit,			//
+	M_Bala,
+} TaskModus;
+
+/* --- StepTaskTime[] this are the Array of Task Times ----*
+ * in the same order as the above TaskModus
+ *
+ */
+
+uint32_t   StepTaskTime[] = {50UL, 50UL, 100UL, 50UL, StepTaskTimeSet, StepTaskTimeSet, StepTaskTimeSet};
 
 
-/* Private function prototypes -----------------------------------------------*/
-void test_ascii_screen(void);
-void test_graphics(void);
-void StepperFollowsPitch(bool StepLenable, bool StepRenable);
+/* ------- Private function prototypes -----------------------------------------------*/
+
+void StepperFollowsPitch(bool StepLenable, bool StepRenable);		//open Loop demo
 void dispMPUBat(MPU6050_t* MPU1, analogCh_t* pADChn);
+void DispAlphaNumMPU(MPU6050_t* pMPU);
+extern void visualisationTOF(TOFSensor_t* TOFSENS);
 
-
-uint8_t I2C_SCAN(I2C_TypeDef *i2c, uint8_t scanAddr);
+/*------------ reserve for RFID Reader -----------------*/
 #define i2cAddr_RFID	0x50
-#define i2cAddr_LIDAR	0x29
 bool enableRFID = false;
-bool enableLIDAR = false;
 
 
 /*------------ MPU6050 Sensor -----------------*/
 
 MPU6050_t MPU1;
 
+
+
+
+/*-------- TOF (TimeOfFlight)-Sensor VL53X -------------*/
+
+TOFSensor_t TOF1;
+bool enableTOF1 = false;
+#define i2cAddr_TOF1	0x29
+
+// variables to store the distance -kann vermutlich weg
+uint16_t TOF_DISTANCE_1 = 10;
 
 
 /* ------ Def and Parameter for stepper motors ------ */
@@ -108,18 +141,21 @@ const bool stepRotDir = true;
 void StepperIHold(bool OnSwitch)
 {
 	static bool OldStatus = false;
-	const uint8_t iOff = 0x01;
+	const uint8_t iOff = 0x0;  //switch off the PWM Regulator Value 0xFF only for AMIS
+								// 0xFF only for AMIS IC
+								// 0x0 reduced current to 59mA
+
 	if (OnSwitch != OldStatus)			// commands only active of OnSwitch Status changed
 	{
 		if (OnSwitch)
 		{
 			stepper.iHold.set(&StepL, StepPaValue[2]);
 			stepper.iHold.set(&StepR, StepPaValue[2]);
-			setRotaryColor(LED_YELLOW);
+			setLED(YELLOW);
 		}
 		else
 		{
-			setRotaryColor(LED_RED);
+			setLED(RED);
 			stepper.iHold.set(&StepL, iOff);
 			stepper.iHold.set(&StepR, iOff);
 		}
@@ -134,12 +170,12 @@ void StepperIHold(bool OnSwitch)
 
 enum
 {
-							a_Cour =0,	a_DEBG, a_posTol,a_phiZ,	a_GyAc,	a_HwLP,	a_LP,	a_piKP,	a_piKI,	a_piKD,	a_raRo,	a_maRo,	a_raTr
+							a_MODE =0,	a_Cour, a_posTol,a_phiZ,	a_GyAc,	a_HwLP,	a_LP,	a_piKP,	a_piKI,	a_piKD,	a_raRo,	a_maRo,	a_raTr
 } argParam;
 
 
 
-char ParamTitle[ParamCount][5] ={"Cour", "DEBG", "poTo", 	"phiZ",		"GyAc",		"HwLP",	"LP  ",	"piKP",	"piKI",	"piKD", 		"raRo",		"maRo",		"raTr"};
+char ParamTitle[ParamCount][5] ={"MODE", "Cour", "poTo", 	"phiZ",		"GyAc",		"HwLP",	"LP  ",	"piKP",	"piKI",	"piKD", 		"raRo",		"maRo",		"raTr"};
 float ParamValue[ParamCount] =  {0,  	0,			0.0, 	-0.004,		0.98, 		5, 		0.36,  	0.75, 	0.058, 	0.27, 		0.002, 		10, 		0.01};
 //								{1, 	0, 			0.0, 	0,		0.98, 		5, 		0.36,  	0.5, 	0.056, 	0.27, 		0.01, 		0.02, 		0.0)   //
 float ParamScale[ParamCount] = 	{1,  	1, 			0.2,   	500, 	100, 		1,		500, 	100, 	500,  	100,		500, 		1,  		500};			//  increment stepsize is 1/Value
@@ -172,7 +208,7 @@ void SetRegParameter(MPU6050_t* MPUa)
 	MPUa->pitchZero = ParamValue[a_phiZ];
 	MPUa->swLowPassFilt = ParamValue[a_LP];
 	MPUa->pitchFilt = ParamValue[a_GyAc];
-	initPID(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
+	PID.init(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
 	if (ParamValue[a_HwLP] <0 ) { ParamValue[a_HwLP] =0;}
 	if (ParamValue[a_HwLP] >6 ) { ParamValue[a_HwLP] =6;}
 	MPUa->LowPassFilt = tableLPFValue[(uint)ParamValue[a_HwLP]];
@@ -185,7 +221,7 @@ void SetRegParameter(MPU6050_t* MPUa)
 
 
 
-void ParamEdit()
+void ParamEdit(TaskModus *Mode)
 {
 	int ButtPos;
 	static int oldButtPos = 0;
@@ -195,6 +231,11 @@ void ParamEdit()
 	if (getRotaryPushButton())
 	{
 		if (++modif >= ParamCount)		{	modif = 0;	}
+		if ((modif > 0)&&(ParamValue[a_MODE]>0))
+		{
+			*Mode = (TaskModus)ParamValue[a_MODE];   // Mode switch
+			ParamValue[a_MODE]=0;
+		}
 		sprintf(strT, "%s :" , ParamTitle[modif]);
 		tftPrintColor((char *)strT,10,20,tft_GREEN);
 		sprintf(strT, "%+5.3f  ", ParamValue[modif]);
@@ -202,9 +243,7 @@ void ParamEdit()
 		ButtPos = (int)ParamScale[modif]*ParamValue[modif];
 		oldButtPos = ButtPos;
 		setRotaryPosition(ButtPos);
-
 	}
-
 	if (ButtPos != oldButtPos)
 	{
 		ParamValue[modif] = ((float)ButtPos/ParamScale[modif]);
@@ -212,6 +251,7 @@ void ParamEdit()
 		tftPrintColor((char *)strT,60,20,tft_YELLOW);
 		oldButtPos = ButtPos;
 		SetRegParameter(&MPU1);
+
 	}
 }
 
@@ -232,34 +272,165 @@ void rotControl(int16_t* setPos, float* targetPos, float phi, int16_t motPosL, i
 }
 
 
+
+// *DevMask b0010 Left, b0001 right stepper; b0100 mpu;  b1000 tof/lidar
+#define DevStepR 0b0001
+#define DevStepL 0b0010
+#define DevMPU1  0b0100
+#define DevTOF1  0b1000
+
+
+int CheckAndInitI2cSlaves(uint8_t* DevMask, Stepper_t* pStepL, Stepper_t* pStepR, MPU6050_t* pMPU1,TOFSensor_t* pTOF1)
+{
+	I2C_TypeDef *i2c = I2C1, *i2c2 = I2C2;
+	static I2C_TypeDef *i2cMPU = I2C1;
+	static I2C_TypeDef *i2cSTEP = I2C1;
+	static I2C_TypeDef *i2cTOF = I2C1;
+	uint8_t foundAddr;
+	static uint8_t i2c_Addr = 1;
+	static int CycleRun = -4;
+	int MPU6050ret;
+
+	if (CycleRun == -5)
+	{
+		foundAddr = i2cFindSlaveAddr(i2c, i2c_Addr); //dummy run
+		foundAddr = i2cFindSlaveAddr(i2c2, i2c_Addr); //dummy run
+		CycleRun++;
+		return (CycleRun);
+	}
+
+	if ((( *DevMask & DevStepL) == 0)&& (CycleRun == -4))
+	{
+		i2c_Addr = i2cAddr_motL;
+		foundAddr = i2cFindSlaveAddr(i2cSTEP, i2c_Addr);
+		if (foundAddr == 0)
+		{
+			i2cSTEP = I2C2;
+			foundAddr = i2cFindSlaveAddr(i2cSTEP, i2c_Addr);
+		}
+		if (foundAddr == i2c_Addr)
+		{
+			//StepLenable = true;
+			tftPrint((char *)"<-Left  -OK-  \0",0,110,0);
+			//StepL.init(... 						iRun,	iHold, 	vMin,  	vMax, 	stepMode, 							rotDir, acceleration, securePosition)
+			StepperInit(pStepL, i2cSTEP, i2c_Addr,StepPaValue[0], StepPaValue[1], StepPaValue[2],StepPaValue[3],stepMode,(uint8_t)!stepRotDir,StepPaValue[4], 0);
+			stepper.pwmFrequency.set(pStepL, 0);
+			*DevMask |= DevStepL;
+		}
+		else
+		{ pStepL->i2cAddress.value = 0; }			// if StepperLeft not exist set pointer to NULL
+		CycleRun++;
+		return (CycleRun);
+	}
+	if (( *DevMask & DevStepR) == 0)
+	{
+		foundAddr = i2cFindSlaveAddr(i2cSTEP, i2cAddr_motR);
+		if (foundAddr != 0)
+		{
+			//  StepRenable = true;
+			tftPrint((char *)"Right->\0",104,110,0);
+			//StepL.init(... 						iRun,	iHold, 	vMin,  	vMax, 	stepMode, 							rotDir, acceleration, securePosition)
+			StepperInit(pStepR, i2cSTEP, i2cAddr_motR,StepPaValue[0], StepPaValue[1], StepPaValue[2],StepPaValue[3],stepMode,(uint8_t)stepRotDir, StepPaValue[4], 0);
+			stepper.pwmFrequency.set(pStepR, 0);
+			*DevMask |= DevStepR;
+			i2cSetClkSpd(i2cSTEP,  I2C_CLOCK_200); //speed up I2CBusclock max Stepper 400kHz<- doesn't worked
+		}
+		else
+		{ pStepR->i2cAddress.value = 0; }			// if StepperRight not exist set pointer to NULL
+	}
+
+	// TOF check and INIT
+	if ((( *DevMask & DevTOF1) == 0)&& (CycleRun == -3))
+	{
+		TOF1.i2c_tof = i2cTOF;
+		TOF1.TOF_address_used = i2cAddr_TOF1;
+	}
+	if ((( *DevMask & DevTOF1) == 0) && (CycleRun <= -3))
+	{
+		if (TOF_init_address(&TOF1))
+		{
+			// Initialisieren des TOF-Sensors
+			initTOFSensorData(&TOF1, i2cTOF, TOF_ADDR_VL53LOX, TOF_DEFAULT_MODE_D, TOF_DISTANCE_1);
+			tftPrint((char *)"TOF found \0",0,80,0);
+			*DevMask |= DevTOF1;
+		}
+		else
+		{
+			tftPrint((char *)"TOF not found \0",0,80,0);
+		}
+	}
+
+	if ((( *DevMask & DevTOF1) != 0) && (CycleRun == -2))
+	{
+
+		bool InitResult = TOF_init_device(&TOF1);
+		if (InitResult)
+		{
+			tftPrint((char *)"TOF init OK\0",0,80,0);
+			//*DevMask |= DevTOF1;
+		}
+
+	}
+
+	if ((( *DevMask & DevTOF1) != 0) && (CycleRun == -1))
+
+	{
+		// Konfigurieren und Aktivieren des Sensors
+		configTOFSensor(&TOF1, TOF_DEFAULT_MODE_D, true);
+		//TOF_set_ranging_profile(&TOF1);
+		TOF_start_continuous(&TOF1);
+	}
+
+
+	// MPU6050 check and Init with 3 runs
+	if (CycleRun == -3)
+	{	// detected and first initrun
+		foundAddr = i2cFindSlaveAddr(i2cMPU, i2cAddr_MPU6050);
+		if (foundAddr == 0)
+		{
+			i2cMPU = I2C2;
+			foundAddr = i2cFindSlaveAddr(i2cMPU, i2cAddr_MPU6050);
+		}
+		if (foundAddr != 0)
+		{
+			tftPrint((char *)"MPU6050 OK \0",0,95,0);
+			*DevMask |= DevMPU1;
+			//i2cSetClkSpd(i2cMPU,  I2C_CLOCK_1Mz); //speed up sensor Bus
+			MPU6050ret = mpuInit(pMPU1, i2cMPU, i2cAddr_MPU6050, FSCALE_250, ACCEL_2g, LPBW_184, NO_RESTART);
+			CycleRun = MPU6050ret;
+		}
+		else
+		{	pMPU1->i2c_address = 0;	}
+		return (CycleRun);
+	}
+	if (((*DevMask & DevMPU1) >0) && (CycleRun < 0))
+	{
+		MPU6050ret = mpuInit(pMPU1, i2cMPU, i2cAddr_MPU6050, FSCALE_250, ACCEL_2g, LPBW_184, NO_RESTART);
+		CycleRun = MPU6050ret;
+		return (CycleRun);
+	}
+	return (CycleRun);
+}
+
+
 int main(void)
 {
-/**
- *  I2C Variables  */
+	uint8_t DevPrMask = 0;			// Mask Presents Devices
 
-	uint8_t        scanAddr = 0x7F;  //7Bit Adresse
-	I2C_TypeDef   *i2c  = I2C1;
-	//I2C_TypeDef   *i2c2  = I2C2;
-
-/**
-*	MPU6050 parameter */
-
-	int8_t MPU6050ret=-1;
-	uint32_t   i2cTaskTime = 50UL;
-	bool MPU6050enable = false;
+	int I2cCheckResult;
 	//float MPUfilt[3] = {0,0,0};
 
 	bool StepLenable = false;
 	bool StepRenable = false;
 	bool resetStepL = true,
 		 resetStepR = true;
-
+	TaskModus TaskMode = M_InitBat;
 
 	const float DivTimeTask= 0.01;   // StepTask div PosTask 7ms / 700ms
 
     uint8_t MotionVar = 0;
 
-	char strX[8],strY[8],strZ[8],strT[32];
+
 /**
  * ADC Measure Battery Voltage
  */
@@ -288,44 +459,53 @@ int main(void)
 
 	int pxPos, pyPos;
 	bool activeMove = false;
-	uint16_t tft_color;
+	//uint16_t tft_color;
 	float AlphaBeta[2];
-
-	static uint8_t RunMode = 1;
+	char strT[32];
+	//static uint8_t RunMode = 1;
 	static bool RunInit = true;
+
+
 
        // Dies ist das Array, das die Adressen aller Timer-Variablen enthaelt.
        // Auch die Groesse des Arrays wird berechnet.
 
-       uint32_t *timerList[] = { &I2C_Timer, &ST7735_Timer , &DispTaskTimer /*, weitere Timer */ };
+       uint32_t *timerList[] = { &StepTaskTimer, &ST7735_Timer , &DispTaskTimer /*, weitere Timer */ };
        size_t    arraySize = sizeof(timerList)/sizeof(timerList[0]);
 
 
-    //BALOsetup();
 
-    ledActivate();		// at BALO.c
-    i2cActivate();		// at BALO.c
-    LED_red_on;
-    adcActivate();
 
-	//Inits needed for TFT Display
-    // Initialisiert den Systick-Timer
-	systickInit(SYSTICK_1MS);
-	spiInit();
+    initLED(&LEDbala);
+
+    activateI2C1();			//! I2C Channel 1 at i2cDevices.c
+    activateI2C2();			//! I2C Channel 2 at i2cDevices.c
+	setLED(RED_on);
+    activateADC(PIN1);		//! BALA2024 used PIN1 for Battery Voltage Measurment
+
+	/**
+	 *	@brief init is needed for TFT Display
+	 *	 and initialize of Systick-Timer
+	 */
+	systickInit(SYSTICK_1MS);		//! Systick Basis Time
+	IOspiInit(&ST7735bala);			//! SPI Init
+
+	/**
+	 * brief make the display clear and working
+	 */
 	tftInitR(INITR_REDTAB);
-
-	//display setup
     tftSetRotation(LANDSCAPE);
     tftSetFont((uint8_t *)&SmallFont[0]);
     tftFillScreen(tft_BLACK);
 
-    /* initialize the rotary push button module */
-    initRotaryPushButton();
+    /**
+     * brief  initialize the rotary push button module
+     */
+    initRotaryPushButton(&PuBio_bala);
 
-    systickSetMillis(&I2C_Timer, i2cTaskTime);
+    systickSetMillis(&StepTaskTimer, StepTaskTime[M_InitBat]);
 
-
-    LED_red_off;
+    setLED(RED_off);
 
     tftPrintColor((char *)"I2C Scanner running \0",0,0,tft_MAGENTA);
 
@@ -338,171 +518,85 @@ int main(void)
 			systickUpdateTimerList((uint32_t *) timerList, arraySize);
 	   }
 
-
-	   if (isSystickExpired(I2C_Timer))
+	   ParamEdit(&TaskMode);  // run routine if Push Buttom activated
+	   if (isSystickExpired(StepTaskTimer))
 	   {
-		   systickSetTicktime(&I2C_Timer, i2cTaskTime);
+		   systickSetTicktime(&StepTaskTimer, StepTaskTime[TaskMode]);
 		   //LED_blue_off;
-		   switch (RunMode)
+		   switch (TaskMode)
 		   {
-		   	   case 0:  //I2C Scan
-		   	   {
+				case M_InitBat:  //BatterieMessungen starten und prüfen
+				{
 
-		   		   //setting at BALO.c BALOsetup() --> i2cActive
-		   		   //i2cSetClkSpd(i2c,  I2C_CLOCK_400);  // for RFID Reader reduced to 200KHz AMIS 400kHz
-		   		   //i2cSetClkSpd(i2c2,  I2C_CLOCK_1Mz);  // Sensor runs fast
-		   		   BatStatus = getBatVolt(&adChn);
-		   		   if (okBat == BatStatus)
-		   		   {
-		   			   tft_color  = tft_GREEN;
-		   		   }
-		   		   else
-		   		   {
-		   			   tft_color  = tft_YELLOW;
-		   		   }
-		   		   sprintf(strT, "Battery: %3.1f V", adChn.BatVolt);
-		   		   tftPrintColor((char *)strT, 0 , 0, tft_color);
-		   		   RunMode  = 1;
-		   	   }
-		   	   break;
-		   	   case 1:  //I2C Scan
-		   	   {
-		   		setRotaryColor(LED_MAGENTA);
-		   		   if ( I2C_SCAN(i2c, scanAddr) != 0)
+				   //setting at BALO.c BALOsetup() --> i2cActive
+				   //i2cSetClkSpd(i2c,  I2C_CLOCK_400);  // for RFID Reader reduced to 200KHz AMIS 400kHz
+				   //i2cSetClkSpd(i2c2,  I2C_CLOCK_1Mz);  // Sensor runs fast
+				   BatStatus = getBatVolt(&adChn);
+				   if (okBat == BatStatus)
 				   {
-					   LED_green_off;
-					   switch (scanAddr)
-					   {
-					   	   case i2cAddr_motL:
-						   {
-							   StepLenable = true;
-							   tftPrint((char *)"<-Left STEP\0",0,110,0);
-								//StepL.init(... 						iRun,	iHold, 	vMin,  	vMax, 	stepMode, 							rotDir, acceleration, securePosition)
-							    StepperInit(&StepL, i2c, i2cAddr_motL,StepPaValue[0], StepPaValue[1], StepPaValue[2],StepPaValue[3],stepMode,(uint8_t)!stepRotDir,StepPaValue[4], 0);
-							    stepper.pwmFrequency.set(&StepL, 0);
-
-						   }
-						   break;
-					   	   case i2cAddr_motR:
-						   {
-							   StepRenable = true;
-							   tftPrint((char *)"Right->\0",94,110,0);
-								//StepL.init(... 						iRun,	iHold, 	vMin,  	vMax, 	stepMode, 							rotDir, acceleration, securePosition)
-							   StepperInit(&StepR, i2c, i2cAddr_motR,StepPaValue[0], StepPaValue[1], StepPaValue[2],StepPaValue[3],stepMode,(uint8_t)stepRotDir, StepPaValue[4], 0);
-							   stepper.pwmFrequency.set(&StepR, 0);
-
-						   }
-						   break;
-					   	   case i2cAddr_RFID:
-						   {
-							   enableRFID = true;
-							   tftPrint((char *)"RFID connected \0",0,65,0);
-							   RFID_LED(i2c,true);
-						   }
-						   break;
-						   case i2cAddr_LIDAR:
-						   {
-							   enableLIDAR = true;
-							   tftPrint((char *)"TOF/LIDAR\0",0,80,0);
-						   }
-						   break;
-						   case i2cAddr_MPU6050:
-						   {
-							   MPU6050enable = true;
-							   tftPrint((char *)"MPU6050 \0",0,95,0);
-						   }
-						   break;
-					   }
-				   }
-
-		   		   if ((scanAddr == 0) && (MPU6050enable))
-				   {
-					   LED_blue_on;
-					   scanAddr = 0x7F;
-					   RunMode = 4;
-					   //i2cTaskTime = 200;
-
-				   }
-				   if ((scanAddr == 0))
-				   {
-					   scanAddr = 0x7F;
-					   if (i2c == I2C1)
-					   {
-						   i2c = I2C2;
-					   }
-					   else
-					   {
-						   i2c = I2C1;
-						   tftFillScreen(tft_BLACK);
-					   }
-				       RunMode = 0;
+						setLED(GREEN);
+					//   tft_color  = tft_GREEN;
 				   }
 				   else
 				   {
-					   scanAddr -=1;
+						setLED(RED);
+					  // tft_color  = tft_YELLOW;
 				   }
-				}
-		   	    break;
-	// 3DG Sensor function
-		   	 	case 4:  // 3DGInit Init
-		   	 	{
-		   	 		if ((MPU6050enable) && (MPU6050ret <0))
-					{
-		   				MPU6050ret = mpuInit(&MPU1, i2c, i2cAddr_MPU6050, FSCALE_250, ACCEL_2g, LPBW_184, NO_RESTART);
-		   			}
-		   			else
-		   			{ MPU6050ret = 0; }
-
-					if  (MPU6050ret == 0)									// MPU6050 init-procedure finished
-					{
-						if ((StepRenable)&& (StepLenable))
-						{
-							RunMode = 8;
-							i2cTaskTime = StepTaskTime;								// Tasktime for Stepper Balancing ca 8ms
-							RunInit = true;
-							LED_blue_off;
-							LED_green_on;
-
-						}
-						else
-						{
-							i2cTaskTime = 70;									// Tasktime for display 70ms
-							RunMode = 7;
-							LED_green_on;
-							LED_blue_off;
-						}
-					}
+				   //sprintf(strT, "Battery: %3.1f V", adChn.BatVolt);
+				   //tftPrintColor((char *)strT, 0 , 0, tft_color);
+				   TaskMode  = M_CheckI2cSlaves;
 				}
 				break;
-		   		case 7:  // read MPU Data
+				case M_CheckI2cSlaves:  //I2C Scan
+				{
+				   setLED(MAGENTA);
+				   I2cCheckResult =  CheckAndInitI2cSlaves(&DevPrMask, &StepL,&StepR,&MPU1,&TOF1);
+
+				   if ((I2cCheckResult == 0)&&(DevPrMask & DevMPU1) && (DevPrMask & DevStepL) && (DevPrMask & DevStepR))  //Motor and Sensor present
+				   {
+						StepRenable = true;
+						StepLenable = true;
+						TaskMode = M_Bala;  // Motor and Sensor present
+						setLED(GREEN);
+						//StepTaskTime = StepTaskTimeSet;								// Tasktime for Stepper Balancing ca 8ms
+						RunInit = true;
+						break;
+				   }
+				   if ((I2cCheckResult == 0)&&(DevPrMask & DevTOF1))  //only TOF-Sensor present
+				   {
+						//StepTaskTime = 70;									// Tasktime for display 70ms
+						TaskMode = M_DispTofData;
+						setLED(BLUE);
+						break;
+				   }
+				   if ((I2cCheckResult == 0)&&(DevPrMask & DevMPU1))  //only MPU-Sensor present
+				   {
+						//StepTaskTime = 70;									// Tasktime for display 70ms
+						TaskMode = M_DispMpuData;
+						setLED(GREEN);
+						break;
+				   }
+				}
+				break;
+		   		case M_DispMpuData:  // read MPU Data
 		   		{
 
-		   			sprintf(strT, "%+3.2f", mpuGetTemp(&MPU1));
-		   			tftPrint((char *)strT,40,40,0);
+		   			DispAlphaNumMPU(&MPU1);
 
-		   			//i2cLIS3DH_XYZ(i2c,(int16_t *) XYZraw);
-		   			mpuGetAccel(&MPU1);
-  					sprintf(strX, "%+6.3f", MPU1.accel[0]);
-		   			tftPrint((char *)strX,20,50,0);
-		   			sprintf(strY, "%+6.3f", MPU1.accel[1]);
-		   			tftPrint((char *)strY,20,60,0);
-		   			sprintf(strZ, "%+6.3f", MPU1.accel[2]);
-		   			tftPrint((char *)strZ,20,70,0);
-
-		   		 dispMPUBat(&MPU1,&adChn);
-					/*if ((timeTMode5--) > 0)
-
-					{
-						RunMode = 8;
-						tftFillScreen(tft_BLACK);
-						tftPrint("T:    MPU6050 (C)23Fl",0,0,0);
-						i2cTaskTime = 100;
-						LED_blue_off;
-
-					}*/
 				}
 		   		break;
-		   		case 8:  // Stepper Closed loop Control
+		 		case M_DispTofData:  // read TOF Data
+				{
+					setLED(WHITE);
+					if (TOF_read_distance_task(&TOF1))
+					//if (TOF_start_up_task(&TOF1))
+					{
+						visualisationTOF(&TOF1);
+					}
+					setLED(BLUE);
+				}
+				break;
+		   		case M_Bala:  // Stepper Closed loop Control (old 8)
 				{
 					if (RunInit)
 					{
@@ -524,13 +618,13 @@ int main(void)
 						MPU1.RPY[0]= 2;				// MPU y Axis goes to the front
 						MPU1.RPY[1]= 3;				// MPU z-Axis goes to the left side
 						MPU1.RPY[2]= -1;			// MPU x-Axis goes down
-						MPU1.timebase = (float) (StepTaskTime+1) * 10e-4;  			// CycleTime for calc from Gyro to angle  fitting statt 10-3 wird 10-4 gesetzt
-						initPID(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
+						MPU1.timebase = (float) (StepTaskTimeSet+1) * 10e-4;  			// CycleTime for calc from Gyro to angle  fitting statt 10-3 wird 10-4 gesetzt
+						PID.init(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
 						RunInit = false;
 					}
-					gpioResetPin(LED_RED_ADR);
+					setLED(RED_off);
 					mpuGetPitch(&MPU1);
-					gpioSetPin(LED_RED_ADR);
+					setLED(RED_on);
 					AlphaBeta[1] = MPU1.pitch;
 					AlphaBeta[0] = MPU1.pitchAccel;
 
@@ -539,11 +633,11 @@ int main(void)
             AlBeOszi(AlphaBeta);
 #endif
 
-        			gpioResetPin(LED_RED_ADR);
+        			setLED(RED_off);
 					if (fabs(AlphaBeta[1]) > 0.35)  // tilt angle more than  0.2 pi/4 = 30deg  -shut off Stepper control and reduce the IHold current and power consumption -> save the planet ;-)
 					{
 						activeMove = false;
-						initPID(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
+						PID.init(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
 						StepperIHold(false);
 						incRot = 0;
 						tarPosR = 0;
@@ -565,17 +659,17 @@ int main(void)
 					{
 						if (fabs((AlphaBeta[1])) < 0.05)
 						{
-							setRotaryColor(LED_GREEN);
+							setLED(GREEN);
 							activeMove = true;
 						}
 						else
 						{
-							setRotaryColor(LED_YELLOW);
+							setLED(YELLOW);
 							StepperIHold(true);
 						}
 						if (activeMove == true)
 						{
-							float setPitch = (rad2step)* runPID(&PID_phi, MPU1.pitch);
+							float setPitch = (rad2step)* PID.run(&PID_phi, MPU1.pitch);
 							if (rampRot < 1)
 							{
 								rampRot += ParamValue[a_raRo];
@@ -589,7 +683,7 @@ int main(void)
 							//setPitch = 0;
 							if (StepRenable)
 							{
-								gpioSetPin(LED_RED_ADR);									// RED LED OFF
+								setLED(RED_off);									// RED LED OFF
 								if (!resetStepR)
 								{
 									curMotR = (float)StepperGetPos(&StepR);					// 0.3 ms
@@ -605,7 +699,7 @@ int main(void)
 								StepperSetPos(&StepR, posMotR); 							//setPosition 0.4 ms
 								StepRenable = false;
 
-								gpioResetPin(LED_RED_ADR);									//RED LED ON
+								setLED(RED_on);									//RED LED ON
 							}
 							else
 							{
@@ -626,30 +720,39 @@ int main(void)
 							}
 						}
 					}
-					ParamEdit();  // run routine if Push Buttom activated
-					gpioSetPin(LED_RED_ADR);
+					//ParamEdit();  // run routine if Push Buttom activated
+					setLED(RED_off);
 				}
 				break;
-		   		case 9:  // Stepper Position follow the tilt angle
+		   		case M_StepFollowPitch:  // Stepper Position follow the tilt angle
 				{
-					//i2cTaskTime = StepTaskTime;								// Tasktime for Stepper Control 50ms
 					StepperFollowsPitch(StepLenable, StepRenable);
 				}
 				break;
 		   		default:
 				{
-					RunMode = 0;
+					TaskMode = M_InitBat;
 				}
 		   }  //end switch (RunMode)
-	    } // end if(isSystickExpired(I2C_Timer))
+	    } // end if(isSystickExpired(StepTaskTimer))
 
-		/*
-		* Routine for Motion Control
-		*/
+/*--------------------------  Routine for Motion Control and Display -------------------*
+ *
+ *
+ *
+*/
 		if (isSystickExpired(DispTaskTimer))
 		{
-			systickSetTicktime(&DispTaskTimer, DispTaskTime);   // Reset Disp timer
-			if ((activeMove == true) && (RunMode == 8 ))
+			systickSetTicktime(&DispTaskTimer, DispTaskTimeSet);   // Reset Disp timer
+		if (( DevPrMask & DevTOF1) != 0)
+		{
+			if (TOF_read_distance_task(&TOF1))
+			//if (TOF_start_up_task(&TOF1))
+			{
+				visualisationTOF(&TOF1);
+			}
+		}
+			if ((activeMove == true) && (TaskMode == M_Bala ))
 			{
 				switch (MotionVar)
 				{
@@ -669,7 +772,8 @@ int main(void)
 
 					  MotionVar = 1;
 					  sprintf(strT, "N%2i,%+5.0f,%+5.0f",routeNum, targetRot, targetTra);
-					  pxPos = 4;   pyPos = 40;	  tft_color = tft_YELLOW;
+					  pxPos = 4;   pyPos = 40;
+					  //tft_color = tft_YELLOW;
 					  tftSetColor(tft_GREEN, tft_BLACK);
 					  tftPrint((char *)strT, pxPos, pyPos, 0);
 
@@ -708,11 +812,13 @@ int main(void)
 
 					  sprintf(strT, "S%2i,%+6i,%+6i  ",routeStep,deltaRot, deltaTra);
 					  //sprintf(strT, "S%2i,%+5i",routeStep,deltaRot);
-					  pxPos = 4;   pyPos = 60;	  tft_color = tft_WHITE;
-					  if (ParamValue[a_DEBG] >0)
-					  {
-						  tftPrintColor((char *)strT, pxPos, pyPos, tft_color);
-					  }
+					  pxPos = 4;   pyPos = 60;
+					  //tft_color = tft_WHITE;
+
+					 /**
+					  * Debug print
+					 tftPrintColor((char *)strT, pxPos, pyPos, tft_color);
+					 **/
 					}
 					break;
 					default:
@@ -724,11 +830,15 @@ int main(void)
 
 			//if ((activeMove == false) && (RunMode == 8 ))
 
-			if ((RunMode == 5)|| ((RunMode == 8)&&(activeMove != true)))
+			if ((TaskMode == M_DispMpuData)||
+				(TaskMode == M_DispTofData)||
+				(TaskMode == M_StepFollowPitch)||
+				((TaskMode == M_Bala)&&(activeMove != true))
+				)
 			{
 				 dispMPUBat(&MPU1,&adChn);
 			}
-			if ((MotionVar == 0) && (RunMode == 8 ))
+			if ((MotionVar == 0) && (TaskMode == M_Bala ))
 			{
 /*
 				sprintf(strT, "%+6i", pos_motL);
@@ -779,64 +889,66 @@ void dispMPUBat(MPU6050_t* pMPU1, analogCh_t* pADChn)
 }
 
 
-
-/* scanAdr. 7Bit Adresse value
- * return	0 if no device found on scanAdr
- *			if yes  return the scanAdr.
- *			and display on the ST7735 Display
+/*--------------                      ----------------
  *
- *
- */
+ * */
 
 
-
-uint8_t I2C_SCAN(I2C_TypeDef *i2c, uint8_t scanAddr)
+void visualisationTOF(TOFSensor_t* TOFSENS)
 {
-	uint8_t 	*outString2 = (uint8_t *) "Addr at: \0";
-	uint8_t     port, *result;
-#define yPosBase 18
-	uint8_t foundAddr = 0;
-	static int xPos[2] = {0,100};
-	static int yPos[2] = {yPosBase, yPosBase};
+#define POS_SCREEN_LINE_4 		0, 94, 0
+	char buffer[3];
+	static uint16_t olddistance_var = TOF_VL53L0X_OUT_OF_RANGE; // Statische Variable zur Speicherung des alten Werts
+	uint16_t* olddistance = &olddistance_var; // Pointer auf die statische Variable
 
-	if (i2c == I2C1)
-    {
-	   port = 0;
-    }
-    else
-    {
-	   port = 1;
-    }
-    if (scanAddr == 0)
-    {
-    yPos[0] = yPosBase;
-    yPos[1] = yPosBase;
-    }
-
-	foundAddr = i2cFindSlaveAddr(i2c, scanAddr);
-	if (yPos[port] == 0)
+	// if value is not out of range
+	if (TOFSENS->distanceFromTOF != TOF_VL53L0X_OUT_OF_RANGE)
 	{
-		tftPrint((char *)outString2,xPos[port],yPos[port],0);
-		yPos[port] = 66;
-	}
-	result = convDecByteToHex(scanAddr);
-	if (foundAddr != 0)
-	{
-		//outString = outString2;
-		tftPrint((char *)result,xPos[port],yPos[port],0);
-		yPos[port] = (int) 14 + yPos[port];
-		if (yPos[port] > 100)
+		// if it was out of range, restore unit visualization
+		if (*olddistance == TOF_VL53L0X_OUT_OF_RANGE)
 		{
-			yPos[port] = yPosBase;
+			tftPrint("  cm        ", POS_SCREEN_LINE_4);
+		}
+
+		// visualize cm in 2 digits
+		int16_t delta = (int16_t) fabs(TOFSENS->distanceFromTOF - *olddistance);
+		if (delta > 10)
+		{
+			sprintf(buffer, "%02d", TOFSENS->distanceFromTOF/10);
+			tftPrint(buffer, POS_SCREEN_LINE_4);
 		}
 	}
+	// if value is out of range
 	else
 	{
-	//	tftPrint((char *)result,xPos,14,0);
+		tftPrint("out of range", POS_SCREEN_LINE_4);
 	}
-	return foundAddr;
 
+	// store current distance to old value
+	*olddistance = TOFSENS->distanceFromTOF;
 }
+
+
+
+
+void DispAlphaNumMPU(MPU6050_t* pMPU)
+{
+	char strX[8],strY[8],strZ[8];
+//	sprintf(strT, "%+3.2f", mpuGetTemp(&MPU1));
+//	tftPrint((char *)strT,40,40,0);
+
+	//i2cLIS3DH_XYZ(i2c,(int16_t *) XYZraw);
+	mpuGetAccel(pMPU);
+	sprintf(strX, "%+6.3f", pMPU->accel[0]);
+	tftPrint((char *)strX,20,50,0);
+	sprintf(strY, "%+6.3f", pMPU->accel[1]);
+	tftPrint((char *)strY,20,60,0);
+	sprintf(strZ, "%+6.3f", pMPU->accel[2]);
+	tftPrint((char *)strZ,20,70,0);
+
+	//dispMPUBat(&MPU1,&adChn);
+}
+
 
 void StepperFollowsPitch(bool StepLenable, bool StepRenable)
 {
@@ -861,7 +973,7 @@ void StepperFollowsPitch(bool StepLenable, bool StepRenable)
 	AlphaBeta[1]= MPU1.pitch;
 
 
-	if (fabs(AlphaBeta[1]) > 0.7)  // tilt angle more than  pi/4 = 45deg  -shut off Stepper control and reduce the IHold current and power consumption -> save the planet ;-)
+	if (fabs(AlphaBeta[1]) > 1)  // tilt angle more than  pi/3 = 60deg  -shut off Stepper control and reduce the IHold current and power consumption -> save the planet ;-)
 	{
 		StepperIHold(false);
 		StepperSoftStop(&StepR);
@@ -876,11 +988,11 @@ void StepperFollowsPitch(bool StepLenable, bool StepRenable)
 	{
 		if (fabs(AlphaBeta[1]) < 0.05)
 		{
-			setRotaryColor(LED_GREEN);
+			setLED(GREEN);
 		}
 		else
 		{
-			setRotaryColor(LED_YELLOW);
+			setLED(YELLOW);
 			StepperIHold(true);
 			pos_motL =(int16_t)(AlphaBeta[1]*rad2step);
 			pos_motR =(int16_t)(AlphaBeta[1]*rad2step);

@@ -1,0 +1,6 @@
+graphics.c:27:6:i2cActivate	1
+graphics.c:75:6:ledActivate	1
+graphics.c:97:6:HWsetup	1
+graphics.c:116:6:OSZIinit	1
+graphics.c:130:9:OSZIrun	7
+graphics.c:191:10:AlBeOszi	7

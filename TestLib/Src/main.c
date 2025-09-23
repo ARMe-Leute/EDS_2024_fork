@@ -6,7 +6,7 @@
  * 					 includes the functionality for an 3DG sensor and the TOF
  * 					 sensor in combination with an TFT display and the rotary
  * 					 push button
- * @date		   : December 2024
+ * @date		   : April 2024
  ******************************************************************************
  */
 
@@ -38,11 +38,10 @@
 #include "main.h"
 
 // Time timer to check Button input, execute
-// Menu change, calculate 3DG rotation data
 uint16_t timeTimerExec = 30;
 
 // Time timer for visualization
-#define timeTimerVisu (100)
+#define timeTimerVisu (50)
 
 // Time timer for LED toggle
 #define timeTimerLED (250)
@@ -52,7 +51,7 @@ uint32_t ST7735_Timer = 0UL;
 
 // flags, if sensors are initialized
 bool inited3DG = false;
-// Mark TOF as initialized for compatibility with dependent functions
+// Mark inited3DG as false for compatibility with dependent functions
 
 bool initedTOF = false;
 
@@ -78,6 +77,11 @@ EXIT_MENU_t exitMenu = EXIT_FALSE;			// variable to exit menu to a certain page
 // variable for MCAL SysTick
 bool timerTrigger = false;
 
+//___________
+	uint8_t interrupt_statustest = 0;	//Variable for the Register Content
+//___________
+
+
 /*
  * @function:	 main
  *
@@ -95,18 +99,17 @@ int main(void)
 	bool buttonPushed = false;
 
 	// variables to store the distance
-	uint16_t distance = 10;
-	uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
+	uint16_t TOF_DISTANCE_1 = 10;
+	//uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
 
 
 	// timer variables
 	uint32_t TimerExec = 0UL;
 	uint32_t TimerVisu = 0UL;
 	uint32_t TimerLED = 0UL;
-	uint32_t Timer3DG = 0UL;
 
 	// Array with all timer variables and calculation of size
-	uint32_t *timerList[] = { &TimerExec, &TimerVisu, &TimerLED, &Timer3DG};
+	uint32_t *timerList[] = { &TimerExec, &TimerVisu, &TimerLED};
 	size_t arraySize = sizeof(timerList)/sizeof(timerList[0]);
 
 	// init project
@@ -116,11 +119,12 @@ int main(void)
 	TOFSensor_t TOF_Sensor_1;
 
 	// Initialisieren des TOF-Sensors
-	initializeTOFSensor(&TOF_Sensor_1, I2C1, TOF_ADDR_VL53LOX, TOF_DEFAULT_MODE_D, distance);
+	initializeTOFSensor(&TOF_Sensor_1, I2C1, TOF_ADDR_VL53LOX, TOF_DEFAULT_MODE_D, TOF_DISTANCE_1);
 
 	// Konfigurieren und Aktivieren des Sensors
 	configureTOFSensor(&TOF_Sensor_1, TOF_DEFAULT_MODE_D, true);
-	TOF_set_ranging_profile(&TOF_Sensor_1);
+	//TOF_set_ranging_profile(&TOF_Sensor_1);
+
 
 	while (1)
 	{
@@ -209,7 +213,7 @@ int main(void)
 				if(buttonPushed)
 				{
 					configureTOFSensor(&TOF_Sensor_1, MODE, true);
-					TOF_set_ranging_profile(&TOF_Sensor_1);
+					//TOF_set_ranging_profile(&TOF_Sensor_1);
 
 					switch(MODE){		//change timerexecution time to recommended +3ms to make shure works
 					case 1:
@@ -231,8 +235,6 @@ int main(void)
 					TimerExec = 0UL;
 					TimerVisu = 0UL;
 					TimerLED = 0UL;
-					Timer3DG = 0UL;
-					//ST7735_Timer = 0UL;
 
 					exitMenu = EXIT_FROMSUB3;
 				}
@@ -270,7 +272,28 @@ int main(void)
 			case SCREEN_PAGE1:
 				break;
 			case SCREEN_PAGE2:
-				visualisationTOF(&TOF_Sensor_1, distance, &olddistance);
+
+/*
+ *
+ * Hier ist der Testabschnitt des 6. Semesters, um testen zu können muss der Controller ganz normal gestartet werden
+ * und anschließend zur Distanz Messung navigiert werden dieser bleibt in der While Schleife hängen und führt dauerhaft
+ * die neue Funktione TOF_read_distance_task aus (s.u.).
+ *
+*/
+/*
+				TOF_start_up_task(&TOF_Sensor_1);
+				while(1)
+					{
+						setRotaryColor(LED_GREEN);
+						TOF_read_distance_task(&TOF_Sensor_1);
+						setRotaryColor(LED_RED);
+						delayms(200);
+						visualisationTOF(&TOF_Sensor_1);
+
+					}
+*/
+				visualisationTOF(&TOF_Sensor_1);
+
 				break;
 			case SCREEN_PAGE3:
 				//visualisationRangingProfileTOF(mode);
@@ -343,8 +366,9 @@ void initSubMenu(SCREEN_PAGES_t page, TOFSensor_t* TOFSENS)
 	case SCREEN_MAIN:
 			break;
 	case SCREEN_PAGE1:
-		// disable "sensor enable" to be able to initialize all sensors
 		enable3DGSensor = false;
+		// disable "sensor enable" to be able to initialize all sensors
+
 		enableTOFSensor = false;
 
 		// reset i2c scan
@@ -444,7 +468,9 @@ void i2cScanAndInit(TOFSensor_t* TOFSENS, I2C_TypeDef   *i2c)
 
 		i2c_tof = i2c;
 
-		bool result = TOF_init(TOFSENS);
+		bool result = TOF_init(TOFSENS);		//Funktion in welcher der MCAL Fehler auftritt
+
+		//ToDo Fehler in der MCAL beheben
 
 		// check if init was successful
 		if(result == true)

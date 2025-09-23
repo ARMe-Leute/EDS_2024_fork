@@ -1,0 +1,8 @@
+regler.c:28:13:PIDget	1
+regler.c:38:6:PIDclear	1
+regler.c:50:6:PIDset	2
+regler.c:67:6:PIDinit	1
+regler.c:82:7:PIDrun	2
+regler.c:123:7:MeanVALrun	1
+regler.c:139:6:MeanVALclr	1
+regler.c:148:6:LowPassFilt	2

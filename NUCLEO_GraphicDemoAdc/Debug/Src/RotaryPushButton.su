@@ -1,0 +1,10 @@
+D:/GITHUB/STM32/EDS_2024/CMSIS/Include/core_cm4.h:1688:22:__NVIC_EnableIRQ	16	static
+../Src/RotaryPushButton.c:104:6:initRotaryPushButton	16	static,ignoring_inline_asm
+../Src/RotaryPushButton.c:166:6:initLED	16	static
+../Src/RotaryPushButton.c:202:6:setLED	16	static
+../Src/RotaryPushButton.c:263:5:getRotaryPushButton	16	static
+../Src/RotaryPushButton.c:291:5:getRotaryPosition	4	static
+../Src/RotaryPushButton.c:302:10:setRotaryPosition	16	static
+../Src/RotaryPushButton.c:318:6:modifPositionCount	8	static
+../Src/RotaryPushButton.c:336:6:EXTI0_IRQHandler	8	static
+../Src/RotaryPushButton.c:353:6:EXTI15_10_IRQHandler	4	static

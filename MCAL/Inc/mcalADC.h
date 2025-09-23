@@ -13,6 +13,8 @@
 extern "C" {
 #endif
 
+
+
 /**
  * @ingroup adc4
  * @{

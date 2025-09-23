@@ -1,7 +1,7 @@
 /**
- *      amis.h
+ *      i2cAMIS.h
  * 
- *      @file step.c provides the methods to control a stepper via the `AMIS-30624`
+ *      @file i2cAMIS.h provides the methods to control a stepper via the `AMIS-30624`
  *      @author: Stefan Heinrich, Dennis Lotz
  *      Created on: Dez. 05, 2023
  */
@@ -90,7 +90,7 @@ void StepperResetToDefault(Stepper_t*);
 void StepperGoToSecurePosition(Stepper_t*);
 void StepperSetDualPosition(Stepper_t*, uint16_t, uint16_t);
 int16_t StepperGetTargetPosition(Stepper_t*);
-uint16_t StepperGetRPM(Stepper_t*);
+uint16_t StepperMaxGetRPM(Stepper_t*);
 
 // ******************** Stepper ********************
 extern const Stepper_t stepper;

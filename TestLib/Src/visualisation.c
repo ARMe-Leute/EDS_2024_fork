@@ -310,32 +310,33 @@ void visualisationShowError(SCREEN_PAGES_t page)
  * @parameters:	 uint16_t distance:		current distance
  * 				 uint16_t *olddistance: old distance
  */
-void visualisationTOF(TOFSensor_t* TOFSENS, uint16_t distance, uint16_t *olddistance)
+void visualisationTOF(TOFSensor_t* TOFSENS)
 {
+    static uint16_t olddistance_var = TOF_VL53L0X_OUT_OF_RANGE; // Statische Variable zur Speicherung des alten Werts
+    uint16_t* olddistance = &olddistance_var; // Pointer auf die statische Variable
 
+    // if value is not out of range
+    if (TOFSENS->distanceFromTOF != TOF_VL53L0X_OUT_OF_RANGE)
+    {
+        // if it was out of range, restore unit visualization
+        if (*olddistance == TOF_VL53L0X_OUT_OF_RANGE)
+        {
+            tftPrint("     mm      ", POS_SCREEN_LINE_4);
+        }
 
-	// if value is not out of range
-	if(TOFSENS->distanceFromTOF != TOF_VL53L0X_OUT_OF_RANGE)
-	{
-		// if it was out of range, restore unit visualization
-		if(*olddistance == TOF_VL53L0X_OUT_OF_RANGE)
-		{
-			tftPrint("     mm      ", POS_SCREEN_LINE_4);
-		}
+        // visualize mm in 4 digits
+        char buffer[100];
+        sprintf(buffer, "%04d", TOFSENS->distanceFromTOF);
+        tftPrint(buffer, POS_SCREEN_LINE_4);
+    }
+    // if value is out of range
+    else
+    {
+        tftPrint("out of range", POS_SCREEN_LINE_4);
+    }
 
-		// visualize mm in 4 digits
-		char buffer[100];
-		sprintf(buffer,"%04d",TOFSENS->distanceFromTOF);
-		tftPrint(buffer, POS_SCREEN_LINE_4);
-	}
-	// if value is out of range
-	else
-	{
-		tftPrint("out of range", POS_SCREEN_LINE_4);
-	}
-
-	//store current distance to old value
-	*olddistance = TOFSENS->distanceFromTOF;
+    // store current distance to old value
+    *olddistance = TOFSENS->distanceFromTOF;
 }
 
 
