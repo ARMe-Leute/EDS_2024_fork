@@ -70,7 +70,7 @@
 // inits from Balancer library
 #include <i2cTOF.h>
 #include <ST7735.h>
-#include <BALO.h>
+//#include <BALO.h>
 
 // Variables for I2C and TOF sensor address
 TOF_ADDR_t TOF_address_used = TOF_ADDR_NONE; // TOF sensor address, initially set to NONE (-1)
@@ -95,7 +95,8 @@ bool TOF_continuous_mode = false;
 
 // Function to initialize the TOF sensor
 // Initializes the sensor with given address, I2C interface, ranging profile, and measurement range.
-void initializeTOFSensor(TOFSensor_t* sensor, I2C_TypeDef *i2c_tof, uint16_t TOF_address_used, uint16_t Ranging_Profiles_t, uint16_t measuredRange) {
+void initTOFSensorData(TOFSensor_t* sensor, I2C_TypeDef *i2c_tof, uint16_t TOF_address_used, uint16_t Ranging_Profiles_t, uint16_t measuredRange)
+{
 	sensor->i2c_tof = i2c_tof;                    // Set the I2C interface (e.g., I2C1, I2C2)
 	sensor->TOF_address_used = TOF_address_used;  // Set the TOF sensor address
     sensor->Ranging_Profiles_t = Ranging_Profiles_t;  // Set the ranging profile (measurement mode)
@@ -106,7 +107,7 @@ void initializeTOFSensor(TOFSensor_t* sensor, I2C_TypeDef *i2c_tof, uint16_t TOF
 
 // Function to configure the TOF sensor
 // Configures the sensor's ranging profile and whether the sensor should be enabled or disabled.
-void configureTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t, bool enable) {
+void configTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t, bool enable) {
     sensor->Ranging_Profiles_t = Ranging_Profiles_t;  // Set the new ranging profile
     sensor->enableTOFSensor = enable;                  // Enable or disable the TOF sensor
     if(sensor->enableTOFSensor == true)
@@ -347,7 +348,8 @@ bool TOF_get_spad_info_from_nvm(TOFSensor_t* TOFSENS, uint8_t * count, bool * ty
 	i2cReadByteFromSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x83, &data);
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x83, data | 0x04);
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_TUNING_2, 0x07);
-	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x83, 0x01);
+	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSTEM_HISTOGRAM_NON, 0x01);
+	//TF01 i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x83, 0x01);
 
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
 
@@ -524,7 +526,7 @@ bool TOF_load_default_tuning_settings(TOFSensor_t* TOFSENS)
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x49, TOF_DEFAULT_0xFF);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x4A, TOF_DEFAULT_0x00);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_TUNING_2, TOF_DEFAULT_0x00);
-    success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x7A, TOF_DEFAULT_0xA0);
+    success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x7A, TOF_DEFAULT_0x0A);  //TF01 change form, 0xA0 to 0x0A
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x7B, TOF_DEFAULT_0x00);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x78, TOF_DEFAULT_0x21);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_TUNING_2, TOF_DEFAULT_0x01);
@@ -818,7 +820,10 @@ bool TOF_init_device(TOFSensor_t* TOFSENS)
 		return false;
 	}
 
-	if (!TOF_set_sequence_steps_enabled(TOFSENS, TOF_RANGE_SEQUENCE_STEP_DSS + TOF_RANGE_SEQUENCE_STEP_PRE_RANGE + TOF_RANGE_SEQUENCE_STEP_FINAL_RANGE)) {
+	if (!TOF_set_sequence_steps_enabled(TOFSENS,
+			TOF_RANGE_SEQUENCE_STEP_DSS +
+			TOF_RANGE_SEQUENCE_STEP_PRE_RANGE +
+			TOF_RANGE_SEQUENCE_STEP_FINAL_RANGE)) {
 		return false;
 	}
 

@@ -102,7 +102,7 @@ int main(void)
 	bool buttonPushed = false;
 
 	// variables to store the distance
-	uint16_t TOF_DISTANCE_1 = 10;
+	uint16_t TOF_DISTANCE_1 = 100;
 	//uint16_t olddistance = TOF_VL53L0X_OUT_OF_RANGE;
 
 
@@ -122,10 +122,10 @@ int main(void)
 	TOFSensor_t TOF_Sensor_1;
 
 	// Initialisieren des TOF-Sensors
-	initializeTOFSensor(&TOF_Sensor_1, I2C1, TOF_ADDR_VL53LOX, TOF_DEFAULT_MODE_D, TOF_DISTANCE_1);
+	initTOFSensorData(&TOF_Sensor_1, I2C1, TOF_ADDR_VL53LOX, TOF_DEFAULT_MODE_D, TOF_DISTANCE_1);
 
 	// Konfigurieren und Aktivieren des Sensors
-	configureTOFSensor(&TOF_Sensor_1, TOF_DEFAULT_MODE_D, true);
+	configTOFSensor(&TOF_Sensor_1, TOF_DEFAULT_MODE_D, true);
 	//TOF_set_ranging_profile(&TOF_Sensor_1);
 
 
@@ -215,12 +215,12 @@ int main(void)
 
 				if(buttonPushed)
 				{
-					configureTOFSensor(&TOF_Sensor_1, MODE, true);
+					configTOFSensor(&TOF_Sensor_1, MODE, true);
 					//TOF_set_ranging_profile(&TOF_Sensor_1);
 
 					switch(MODE){		//change timerexecution time to recommended +3ms to make shure works
 					case 1:
-						timeTimerExec = 30;
+						timeTimerExec = 35;
 						break;
 					case 2:
 						timeTimerExec = 23;
@@ -485,9 +485,7 @@ void i2cScanAndInit(TOFSensor_t *TOFSENS) //
 
 		i2c_tof = i2c;
 
-		InitResult = TOF_init(TOFSENS);		//Funktion in welcher der MCAL Fehler auftritt
-
-		//ToDo Fehler in der MCAL beheben
+		InitResult = TOF_init(TOFSENS);
 
 		// check if init was successful
 		if(InitResult)

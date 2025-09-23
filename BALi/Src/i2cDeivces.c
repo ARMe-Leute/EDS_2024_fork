@@ -9,6 +9,7 @@
 #include <mcalI2C.h>
 #include <mcalSysTick.h>
 #include <BALO.h>
+#include <i2cTOF.h>
 #include "i2cDevices.h"
 
 
@@ -131,8 +132,6 @@ int8_t LIS3DHINIT(I2C_TypeDef *i2c, int8_t restart)
 
 }
 */
-
-
 
 
 

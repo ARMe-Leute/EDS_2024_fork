@@ -16,8 +16,8 @@
 #include <i2cTOF.h>
 
 // defines for the system
-#define I2C_MAXADRESS 	0x7F
-#define I2C_MAXATTEMPTS 2
+#define I2C_MAXADRESS 	0x2F
+#define I2C_MAXATTEMPTS 1
 
 // i2c connections, which can be used
 I2C_TypeDef   *i2c  = I2C1;

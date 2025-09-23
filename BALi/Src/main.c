@@ -34,6 +34,7 @@
 #include <BALO.h>
 #include <i2cMPU.h>
 #include <i2cAMIS.h>
+#include <i2cTOF.h>
 #include <regler.h>
 #include "route.h"
 
@@ -71,35 +72,48 @@ typedef enum
 {
 	M_InitBat = 0,
 	M_DispMpuData,  // 1
-	M_StepFollowPitch,  // open loop control - stepper follows the pitch
+	M_DispTofData,
 	M_CheckI2cSlaves,  	//prüfen welche I2C Slaves vorhanden sind
+	M_StepFollowPitch,  // open loop control - stepper follows the pitch
 	M_3DGinit,			//
 	M_Bala,
-
 } TaskModus;
 
+/* --- StepTaskTime[] this are the Array of Task Times ----*
+ * in the same order as the above TaskModus
+ *
+ */
+
+uint32_t   StepTaskTime[] = {50UL, 50UL, 100UL, 50UL, StepTaskTimeSet, StepTaskTimeSet, StepTaskTimeSet};
 
 
-uint32_t   StepTaskTime[] = {50UL, 50UL, StepTaskTimeSet, StepTaskTimeSet, StepTaskTimeSet, StepTaskTimeSet};
+/* ------- Private function prototypes -----------------------------------------------*/
 
-
-/* Private function prototypes -----------------------------------------------*/
-
-void StepperFollowsPitch(bool StepLenable, bool StepRenable);
+void StepperFollowsPitch(bool StepLenable, bool StepRenable);		//open Loop demo
 void dispMPUBat(MPU6050_t* MPU1, analogCh_t* pADChn);
 void DispAlphaNumMPU(MPU6050_t* pMPU);
+extern void visualisationTOF(TOFSensor_t* TOFSENS);
 
-
+/*------------ reserve for RFID Reader -----------------*/
 #define i2cAddr_RFID	0x50
-#define i2cAddr_LIDAR	0x29
 bool enableRFID = false;
-bool enableLIDAR = false;
 
 
 /*------------ MPU6050 Sensor -----------------*/
 
 MPU6050_t MPU1;
 
+
+
+
+/*-------- TOF (TimeOfFlight)-Sensor VL53X -------------*/
+
+TOFSensor_t TOF1;
+bool enableTOF1 = false;
+#define i2cAddr_TOF1	0x29
+
+// variables to store the distance -kann vermutlich weg
+uint16_t TOF_DISTANCE_1 = 10;
 
 
 /* ------ Def and Parameter for stepper motors ------ */
@@ -256,13 +270,14 @@ void rotControl(int16_t* setPos, float* targetPos, float phi, int16_t motPosL, i
 
 
 
-// *DevMask b0010 Left, b0001 right stepper; b0100 mpu;  b1000 lidar
+// *DevMask b0010 Left, b0001 right stepper; b0100 mpu;  b1000 tof/lidar
 #define DevStepR 0b0001
 #define DevStepL 0b0010
 #define DevMPU1  0b0100
-#define DevLIDAR 0b1000
+#define DevTOF1  0b1000
 
-int CheckAndInitI2cSlaves(uint8_t* DevMask, Stepper_t* pStepL, Stepper_t* pStepR, MPU6050_t* pMPU1)
+
+int CheckAndInitI2cSlaves(uint8_t* DevMask, Stepper_t* pStepL, Stepper_t* pStepR, MPU6050_t* pMPU1,TOFSensor_t* pTOF1)
 {
 	I2C_TypeDef *i2c = I2C1, *i2c2 = I2C2;
 	static I2C_TypeDef *i2cMPU = I2C1;
@@ -315,30 +330,55 @@ int CheckAndInitI2cSlaves(uint8_t* DevMask, Stepper_t* pStepL, Stepper_t* pStepR
 			StepperInit(pStepR, i2cSTEP, i2cAddr_motR,StepPaValue[0], StepPaValue[1], StepPaValue[2],StepPaValue[3],stepMode,(uint8_t)stepRotDir, StepPaValue[4], 0);
 			stepper.pwmFrequency.set(pStepR, 0);
 			*DevMask |= DevStepR;
-			i2cSetClkSpd(i2cSTEP,  I2C_CLOCK_200); //speed up I2CBusclock max Stepper 400kHz
+			i2cSetClkSpd(i2cSTEP,  I2C_CLOCK_200); //speed up I2CBusclock max Stepper 400kHz<- doesn't worked
 		}
 		else
 		{ pStepR->i2cAddress.value = 0; }			// if StepperRight not exist set pointer to NULL
 	}
-	// LIDAR check
-	if (( *DevMask & DevLIDAR) == 0)
+
+	// TOF check and INIT
+	if ((( *DevMask & DevTOF1) == 0)&& (CycleRun == -3))
 	{
-		foundAddr = i2cFindSlaveAddr(i2cTOF, i2cAddr_LIDAR);
-		if (foundAddr == 0)
+		TOF1.i2c_tof = i2cTOF;
+		TOF1.TOF_address_used = i2cAddr_TOF1;
+	}
+	if ((( *DevMask & DevTOF1) == 0) && (CycleRun <= -3))
+	{
+		if (TOF_init_address(&TOF1))
 		{
-			i2cSTEP = I2C2;
-			foundAddr = i2cFindSlaveAddr(i2cTOF, i2cAddr_LIDAR);
-		}
-		if (foundAddr != 0)
-		{
-			tftPrint((char *)"TOF/LIDAR OK \0",0,80,0);
-			*DevMask |= DevLIDAR;
+			// Initialisieren des TOF-Sensors
+			initTOFSensorData(&TOF1, i2cTOF, TOF_ADDR_VL53LOX, TOF_DEFAULT_MODE_D, TOF_DISTANCE_1);
+			tftPrint((char *)"TOF found \0",0,80,0);
+			*DevMask |= DevTOF1;
 		}
 		else
 		{
-			tftPrint((char *)"TOF/LIDAR not \0",0,80,0);
+			tftPrint((char *)"TOF not found \0",0,80,0);
 		}
 	}
+
+	if ((( *DevMask & DevTOF1) != 0) && (CycleRun == -2))
+	{
+
+		bool InitResult = TOF_init_device(&TOF1);
+		if (InitResult)
+		{
+			tftPrint((char *)"TOF init OK\0",0,80,0);
+			//*DevMask |= DevTOF1;
+		}
+
+	}
+
+	if ((( *DevMask & DevTOF1) != 0) && (CycleRun == -1))
+
+	{
+		// Konfigurieren und Aktivieren des Sensors
+		configTOFSensor(&TOF1, TOF_DEFAULT_MODE_D, true);
+		//TOF_set_ranging_profile(&TOF1);
+		TOF_start_continuous(&TOF1);
+	}
+
+
 	// MPU6050 check and Init with 3 runs
 	if (CycleRun == -3)
 	{	// detected and first initrun
@@ -352,7 +392,7 @@ int CheckAndInitI2cSlaves(uint8_t* DevMask, Stepper_t* pStepL, Stepper_t* pStepR
 		{
 			tftPrint((char *)"MPU6050 OK \0",0,95,0);
 			*DevMask |= DevMPU1;
-			i2cSetClkSpd(i2cMPU,  I2C_CLOCK_1Mz); //speed up sensor Bus
+			//i2cSetClkSpd(i2cMPU,  I2C_CLOCK_1Mz); //speed up sensor Bus
 			MPU6050ret = mpuInit(pMPU1, i2cMPU, i2cAddr_MPU6050, FSCALE_250, ACCEL_2g, LPBW_184, NO_RESTART);
 			CycleRun = MPU6050ret;
 		}
@@ -500,7 +540,7 @@ int main(void)
 				case M_CheckI2cSlaves:  //I2C Scan
 				{
 				   setRotaryColor(LED_MAGENTA);
-				   I2cCheckResult =  CheckAndInitI2cSlaves(&DevPrMask, &StepL,&StepR,&MPU1);
+				   I2cCheckResult =  CheckAndInitI2cSlaves(&DevPrMask, &StepL,&StepR,&MPU1,&TOF1);
 
 				   if ((I2cCheckResult == 0)&&(DevPrMask & DevMPU1) && (DevPrMask & DevStepL) && (DevPrMask & DevStepR))  //Motor and Sensor present
 				   {
@@ -510,6 +550,13 @@ int main(void)
 						setRotaryColor(LED_GREEN);
 						//StepTaskTime = StepTaskTimeSet;								// Tasktime for Stepper Balancing ca 8ms
 						RunInit = true;
+						break;
+				   }
+				   if ((I2cCheckResult == 0)&&(DevPrMask & DevTOF1))  //only TOF-Sensor present
+				   {
+						//StepTaskTime = 70;									// Tasktime for display 70ms
+						TaskMode = M_DispTofData;
+						setRotaryColor(LED_BLUE);
 						break;
 				   }
 				   if ((I2cCheckResult == 0)&&(DevPrMask & DevMPU1))  //only MPU-Sensor present
@@ -528,6 +575,17 @@ int main(void)
 
 				}
 		   		break;
+		 		case M_DispTofData:  // read TOF Data
+				{
+					setRotaryColor(LED_WHITE);
+					if (TOF_read_distance_task(&TOF1))
+					//if (TOF_start_up_task(&TOF1))
+					{
+						visualisationTOF(&TOF1);
+					}
+					setRotaryColor(LED_BLUE);
+				}
+				break;
 		   		case M_Bala:  // Stepper Closed loop Control (old 8)
 				{
 					if (RunInit)
@@ -668,12 +726,22 @@ int main(void)
 		   }  //end switch (RunMode)
 	    } // end if(isSystickExpired(StepTaskTimer))
 
-		/*
-		* Routine for Motion Control
-		*/
+/*--------------------------  Routine for Motion Control and Display -------------------*
+ *
+ *
+ *
+*/
 		if (isSystickExpired(DispTaskTimer))
 		{
 			systickSetTicktime(&DispTaskTimer, DispTaskTimeSet);   // Reset Disp timer
+		if (( DevPrMask & DevTOF1) != 0)
+		{
+			if (TOF_read_distance_task(&TOF1))
+			//if (TOF_start_up_task(&TOF1))
+			{
+				visualisationTOF(&TOF1);
+			}
+		}
 			if ((activeMove == true) && (TaskMode == M_Bala ))
 			{
 				switch (MotionVar)
@@ -753,6 +821,7 @@ int main(void)
 			//if ((activeMove == false) && (RunMode == 8 ))
 
 			if ((TaskMode == M_DispMpuData)||
+				(TaskMode == M_DispTofData)||
 				(TaskMode == M_StepFollowPitch)||
 				((TaskMode == M_Bala)&&(activeMove != true))
 				)
@@ -810,66 +879,47 @@ void dispMPUBat(MPU6050_t* pMPU1, analogCh_t* pADChn)
 }
 
 
-
-/* scanAdr. 7Bit Adresse value
- * return	0 if no device found on scanAdr
- *			if yes  return the scanAdr.
- *			and display on the ST7735 Display
+/*--------------                      ----------------
  *
- *
+ * */
 
 
-
-
-uint8_t I2C_SCAN(I2C_TypeDef *i2c, uint8_t scanAddr)
+void visualisationTOF(TOFSensor_t* TOFSENS)
 {
-	uint8_t 	*outString2 = (uint8_t *) "Addr at: \0";
-	uint8_t     port, *result;
-#define yPosBase 18
-	uint8_t foundAddr = 0;
-	static int xPos[2] = {0,100};
-	static int yPos[2] = {yPosBase, yPosBase};
+#define POS_SCREEN_LINE_4 		0, 94, 0
+	char buffer[3];
+	static uint16_t olddistance_var = TOF_VL53L0X_OUT_OF_RANGE; // Statische Variable zur Speicherung des alten Werts
+	uint16_t* olddistance = &olddistance_var; // Pointer auf die statische Variable
 
-	if (i2c == I2C1)
-    {
-	   port = 0;
-    }
-    else
-    {
-	   port = 1;
-    }
-    if (scanAddr == 0)
-    {
-    yPos[0] = yPosBase;
-    yPos[1] = yPosBase;
-    }
-
-	foundAddr = i2cFindSlaveAddr(i2c, scanAddr);
-	if (yPos[port] == 0)
+	// if value is not out of range
+	if (TOFSENS->distanceFromTOF != TOF_VL53L0X_OUT_OF_RANGE)
 	{
-		tftPrint((char *)outString2,xPos[port],yPos[port],0);
-		yPos[port] = 66;
-	}
-	result = convDecByteToHex(scanAddr);
-	if (foundAddr != 0)
-	{
-		//outString = outString2;
-		tftPrint((char *)result,xPos[port],yPos[port],0);
-		yPos[port] = (int) 14 + yPos[port];
-		if (yPos[port] > 100)
+		// if it was out of range, restore unit visualization
+		if (*olddistance == TOF_VL53L0X_OUT_OF_RANGE)
 		{
-			yPos[port] = yPosBase;
+			tftPrint("  cm        ", POS_SCREEN_LINE_4);
+		}
+
+		// visualize cm in 2 digits
+		if (abs(TOFSENS->distanceFromTOF - *olddistance)>10)
+		{
+			sprintf(buffer, "%02d", TOFSENS->distanceFromTOF/10);
+			tftPrint(buffer, POS_SCREEN_LINE_4);
 		}
 	}
+	// if value is out of range
 	else
 	{
-	//	tftPrint((char *)result,xPos,14,0);
+		tftPrint("out of range", POS_SCREEN_LINE_4);
 	}
-	return foundAddr;
 
+	// store current distance to old value
+	*olddistance = TOFSENS->distanceFromTOF;
 }
 
-*/
+
+
+
 void DispAlphaNumMPU(MPU6050_t* pMPU)
 {
 	char strX[8],strY[8],strZ[8];

@@ -27,7 +27,6 @@ extern int8_t RFID_readFWVersion(I2C_TypeDef *i2c, char *strFirmware);
 #define _OK 1
 
 
-#define i2cAddr_LIDAR	0x29
 
 
 extern bool enableRFID;

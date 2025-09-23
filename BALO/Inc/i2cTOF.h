@@ -286,8 +286,8 @@ struct TOFSensor {
 };
 
 // Function prototypes for initializing and configuring the TOF sensor
-extern void initializeTOFSensor(TOFSensor_t* sensor, I2C_TypeDef *i2c_tof, uint16_t TOF_address_used, uint16_t Ranging_Profiles_t, uint16_t measuredRange);
-extern void configureTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t, bool enable);
+extern void initTOFSensorData(TOFSensor_t* sensor, I2C_TypeDef *i2c_tof, uint16_t TOF_address_used, uint16_t Ranging_Profiles_t, uint16_t measuredRange);
+extern void configTOFSensor(TOFSensor_t* sensor, uint16_t Ranging_Profiles_t, bool enable);
 
 
 //--------------------- INTERNAL FUNCTIONS ---------------------
