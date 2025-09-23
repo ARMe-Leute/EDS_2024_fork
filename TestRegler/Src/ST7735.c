@@ -500,6 +500,7 @@ static const uint8_t Rcmd3[] = {
 };
 
 #define putpix(c) { tftSPISenddata(c >> 8); tftSPISenddata(c & 0xFF); }
+//define putpix(c) { tftSPISenddata16(c);} //doesnt work
 
 //default values for start Position
 static int colstart = 0; // May be overwritten in init func
