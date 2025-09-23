@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['ranging_5fprofile_5ftime_0',['Ranging_Profile_time',['../struct_t_o_f_sensor.html#a3fadb0d83e3e932d9c33b04a4ee6653e',1,'TOFSensor']]],
+  ['ranging_5fprofiles_5ft_1',['Ranging_Profiles_t',['../struct_t_o_f_sensor.html#a19d7dabdbd4be4d153a43c3fbf8f2c5d',1,'TOFSensor']]],
+  ['ratiobatvolt_2',['ratioBatVolt',['../structanalog_ch__t.html#a348f8748fdbf8e0edc8c32c97b7641aa',1,'analogCh_t']]],
+  ['relativemotionthreshold_3',['relativeMotionThreshold',['../struct_stepper.html#a84061b44801d2522e3e7bce441a88b38',1,'Stepper']]],
+  ['relativemotionthresholddescription_4',['relativeMotionThresholdDescription',['../i2c_a_m_i_s_8c.html#af9c35448d8ded633fcb9eb64867c6144',1,'i2cAMIS.c']]],
+  ['relativemotionthresholdname_5',['relativeMotionThresholdName',['../i2c_a_m_i_s_8c.html#a4164c7deb8c680b27d6d8263133b970f',1,'i2cAMIS.c']]],
+  ['rfidcmd_5fgetfirmwareversion_6',['RFIDcmd_getFirmwareVersion',['../i2c_r_f_i_d_8c.html#a1f16f009ee55b1e6410ebdf873298b80',1,'i2cRFID.c']]],
+  ['rfidcmd_5fgetmifareuid_7',['RFIDcmd_getMifareUID',['../i2c_r_f_i_d_8c.html#a70650ea110a78fc28ed2c288b0cb2ca0',1,'i2cRFID.c']]],
+  ['rfidcmd_5fledoff_8',['RFIDcmd_LEDoff',['../i2c_r_f_i_d_8c.html#a29a5a337c860cf5743e128a4721a88aa',1,'i2cRFID.c']]],
+  ['rfidcmd_5fledon_9',['RFIDcmd_LEDon',['../i2c_r_f_i_d_8c.html#a72dd58eff2941e8b5e0038e1e71c451b',1,'i2cRFID.c']]],
+  ['roll_10',['roll',['../struct_m_p_u6050.html#a9858ff9abef12e111fff8cc5914c0d9f',1,'MPU6050']]],
+  ['rotationdirection_11',['rotationDirection',['../struct_stepper.html#a6e129b80253d7f8a1d540fadcbda4664',1,'Stepper']]],
+  ['rotationdirectiondescription_12',['rotationDirectionDescription',['../i2c_a_m_i_s_8c.html#ab4948800e4fd604967dc40638b4fb04a',1,'i2cAMIS.c']]],
+  ['rotationdirectionname_13',['rotationDirectionName',['../i2c_a_m_i_s_8c.html#a2081132e65cad09f947cabee029a87b2',1,'i2cAMIS.c']]],
+  ['rotoryposition_14',['rotoryPosition',['../_rotary_push_button_8c.html#af2f3170e386b49aec6d9cc216710cc0a',1,'RotaryPushButton.c']]],
+  ['rpy_15',['RPY',['../struct_m_p_u6050.html#acde6967965fba6efee4edcbad2dd7b4b',1,'MPU6050']]],
+  ['run_16',['run',['../struct_p_i_d_contr.html#a19a556b46f5412767cbd331a7dcc203e',1,'PIDContr']]]
+];

@@ -1,0 +1,37 @@
+var _b_a_l_o_8h =
+[
+    [ "analogCh_t", "structanalog_ch__t.html", "structanalog_ch__t" ],
+    [ "BALA2024", "_b_a_l_o_8h.html#a0c48418de10f86ce90c453b96f19d5b9", null ],
+    [ "DELAY_blue", "_b_a_l_o_8h.html#ad6e2f3b75678b7b3a3cf47081a52b010", null ],
+    [ "DELAY_green", "_b_a_l_o_8h.html#af9d0150944bea3877f25f0ea3789c524", null ],
+    [ "DELAY_red", "_b_a_l_o_8h.html#a07da22015852e53e6ca725920003d085", null ],
+    [ "emptyBatVolt", "_b_a_l_o_8h.html#ad984ab476c9bd8e6ff05d4a234ef5e70", null ],
+    [ "halfBatVolt", "_b_a_l_o_8h.html#a91d56e13cb594f8d1bf03b4dab790136", null ],
+    [ "LED_blue", "_b_a_l_o_8h.html#abad30307e9f0ed75f953fd9083b0ec95", null ],
+    [ "LED_blue_off", "_b_a_l_o_8h.html#a00fad37e251673b2d7208284ae38cf66", null ],
+    [ "LED_blue_on", "_b_a_l_o_8h.html#aa1b00481fdff05ae90a86b4b2e096ede", null ],
+    [ "LED_GPIO", "_b_a_l_o_8h.html#a843b341668408e5656cf19cf3389bb5a", null ],
+    [ "LED_green", "_b_a_l_o_8h.html#a84887060595ffa60b7809fc5e1bf9ba3", null ],
+    [ "LED_green_off", "_b_a_l_o_8h.html#a6605d74820e0da3c272837a12cbf70ca", null ],
+    [ "LED_green_on", "_b_a_l_o_8h.html#abeb2ff083c44664b489d7e76ae78acf3", null ],
+    [ "LED_red", "_b_a_l_o_8h.html#ab559a6e0682813ab048f0c77ae787ab4", null ],
+    [ "LED_red_off", "_b_a_l_o_8h.html#a2ede61d75fc283ec976291c4ebb86825", null ],
+    [ "LED_red_on", "_b_a_l_o_8h.html#a174f0a90ac4afaaa1a1a1cb76c8d16a5", null ],
+    [ "BatStat_t", "_b_a_l_o_8h.html#a9a85a5e6c8862eb03938052b064e4ab5", [
+      [ "okBat", "_b_a_l_o_8h.html#a9a85a5e6c8862eb03938052b064e4ab5a7eece130735e33f9281aa175cd36a618", null ],
+      [ "halfBat", "_b_a_l_o_8h.html#a9a85a5e6c8862eb03938052b064e4ab5a5df0e2b1fd84a14334074e5d2d1f5e75", null ],
+      [ "emptyBat", "_b_a_l_o_8h.html#a9a85a5e6c8862eb03938052b064e4ab5ab0f9e454be91f2dfec5a64bbf7433605", null ],
+      [ "underVolt", "_b_a_l_o_8h.html#a9a85a5e6c8862eb03938052b064e4ab5acb6018bd571395302c4c70d909174472", null ],
+      [ "overVolt", "_b_a_l_o_8h.html#a9a85a5e6c8862eb03938052b064e4ab5a29eaaccb0a9a104ac85e6ab2eec7019d", null ]
+    ] ],
+    [ "adcActivate", "_b_a_l_o_8h.html#a35f327499360cf482454ec60b5680e1e", null ],
+    [ "AlBeOszi", "_b_a_l_o_8h.html#a3d44d87ca8749515d728160acfd57bc4", null ],
+    [ "BALOsetup", "_b_a_l_o_8h.html#a9ba8f151fc055a1fcf722f80a0260d33", null ],
+    [ "convDecByteToHex", "_b_a_l_o_8h.html#a9b1d469d4f5a631f6ffc401afa1d7b01", null ],
+    [ "getBatVolt", "_b_a_l_o_8h.html#a60741550a99d7425829c36a9317e0664", null ],
+    [ "I2C_SCAN", "_b_a_l_o_8h.html#a79f35f2a338b329628da80cb01938c79", null ],
+    [ "i2cActivate", "_b_a_l_o_8h.html#a50fe79f52e9390b57374a21525c912e8", null ],
+    [ "ledActivate", "_b_a_l_o_8h.html#afab2fa5af9d43c8ecf418d855e0c1112", null ],
+    [ "low_pass", "_b_a_l_o_8h.html#a6f63da1ee0beb17c9c0e5fd226f177d6", null ],
+    [ "analogCh", "_b_a_l_o_8h.html#a7c2bc2b813339eab16892570dd875385", null ]
+];

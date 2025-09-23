@@ -1,21 +1,41 @@
-/*********************************************************************************
-Some parts of code have been ported from Arduino Adafruit & UTFT libraries.
-Copyrights below:
+/**
+ ******************************************************************************
+ * @file	ST7735.c
+ * @author 	Henning Karlsen (C)2010-2013
+ * @author 	V1.1 Lea Hoß and Samuel Schieber (Students of DHBW Stuttgart)
+ * 			Redesign and further development
+ * @author	V1.2 Prof Flaemig <https://github.com/tflaemig68/>
+ * @brief	ST7735 TFT Graphic Interface V1.2
+ * @brief 	sorry, until now, there no doxygen compatible comments included
+ * @date	V1.2 Aug. 2025
+ ******************************************************************************
+ * @attention This software is licensed based on CC BY-NC-SA 4.0
+ * @attention Code has been ported from Arduino Adafruit library.
+ * @attention Copyrigths below:
+ *  This is a library for the Adafruit 1.8" SPI display.
+ *  This library works with the Adafruit 1.8" TFT Breakout w/SD card
+ *  ----> http://www.adafruit.com/products/358
+ *  as well as Adafruit raw 1.8" TFT display
+ *  ----> http://www.adafruit.com/products/618
+ *
+ * Written by Limor Fried/Ladyada for Adafruit Industries.
+ * MIT license, all text above must be included in any redistribution
+ *
+ * Some parts of code have been ported from Arduino Adafruit & UTFT libraries.
+ * Copyrights below:
+ * Written by Limor Fried/Ladyada for Adafruit Industries.
+ * MIT license, all text above must be included in any redistribution
+ * UTFT.cpp - Arduino/chipKit library support for Color TFT tft Boards
+ * Copyright (C)2010-2013 Henning Karlsen. All right reserved
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the CC BY-NC-SA 3.0 license.
+ * Please see the included documents for further information.
+ *********************************************************************************
+ */
 
-Written by Limor Fried/Ladyada for Adafruit Industries.
-MIT license, all text above must be included in any redistribution
-
-UTFT.cpp - Arduino/chipKit library support for Color TFT tft Boards
-Copyright (C)2010-2013 Henning Karlsen. All right reserved
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the CC BY-NC-SA 3.0 license.
-Please see the included documents for further information.
-**********************************************************************************/
-/*Redesign and further development have been done by Students of DHBW Stuttgart
-*/
 
 
+#include <graphics.h>
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
@@ -24,7 +44,6 @@ Please see the included documents for further information.
 #include <mcalSysTick.h>
 #include <mcalGPIO.h>
 #include <mcalSPI.h>
-#include <BALO.h>
 
 static uint16_t width = ST7735_TFTWIDTH;
 static uint16_t height = ST7735_TFTHEIGHT;
@@ -40,7 +59,7 @@ Hardware Configuration
 * The idea of HW initialization and configuration have taken on from
 * http://vg.ucoz.ru/load/stm32_ickhodnye_teksty_programm_na_si/stm32_biblioteka_podkljuchenija_displeja_na_kontrollere_st7735_dlja_stm32f4/16-1-0-41
 ****************************************************************************************/
-//Redesign and further development have been done by Lea Hoß and Samuel Schieber (Students of DHBW Stuttgart)
+
 
 
 static SPI_TypeDef  *spi  = SPI1;

@@ -1,11 +1,15 @@
 /**
  ******************************************************************************
- * @file           : RotaryPushButton.h
- * @author         : Linus Blanke & Christoph Lederbogen
- * @brief          : This is the header file for controlling the rotary encoder with a built-in push button.
- *              	 It includes functions for initializing the rotary push button,
- *              	 reading the rotary position and button state, as well as controlling the module's color.
- * @date		   : December 27, 2023
+ * @file    RotaryPushButton.h
+ * @author	V1.0 Linus Blanke & Christoph Lederbogen
+ * @author	V1.1 Prof Flaemig <https://github.com/tflaemig68/>
+ * @brief	This is the C source code for controlling the rotary encoder with a built-in push button.
+ *          It includes the implementations of the functions defined in "RotaryPushButton.h."
+ *          Additionally, this source code contains the implementation of the interrupt functions.
+ *          This library is based on the CMSIS and MCAL library.
+ * @date	V1.0 December 27, 2023
+ * @date	V1.1 Aug 2025
+ * @attention This software is licensed based on CC BY-NC-SA 4.0
  ******************************************************************************
  */
 
@@ -13,8 +17,8 @@
 #define ROTARYPUSHBUTTON_H
 
 /* Includes */
+#include <graphics.h>
 #include <stdbool.h>
-#include <BALO.h>
 
 #define ERROR_VALUE 		(int16_t)-65535
 

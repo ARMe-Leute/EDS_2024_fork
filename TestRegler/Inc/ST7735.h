@@ -1,27 +1,34 @@
+#ifndef _ST7735H_
+#define _ST7735H_
+/**
+ ******************************************************************************
+ * @file	ST7735.h
+ * @author	see file ST7735.c
+ * @brief	ST7735 TFT Graphic Interface V1.2
+ * @brief 	sorry, until now, there no doxygen compatible comments included
+ * @date	Aug 2025
+ *
+ * @attention This software is licensed based on CC BY-NC-SA 4.0
+ * @attention Code has been ported from Arduino Adafruit library.
+ *  Copyrigths below:
+ *  This is a library for the Adafruit 1.8" SPI display.
+ *  This library works with the Adafruit 1.8" TFT Breakout w/SD card
+ *  ----> http://www.adafruit.com/products/358
+ *  as well as Adafruit raw 1.8" TFT display
+ *  ----> http://www.adafruit.com/products/618
+ *
+ * @attention  Written by Limor Fried/Ladyada for Adafruit Industries.
+ * @attention  MIT license, all text above must be included in any redistribution
+ ******************************************************************************
+ */
 
-/***************************************************
-  Code has been ported from Arduino Adafruit library.
-  Copyrigths below:
-
-  This is a library for the Adafruit 1.8" SPI display.
-  This library works with the Adafruit 1.8" TFT Breakout w/SD card
-  ----> http://www.adafruit.com/products/358
-  as well as Adafruit raw 1.8" TFT display
-  ----> http://www.adafruit.com/products/618
-
-  Written by Limor Fried/Ladyada for Adafruit Industries.
-  MIT license, all text above must be included in any redistribution
- ****************************************************/
-
-#ifndef _ADAFRUIT_ST7735H_
-#define _ADAFRUIT_ST7735H_
 
 //#include "stm32f30x.h"
+#include <graphics.h>
 #include <stm32f4xx.h>
 #include <mcalGPIO.h>
 #include <mcalSPI.h>
 #include <mcalSysTick.h>
-#include <BALO.h>
 
 
 /*****************************************************************************************

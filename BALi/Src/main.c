@@ -208,7 +208,7 @@ void SetRegParameter(MPU6050_t* MPUa)
 	MPUa->pitchZero = ParamValue[a_phiZ];
 	MPUa->swLowPassFilt = ParamValue[a_LP];
 	MPUa->pitchFilt = ParamValue[a_GyAc];
-	initPID(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
+	PID.init(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
 	if (ParamValue[a_HwLP] <0 ) { ParamValue[a_HwLP] =0;}
 	if (ParamValue[a_HwLP] >6 ) { ParamValue[a_HwLP] =6;}
 	MPUa->LowPassFilt = tableLPFValue[(uint)ParamValue[a_HwLP]];
@@ -612,7 +612,7 @@ int main(void)
 						MPU1.RPY[1]= 3;				// MPU z-Axis goes to the left side
 						MPU1.RPY[2]= -1;			// MPU x-Axis goes down
 						MPU1.timebase = (float) (StepTaskTimeSet+1) * 10e-4;  			// CycleTime for calc from Gyro to angle  fitting statt 10-3 wird 10-4 gesetzt
-						initPID(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
+						PID.init(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
 						RunInit = false;
 					}
 					gpioResetPin(LED_RED_ADR);
@@ -630,7 +630,7 @@ int main(void)
 					if (fabs(AlphaBeta[1]) > 0.35)  // tilt angle more than  0.2 pi/4 = 30deg  -shut off Stepper control and reduce the IHold current and power consumption -> save the planet ;-)
 					{
 						activeMove = false;
-						initPID(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
+						PID.init(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
 						StepperIHold(false);
 						incRot = 0;
 						tarPosR = 0;
@@ -662,7 +662,7 @@ int main(void)
 						}
 						if (activeMove == true)
 						{
-							float setPitch = (rad2step)* runPID(&PID_phi, MPU1.pitch);
+							float setPitch = (rad2step)* PID.run(&PID_phi, MPU1.pitch);
 							if (rampRot < 1)
 							{
 								rampRot += ParamValue[a_raRo];

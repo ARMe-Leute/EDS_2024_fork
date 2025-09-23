@@ -1,7 +1,7 @@
 /**
- *      amis.c
+ *      i2cAMIS.c
  * 
- *      @file amis.c provides the methods to control a stepper via the `AMIS-30624`
+ *      @file i2cAMIS.c provides the methods to control a stepper via the `AMIS-30624`
  *      @author: Stefan Heinrich, Dennis Lotz
  *      Created on: Dez. 05, 2023
  */
@@ -424,7 +424,7 @@ uint16_t getSecPos(Stepper_t* stepper)
  * @param uint8_t value - 0x0 / 0x1, `0`: normal acceleration from vMin to vMax, `1`: motion at vMin without acceleration - for more information view data sheet 
  * @returns void
  */
-void setAccelShape(Stepper_t* stepper, uint8_t value)
+void setAccelShape(Stepper_t *stepper, uint8_t value)
 {
 	stepper->accelerationShape.value = value;
 	setStallParam(stepper);
@@ -433,8 +433,10 @@ void setAccelShape(Stepper_t* stepper, uint8_t value)
 /**
  * get the currently set acceleration shape
  * 
- * @param Stepper_t* stepper - the stepper to read the acceleration shape from
- * @returns uint8_t `0`: normal acceleration from vMin to vMax, `1`: motion at vMin without acceleration
+ * @param stepper -  the acceleration is read from the pointer stepper
+ * @returns uint8_t
+ * @retval 0 : normal acceleration from vMin to vMax, `
+ * @retval 1 : motion at vMin without acceleration
  */
 uint8_t getAccelShape(Stepper_t* stepper)
 {
@@ -448,12 +450,12 @@ uint8_t getAccelShape(Stepper_t* stepper)
 /**
  * get the current position of the stepper
  *
- * @param Stepper_t* stepper - the stepper to read the acceleration shape from
- * @returns uint16_t 16bit integer `-30000` .. `+30000`
+ * @param 	stepper - the stepper to read the acceleration shape from
+ * @returns uint16_t current Position `-30000` .. `+30000`
+ * @brief	it takes at 100kHz of I2C Clock  1,16ms
  */
 int16_t StepperGetPos(Stepper_t* stepper)
-{ // was getActualPosition
-	// it takes at 100KHz I2C Clock 1,16ms
+{
 	uint8_t data[8];
 	int16_t i_ret;
 	uint8_t befehl = (uint8_t) 0xFC; // 0xFc is the command to get the FullStatus2
@@ -515,8 +517,7 @@ void setPWMFrequency(Stepper_t* stepper, uint8_t value)
 {
 	stepper->pwmFrequency.value = value;
 	setMotorParam(stepper);
-	/**
-	 *
+	/*
 	uint8_t befehl = (uint8_t) 0x89;
 	uint8_t data[8];
 	I2C_TypeDef   *i2c;
@@ -537,7 +538,7 @@ void setPWMFrequency(Stepper_t* stepper, uint8_t value)
 
 /**
  * get the PWM Jitter
- * @param Stepper_t* stepper - the stepper to read the PWM Jitter from
+ * @param 	stepper - the stepper to read the PWM Jitter from
  * @returns uint8_t - the currently set PWM Jitter
 */
 uint8_t getPWMJitter(Stepper_t* stepper) {
@@ -628,7 +629,7 @@ void setRelativeMotionThreshold(Stepper_t* stepper, uint8_t value)
 /**
  * get the current target position of the stepper
  *
- * @param Stepper_t* stepper - the stepper to read the data from
+ * @param 	stepper - the stepper to read the data from
  * @returns uint16_t 16bit integer `-30000` .. `+30000`
  */
 int16_t StepperGetTargetPosition(Stepper_t* stepper) { // falls probleme auftreten zurück zu int als return type

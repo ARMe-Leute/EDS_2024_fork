@@ -1,12 +1,15 @@
 /**
  ******************************************************************************
- * @file           : RotaryPushButton.c
- * @author         : Linus Blanke & Christoph Lederbogen
- * @brief          : This is the C source code for controlling the rotary encoder with a built-in push button.
- *              	 It includes the implementations of the functions defined in "RotaryPushButton.h."
- *              	 Additionally, this source code contains the implementation of the interrupt functions.
- *              	 This library is based on the CMSIS and MCAL library.
- * @date		   : December 27, 2023
+ * @file	RotaryPushButton.c
+ * @author	V1.0 Linus Blanke & Christoph Lederbogen
+ * @author	V1.1 Prof Flaemig <https://github.com/tflaemig68/>
+ * @brief	This is the C source code for controlling the rotary encoder with a built-in push button.
+ *          It includes the implementations of the functions defined in "RotaryPushButton.h."
+ *          Additionally, this source code contains the implementation of the interrupt functions.
+ *          This library is based on the CMSIS and MCAL library.
+ * @date	V1.0 December 27, 2023
+ * @date	V1.1 Aug 2025
+ * @attention This software is licensed based on CC BY-NC-SA 4.0
  ******************************************************************************
  */
 
@@ -37,9 +40,9 @@ bool initRotaryPushButtonLEDDone = false;
 
 
 /*
- * @function:	 initRotaryPushButton
+ * @function	 initRotaryPushButton
  *
- * @brief: 		 Initializes the Rotary Push Button.
+ * @brief 		 Initializes the Rotary Push Button.
  *               This function disables interrupts, configures GPIO pins,
  *               and sets up EXTI and NVIC for interrupt handling.
  *               It enables interrupts before returning.
@@ -91,9 +94,9 @@ void initRotaryPushButton()
 }
 
 /*
- * @function:	 initRotaryPushButtonLED
+ * @function	 initRotaryPushButtonLED
  *
- * @brief: 		 Initializes the LEDs of the Rotary Push Button.
+ * @brief 		 Initializes the LEDs of the Rotary Push Button.
  *               After initializing the LEDs of the Rotary Push Button can be used.
  */
 void initRotaryPushButtonLED(void)
@@ -123,13 +126,13 @@ void initRotaryPushButtonLED(void)
 
 
 /*
- * @function:	 setRotaryColor
+ * @function	 setRotaryColor
  *
- * @brief: 		 Sets the color of the RGB LED in the Rotary Encoder module.
+ * @brief 		 Sets the color of the RGB LED in the Rotary Encoder module.
  *        		 The color is controlled by specifying the state of each color
  *        		 component (red, green, blue).
  *
- * @args:		 LED_OUTPUT_t color:	 color for LED
+ * @args		 LED_OUTPUT_t color:	 color for LED
  */
 void setRotaryColor(LED_COLOR_t color)
 {
@@ -200,9 +203,9 @@ void setRotaryColor(LED_COLOR_t color)
 
 
 /*
- * @function:	 getRotaryPushButton
+ * @function	 getRotaryPushButton
  *
- * @brief: 		 Returns the state of the Push Button.
+ * @brief 		 Returns the state of the Push Button.
  *        		 Returns true if the button is pressed, false otherwise.
  *        		 Additionally, it clears the internal flag if the button was pressed.
  */
@@ -229,9 +232,9 @@ int getRotaryPushButton()
 
 
 /*
- * @function:	 getRotaryPosition
+ * @function	 getRotaryPosition
  *
- * @brief: 		 Gets the rotary encoder position.
+ * @brief 		 Gets the rotary encoder position.
  *        		 Returns the current position as an integer.
  */
 int getRotaryPosition()
@@ -259,10 +262,10 @@ uint16_t setRotaryPosition(int32_t position)
 
 
 /*
- * @function:	 ROTARY_A_HANDLER
+ * @function	 ROTARY_A_HANDLER
  * 				 (the correct handler is linked as a define according to the used controller)
  *
- * @brief: 		 EXTI Interrupt Handler for ROT A.
+ * @brief 		 EXTI Interrupt Handler for ROT A.
  *               Checks ROT B and updates the position accordingly.
  */
 
@@ -291,10 +294,10 @@ void ROTARY_A_HANDLER(void)
 
 
 /*
- * @function:	 ROTARY_SW_HANDLER
+ * @function	 ROTARY_SW_HANDLER
  * 				 (the correct handler is linked as a define according to the used controller)
  *
- * @brief: 		 EXTI Interrupt Handler for PUSH BUTTON.
+ * @brief		 EXTI Interrupt Handler for PUSH BUTTON.
  *        		 Sets the PUSH BUTTON flag.
  */
 void ROTARY_SW_HANDLER(void)

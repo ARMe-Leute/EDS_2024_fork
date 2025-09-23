@@ -7,7 +7,7 @@
 
   - [Installation](#installation)
   - [Example](#usageexamples)
-  - [Authors](#authors)
+  - [Authors](#@author)
 
 
 
