@@ -33,8 +33,66 @@ ADC_RESOLUTION_t 		resolution = ADC_RES_12BIT;				// Resolution of the ADC
 ADC_CHANNEL_t chnList[] = { ADC_CHN_0 };						// List of ADC channels in a sequence
 size_t         listSize = sizeof(chnList) / sizeof(chnList[0]);	// Calculate number of channel-list elements
 
+<<<<<<< HEAD
 /* Depending on the Voltage the Color of the RotaryPushButton is changed using the RotaryPushButton library */
 void setColorDependingOnValue(int caseNumber){
+=======
+    const uint16_t threshold = 4096/4;		// 1/4 of the full scale 12Bit value
+
+#define 	LED_GPIO		GPIOB
+#define 	LED_red			PIN3
+#define		LED_green		PIN4
+#define		LED_blue		PIN10
+#define 	Bit_red			(unsigned int) 1
+#define		Bit_blue		(unsigned int) 2
+#define		Bit_green		(unsigned int) 4
+    gpioSelectPort(LED_GPIO);
+    gpioSelectPinMode(LED_GPIO, LED_red, OUTPUT);
+    gpioSelectPinMode(LED_GPIO, LED_green, OUTPUT);
+    gpioSelectPinMode(LED_GPIO, LED_blue, OUTPUT);
+
+	gpioSetPin(LED_GPIO, LED_red);	 // switch off LED red
+	gpioSetPin(LED_GPIO, LED_green);  // switch off LED green
+
+#define 	ADC_GPIO		GPIOA
+#define 	PA0				PIN0
+    gpioSelectPort(ADC_GPIO);
+    gpioSelectPinMode(ADC_GPIO, PA0, ANALOG); // PA0 : Analog-Modus
+
+#ifdef MCAL_ADC     // Beginn der MCAL-Version
+
+    // Liste der ADC-Kanaele in einer Sequenz
+    ADC_CHANNEL_t chnList[] = { ADC_CHN_0 };
+
+    // Anzahl der Listenelemente berechnen
+    size_t         listSize = sizeof(chnList) / sizeof(chnList[0]);
+
+    adcSelectADC(adc);                     // ADC1: Bustakt aktivieren
+
+    // Konfiguration der Sequenz und Eintrag der Laenge von chnList[]
+    adcSetChannelSequence(adc, chnList, listSize);
+    adcEnableADC(adc);
+
+    while (1)
+    {
+        adcStartConversion(adc);
+        gpioResetPin(LED_GPIO, LED_blue);	//switch LED blue on
+        while (!(adcIsConversionFinished(adc)))
+        {
+            ;
+        }
+        gpioSetPin(LED_GPIO, LED_blue);	//switch LED blue off
+        result = adcGetConversionResult(adc);
+
+        if (result > threshold)
+              {
+              	gpioSetPin(LED_GPIO, LED_red);			//LED off
+              }
+              else
+              {
+              	gpioResetPin(LED_GPIO, LED_red);		// LED On
+              }
+>>>>>>> b87c7c8006f51f0097ae241f20d834498e69beb3
 
     switch (caseNumber) {
         case 0:
