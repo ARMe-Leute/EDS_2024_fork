@@ -17,7 +17,7 @@
  ******************************************************************************
 
  */
-#define SwVersion "DHBW Bala-V1.4c(c)Fl"
+#define SwVersion "DHBW Bala-V1.5a(c)Fl"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -141,7 +141,10 @@ const bool stepRotDir = true;
 void StepperIHold(bool OnSwitch)
 {
 	static bool OldStatus = false;
-	const uint8_t iOff = 0xFF; //switch off the PWM Regulator;
+	const uint8_t iOff = 0x0;  //switch off the PWM Regulator Value 0xFF only for AMIS
+								// 0xFF only for AMIS IC
+								// 0x0 reduced current to 59mA
+
 	if (OnSwitch != OldStatus)			// commands only active of OnSwitch Status changed
 	{
 		if (OnSwitch)
@@ -901,7 +904,8 @@ void visualisationTOF(TOFSensor_t* TOFSENS)
 		}
 
 		// visualize cm in 2 digits
-		if (abs(TOFSENS->distanceFromTOF - *olddistance)>10)
+		int16_t delta = (int16_t) fabs(TOFSENS->distanceFromTOF - *olddistance);
+		if (delta > 10)
 		{
 			sprintf(buffer, "%02d", TOFSENS->distanceFromTOF/10);
 			tftPrint(buffer, POS_SCREEN_LINE_4);

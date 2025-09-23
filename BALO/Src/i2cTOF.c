@@ -1,12 +1,13 @@
 /**
  ******************************************************************************
  * @file           : i2cTOF.c
- * @author         : Andreas Ladner & Philipp Röhlke
+ * @authors        : Linus Blanke & Christoph Lederbogen & Andreas Ladner & Philipp Röhlke
  * @brief          : This library file handles communication with a Time-of-Flight (TOF) sensor.
  *                    Currently adapted to the VL53LOX sensor.
  *                    The library supports both single-shot and continuous measurement modes.
  *                    Configuration is managed via the appropriate register settings for the sensor.
  * @date           : April 2025
+ * @updates	       : July 2025 by T Flaemig marked with //TF_July25
  ******************************************************************************
 
 
@@ -349,7 +350,7 @@ bool TOF_get_spad_info_from_nvm(TOFSensor_t* TOFSENS, uint8_t * count, bool * ty
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x83, data | 0x04);
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_TUNING_2, 0x07);
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_SYSTEM_HISTOGRAM_NON, 0x01);
-	//TF01 i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x83, 0x01);
+	//TF_July25 deleted by comment-> i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x83, 0x01);
 
 	i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_POWER_MANAGEMENT_GO1_POWER_FORCE, 0x01);
 
@@ -526,7 +527,7 @@ bool TOF_load_default_tuning_settings(TOFSensor_t* TOFSENS)
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x49, TOF_DEFAULT_0xFF);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x4A, TOF_DEFAULT_0x00);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_TUNING_2, TOF_DEFAULT_0x00);
-    success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x7A, TOF_DEFAULT_0x0A);  //TF01 change form, 0xA0 to 0x0A
+    success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x7A, TOF_DEFAULT_0x0A);  //TF_July25 data changed form 0xA0 to 0x0A
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x7B, TOF_DEFAULT_0x00);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_CONFIG_0x78, TOF_DEFAULT_0x21);
     success &= i2cSendByteToSlaveReg(TOF_i2c, TOF_address_used, TOF_REG_INTERNAL_TUNING_2, TOF_DEFAULT_0x01);

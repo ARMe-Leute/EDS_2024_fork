@@ -1,12 +1,13 @@
 /**
  ******************************************************************************
  * @file           : i2cTOF.h
- * @author         : Andreas Ladner & Philipp Röhlke
+ * @authors        : Linus Blanke & Christoph Lederbogen & Andreas Ladner & Philipp Röhlke
  * @brief          : This library file handles communication with a Time-of-Flight (TOF) sensor.
  *                    Currently adapted to the VL53LOX sensor.
  *                    The library supports both single-shot and continuous measurement modes.
  *                    Configuration is managed via the appropriate register settings for the sensor.
  * @date           : April 2025
+ * @updates	       : July 2025 by T Flaemig marked with //TF_July25
  ******************************************************************************
 
 
