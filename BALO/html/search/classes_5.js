@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['sequencestepenables_0',['SequenceStepEnables',['../struct_sequence_step_enables.html',1,'']]],
-  ['sequencesteptimeouts_1',['SequenceStepTimeouts',['../struct_sequence_step_timeouts.html',1,'']]],
-  ['stepper_2',['Stepper',['../struct_stepper.html',1,'']]]
+  ['pidcontr_0',['PIDContr',['../struct_p_i_d_contr.html',1,'']]],
+  ['pubio_1',['PuBio',['../struct_pu_bio.html',1,'']]]
 ];

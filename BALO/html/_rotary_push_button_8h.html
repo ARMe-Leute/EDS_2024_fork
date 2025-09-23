@@ -92,59 +92,79 @@ $(function(){initNavTree('_rotary_push_button_8h.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>: This is the header file for controlling the rotary encoder with a built-in push button. It includes functions for initializing the rotary push button, reading the rotary position and button state, as well as controlling the module's color.  
+<p>This is the header file for controlling the rotary encoder with a built-in push button. It includes functions for initializing the rotary push button, reading the rotary position and button state, as well as controlling the module's LED-color.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;stdbool.h&gt;</code><br />
-<code>#include &lt;<a class="el" href="_b_a_l_o_8h_source.html">BALO.h</a>&gt;</code><br />
+<code>#include &lt;mcalEXTI.h&gt;</code><br />
 </div>
 <p><a href="_rotary_push_button_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:LEDio" id="r_LEDio"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_l_e_dio.html">LEDio</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">******* Predeclare RotPushButtom IO-Interface ********************  <a href="struct_l_e_dio.html#details">More...</a><br /></td></tr>
+<tr class="memitem:PuBio" id="r_PuBio"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_pu_bio.html">PuBio</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">IO-Interface for a 3 wire Rotation Push Buttom using C with a struct as OOP (object oriented program) style.  <a href="struct_pu_bio.html#details">More...</a><br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a48e49bfe7b106d9356d27403982bcf7c" id="r_a48e49bfe7b106d9356d27403982bcf7c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a48e49bfe7b106d9356d27403982bcf7c">ERROR_VALUE</a>&#160;&#160;&#160;(int16_t)-65535</td></tr>
-<tr class="memitem:a8fb919ab55c6a330f76284bb86fbb323" id="r_a8fb919ab55c6a330f76284bb86fbb323"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8fb919ab55c6a330f76284bb86fbb323">LED_RED_ADR</a>&#160;&#160;&#160;GPIOB, PIN15</td></tr>
-<tr class="memitem:aa26914090ca9c3ce5abb851970833dab" id="r_aa26914090ca9c3ce5abb851970833dab"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa26914090ca9c3ce5abb851970833dab">LED_GREEN_ADR</a>&#160;&#160;&#160;GPIOB, PIN14</td></tr>
-<tr class="memitem:ae464107ec9d96fadabacced1ea36e1ef" id="r_ae464107ec9d96fadabacced1ea36e1ef"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae464107ec9d96fadabacced1ea36e1ef">LED_BLUE_ADR</a>&#160;&#160;&#160;GPIOB, PIN13</td></tr>
-<tr class="memitem:a063b3577d19273e12f62381b94db037e" id="r_a063b3577d19273e12f62381b94db037e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a063b3577d19273e12f62381b94db037e">ROTARY_A_ADR</a>&#160;&#160;&#160;GPIOB, PIN0</td></tr>
-<tr class="memitem:a5eff0ecb2d23f9a2030f7962ed09a949" id="r_a5eff0ecb2d23f9a2030f7962ed09a949"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5eff0ecb2d23f9a2030f7962ed09a949">ROTARY_A_IRQ</a>&#160;&#160;&#160;EXTI_PIN0</td></tr>
-<tr class="memitem:a3fde37acc4e4d9085e3ac33cfd6c1bf3" id="r_a3fde37acc4e4d9085e3ac33cfd6c1bf3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3fde37acc4e4d9085e3ac33cfd6c1bf3">ROTARY_A_IRQn</a>&#160;&#160;&#160;EXTI0_IRQn</td></tr>
-<tr class="memitem:a5fd38feff7c46a9eff48506a6f6aaaf5" id="r_a5fd38feff7c46a9eff48506a6f6aaaf5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5fd38feff7c46a9eff48506a6f6aaaf5">ROTARY_A_HANDLER</a></td></tr>
-<tr class="memitem:a56c219190632a35873137ec80058caf1" id="r_a56c219190632a35873137ec80058caf1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a56c219190632a35873137ec80058caf1">ROTARY_A_PR</a>&#160;&#160;&#160;EXTI_PR_PR0</td></tr>
-<tr class="memitem:acc1e7d4a9757c74826d896685dbbf1ca" id="r_acc1e7d4a9757c74826d896685dbbf1ca"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acc1e7d4a9757c74826d896685dbbf1ca">ROTARY_B_ADR</a>&#160;&#160;&#160;GPIOB, PIN1</td></tr>
-<tr class="memitem:ad3ad6440fd8270bf1e4f837c67cbbb42" id="r_ad3ad6440fd8270bf1e4f837c67cbbb42"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad3ad6440fd8270bf1e4f837c67cbbb42">ROTARY_SW_ADR</a>&#160;&#160;&#160;GPIOA, PIN10</td></tr>
-<tr class="memitem:a769be268507b887c76b6425be445fe00" id="r_a769be268507b887c76b6425be445fe00"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a769be268507b887c76b6425be445fe00">ROTARY_SW_IRQ</a>&#160;&#160;&#160;EXTI_PIN10</td></tr>
-<tr class="memitem:ad099cc20bb527b7c31889428e7b18021" id="r_ad099cc20bb527b7c31889428e7b18021"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad099cc20bb527b7c31889428e7b18021">ROTARY_SW_IRQn</a>&#160;&#160;&#160;EXTI15_10_IRQn</td></tr>
-<tr class="memitem:a98297204ddd36ec988f681e60e421ee7" id="r_a98297204ddd36ec988f681e60e421ee7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a98297204ddd36ec988f681e60e421ee7">ROTARY_SW_HANDLER</a></td></tr>
-<tr class="memitem:a440c5e5cacdd9cd64a617b423a6a609e" id="r_a440c5e5cacdd9cd64a617b423a6a609e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a440c5e5cacdd9cd64a617b423a6a609e">ROTARY_SW_PR</a>&#160;&#160;&#160;EXTI_PR_PR10</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:aa8142e0463b546bc4513cc7c344f1d9f" id="r_aa8142e0463b546bc4513cc7c344f1d9f"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="struct_l_e_dio.html">LEDio</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a></td></tr>
+<tr class="memitem:a25ed0f4d4dc43dde22bc304261b7f700" id="r_a25ed0f4d4dc43dde22bc304261b7f700"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="struct_pu_bio.html">PuBio</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a></td></tr>
+<tr class="memdesc:a25ed0f4d4dc43dde22bc304261b7f700"><td class="mdescLeft">&#160;</td><td class="mdescRight">******* Predeclare LED IO-Interface ********************  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-enum-members" class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
 <tr class="memitem:a2e6f2b264229590debe98b5c71abe9da" id="r_a2e6f2b264229590debe98b5c71abe9da"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2e6f2b264229590debe98b5c71abe9da">LED_COLOR_t</a> { <br />
-&#160;&#160;<a class="el" href="#a2e6f2b264229590debe98b5c71abe9daa4376d5e9e19f1983bbc3e8b412f84e3d">LED_BLACK</a> = 0
-, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daad80f13022b6d309268fadc7b1da89cb9">LED_RED</a> = 1
-, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daa0ad916c7f80666dc88f6b5b22a72e742">LED_GREEN</a> = 2
-, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daaa67c57c0ff22a2772cb6a5751a3327bf">LED_BLUE</a> = 3
+&#160;&#160;<a class="el" href="#a2e6f2b264229590debe98b5c71abe9daa831544cfcc81f1e2d0492f2246529af1">RED_off</a> = 0
+, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daad3c27e3e5ca74edbe47f6b9fd722f1d5">RED_on</a> = 1
+, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daae00e64337ce221981253ea75c8a0a1b9">GREEN_on</a> = 2
+, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daab98bd10255fd8f515cdeac80aa5c67da">BLUE_off</a> = 3
 , <br />
-&#160;&#160;<a class="el" href="#a2e6f2b264229590debe98b5c71abe9daaf942b8844d07bcf04804008bb1421ae1">LED_MAGENTA</a> = 4
-, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daaf0939e8f07680b1a6d2ba02a70b819d2">LED_CYAN</a> = 5
-, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daa81b537bb7607998bab91c7f08c5883de">LED_YELLOW</a> = 6
-, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daace843b172a923d4eea99189d6764dfe4">LED_WHITE</a> = 7
+&#160;&#160;<a class="el" href="#a2e6f2b264229590debe98b5c71abe9daa74a000c7d831100dd845b9aa010fd4ad">BLUE_on</a> = 4
+, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daac215b327b9f6fa77d09dbab22df63810">GREEN_off</a> = 5
+, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daaf77fb67151d0c18d397069ad8c271ba3">BLACK</a> = 8
+, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daaf80f9a890089d211842d59625e561f88">RED</a> = 9
+, <br />
+&#160;&#160;<a class="el" href="#a2e6f2b264229590debe98b5c71abe9daaa60bd322f93178d68184e30e162571ca">GREEN</a> = 10
+, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daae735a848bf82163a19236ead1c3ef2d2">YELLOW</a> = 11
+, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daa35d6719cb4d7577c031b3d79057a1b79">BLUE</a> = 12
+, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daa56926c820ad72d0977e7ee44d9916e62">MAGENTA</a> = 13
+, <br />
+&#160;&#160;<a class="el" href="#a2e6f2b264229590debe98b5c71abe9daaafe71cad474c15ce63b300c470eef8cc">CYAN</a> = 14
+, <a class="el" href="#a2e6f2b264229590debe98b5c71abe9daa283fc479650da98250635b9c3c0e7e50">WHITE</a> = 15
 <br />
  }</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ab736a51fcfa09fc50ac41e09c3eaae0a" id="r_ab736a51fcfa09fc50ac41e09c3eaae0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab736a51fcfa09fc50ac41e09c3eaae0a">initRotaryPushButton</a> (void)</td></tr>
-<tr class="memitem:a0d6a5dcd3b6f6ad2e02b234581dbe84f" id="r_a0d6a5dcd3b6f6ad2e02b234581dbe84f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d6a5dcd3b6f6ad2e02b234581dbe84f">initRotaryPushButtonLED</a> (void)</td></tr>
-<tr class="memitem:a028fccda0f7226337105e3d02ae3c71e" id="r_a028fccda0f7226337105e3d02ae3c71e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a028fccda0f7226337105e3d02ae3c71e">setRotaryColor</a> (<a class="el" href="#a2e6f2b264229590debe98b5c71abe9da">LED_COLOR_t</a> color)</td></tr>
+<tr class="memitem:afc12f169b97fca27c4b8e3bc1852ace4" id="r_afc12f169b97fca27c4b8e3bc1852ace4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afc12f169b97fca27c4b8e3bc1852ace4">initRotaryPushButton</a> (const <a class="el" href="#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a> *pPuBioset)</td></tr>
+<tr class="memitem:ad8e604dfc3d1aebb48a5d2e2ce12fc86" id="r_ad8e604dfc3d1aebb48a5d2e2ce12fc86"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad8e604dfc3d1aebb48a5d2e2ce12fc86">initLED</a> (const <a class="el" href="#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a> *_pLED)</td></tr>
+<tr class="memitem:a562a32530eb04529817d1c6925d1ed5b" id="r_a562a32530eb04529817d1c6925d1ed5b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a562a32530eb04529817d1c6925d1ed5b">setLED</a> (<a class="el" href="#a2e6f2b264229590debe98b5c71abe9da">LED_COLOR_t</a> color)</td></tr>
 <tr class="memitem:a6aebe12370ad0af823ed5c0feefd8b26" id="r_a6aebe12370ad0af823ed5c0feefd8b26"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6aebe12370ad0af823ed5c0feefd8b26">getRotaryPushButton</a> (void)</td></tr>
+<tr class="memdesc:a6aebe12370ad0af823ed5c0feefd8b26"><td class="mdescLeft">&#160;</td><td class="mdescRight">: Returns the state of the Push Button. Returns true if the button is pressed, false otherwise. Additionally, it clears the internal flag if the button was pressed.  <br /></td></tr>
 <tr class="memitem:a76034e5ab3fd0371aec4a3ff0c47fa9c" id="r_a76034e5ab3fd0371aec4a3ff0c47fa9c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a76034e5ab3fd0371aec4a3ff0c47fa9c">getRotaryPosition</a> (void)</td></tr>
+<tr class="memdesc:a76034e5ab3fd0371aec4a3ff0c47fa9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">: Gets the rotary encoder position. Returns the current position as an integer.  <br /></td></tr>
 <tr class="memitem:aa3efce68ff77452bb7bdec0b0ef0db7c" id="r_aa3efce68ff77452bb7bdec0b0ef0db7c"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa3efce68ff77452bb7bdec0b0ef0db7c">setRotaryPosition</a> (int32_t position)</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a0562d3d8794334f06870fc75ea1412c7" id="r_a0562d3d8794334f06870fc75ea1412c7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0562d3d8794334f06870fc75ea1412c7">LEDpgb</a></td></tr>
+<tr class="memitem:a9222623564fba0f2e9fc01d1b92771ba" id="r_a9222623564fba0f2e9fc01d1b92771ba"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9222623564fba0f2e9fc01d1b92771ba">LEDbala</a></td></tr>
+<tr class="memitem:a3f2370f926f4afa1c8c25f62840b3da1" id="r_a3f2370f926f4afa1c8c25f62840b3da1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3f2370f926f4afa1c8c25f62840b3da1">PuBio_pgb</a></td></tr>
+<tr class="memdesc:a3f2370f926f4afa1c8c25f62840b3da1"><td class="mdescLeft">&#160;</td><td class="mdescRight">exsamples of IO-connected RotPushButtom  <br /></td></tr>
+<tr class="memitem:adc65ecaa33b77fac7adc0b606045adff" id="r_adc65ecaa33b77fac7adc0b606045adff"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc65ecaa33b77fac7adc0b606045adff">PuBio_bala</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>: This is the header file for controlling the rotary encoder with a built-in push button. It includes functions for initializing the rotary push button, reading the rotary position and button state, as well as controlling the module's color. </p>
-<dl class="section author"><dt>Author</dt><dd>: Linus Blanke &amp; Christoph Lederbogen </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>: December 27, 2023 </dd></dl>
+<div class="textblock"><p>This is the header file for controlling the rotary encoder with a built-in push button. It includes functions for initializing the rotary push button, reading the rotary position and button state, as well as controlling the module's LED-color. </p>
+<dl class="section author"><dt>Author</dt><dd>Linus Blanke &amp; Christoph Lederbogen </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>December 27, 2023 </dd></dl>
+<dl class="section author"><dt>Author</dt><dd>V1.1ff Prof Flaemig <a href="https://github.com/tflaemig68/">https://github.com/tflaemig68/</a></dd></dl>
+<p>sorry, until now, there are partial doxygen compatible comments </p><dl class="section date"><dt>Date</dt><dd>V1.1 Sept. 2025</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="a48e49bfe7b106d9356d27403982bcf7c" name="a48e49bfe7b106d9356d27403982bcf7c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a48e49bfe7b106d9356d27403982bcf7c">&#9670;&#160;</a></span>ERROR_VALUE</h2>
@@ -160,207 +180,34 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ae464107ec9d96fadabacced1ea36e1ef" name="ae464107ec9d96fadabacced1ea36e1ef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae464107ec9d96fadabacced1ea36e1ef">&#9670;&#160;</a></span>LED_BLUE_ADR</h2>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">Typedef Documentation</h2>
+<a id="aa8142e0463b546bc4513cc7c344f1d9f" name="aa8142e0463b546bc4513cc7c344f1d9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8142e0463b546bc4513cc7c344f1d9f">&#9670;&#160;</a></span>LEDio_t</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define LED_BLUE_ADR&#160;&#160;&#160;GPIOB, PIN13</td>
+          <td class="memname">typedef struct <a class="el" href="struct_l_e_dio.html">LEDio</a> <a class="el" href="#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="aa26914090ca9c3ce5abb851970833dab" name="aa26914090ca9c3ce5abb851970833dab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa26914090ca9c3ce5abb851970833dab">&#9670;&#160;</a></span>LED_GREEN_ADR</h2>
+<a id="a25ed0f4d4dc43dde22bc304261b7f700" name="a25ed0f4d4dc43dde22bc304261b7f700"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25ed0f4d4dc43dde22bc304261b7f700">&#9670;&#160;</a></span>PuBio_t</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define LED_GREEN_ADR&#160;&#160;&#160;GPIOB, PIN14</td>
+          <td class="memname">typedef struct <a class="el" href="struct_pu_bio.html">PuBio</a> <a class="el" href="#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="a8fb919ab55c6a330f76284bb86fbb323" name="a8fb919ab55c6a330f76284bb86fbb323"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8fb919ab55c6a330f76284bb86fbb323">&#9670;&#160;</a></span>LED_RED_ADR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define LED_RED_ADR&#160;&#160;&#160;GPIOB, PIN15</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a063b3577d19273e12f62381b94db037e" name="a063b3577d19273e12f62381b94db037e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a063b3577d19273e12f62381b94db037e">&#9670;&#160;</a></span>ROTARY_A_ADR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ROTARY_A_ADR&#160;&#160;&#160;GPIOB, PIN0</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a5fd38feff7c46a9eff48506a6f6aaaf5" name="a5fd38feff7c46a9eff48506a6f6aaaf5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5fd38feff7c46a9eff48506a6f6aaaf5">&#9670;&#160;</a></span>ROTARY_A_HANDLER</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ROTARY_A_HANDLER</td>
-          <td>(</td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>void</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">EXTI0_IRQHandler</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a5eff0ecb2d23f9a2030f7962ed09a949" name="a5eff0ecb2d23f9a2030f7962ed09a949"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5eff0ecb2d23f9a2030f7962ed09a949">&#9670;&#160;</a></span>ROTARY_A_IRQ</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ROTARY_A_IRQ&#160;&#160;&#160;EXTI_PIN0</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a3fde37acc4e4d9085e3ac33cfd6c1bf3" name="a3fde37acc4e4d9085e3ac33cfd6c1bf3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3fde37acc4e4d9085e3ac33cfd6c1bf3">&#9670;&#160;</a></span>ROTARY_A_IRQn</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ROTARY_A_IRQn&#160;&#160;&#160;EXTI0_IRQn</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a56c219190632a35873137ec80058caf1" name="a56c219190632a35873137ec80058caf1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56c219190632a35873137ec80058caf1">&#9670;&#160;</a></span>ROTARY_A_PR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ROTARY_A_PR&#160;&#160;&#160;EXTI_PR_PR0</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="acc1e7d4a9757c74826d896685dbbf1ca" name="acc1e7d4a9757c74826d896685dbbf1ca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acc1e7d4a9757c74826d896685dbbf1ca">&#9670;&#160;</a></span>ROTARY_B_ADR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ROTARY_B_ADR&#160;&#160;&#160;GPIOB, PIN1</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad3ad6440fd8270bf1e4f837c67cbbb42" name="ad3ad6440fd8270bf1e4f837c67cbbb42"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad3ad6440fd8270bf1e4f837c67cbbb42">&#9670;&#160;</a></span>ROTARY_SW_ADR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ROTARY_SW_ADR&#160;&#160;&#160;GPIOA, PIN10</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a98297204ddd36ec988f681e60e421ee7" name="a98297204ddd36ec988f681e60e421ee7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a98297204ddd36ec988f681e60e421ee7">&#9670;&#160;</a></span>ROTARY_SW_HANDLER</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ROTARY_SW_HANDLER</td>
-          <td>(</td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>void</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">EXTI15_10_IRQHandler</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a769be268507b887c76b6425be445fe00" name="a769be268507b887c76b6425be445fe00"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a769be268507b887c76b6425be445fe00">&#9670;&#160;</a></span>ROTARY_SW_IRQ</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ROTARY_SW_IRQ&#160;&#160;&#160;EXTI_PIN10</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad099cc20bb527b7c31889428e7b18021" name="ad099cc20bb527b7c31889428e7b18021"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad099cc20bb527b7c31889428e7b18021">&#9670;&#160;</a></span>ROTARY_SW_IRQn</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ROTARY_SW_IRQn&#160;&#160;&#160;EXTI15_10_IRQn</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a440c5e5cacdd9cd64a617b423a6a609e" name="a440c5e5cacdd9cd64a617b423a6a609e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a440c5e5cacdd9cd64a617b423a6a609e">&#9670;&#160;</a></span>ROTARY_SW_PR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ROTARY_SW_PR&#160;&#160;&#160;EXTI_PR_PR10</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<p>******* Predeclare LED IO-Interface ******************** </p>
 
 </div>
 </div>
@@ -376,15 +223,29 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Enum for the state of the RGB-LEDs </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daa4376d5e9e19f1983bbc3e8b412f84e3d" name="a2e6f2b264229590debe98b5c71abe9daa4376d5e9e19f1983bbc3e8b412f84e3d"></a>LED_BLACK&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daad80f13022b6d309268fadc7b1da89cb9" name="a2e6f2b264229590debe98b5c71abe9daad80f13022b6d309268fadc7b1da89cb9"></a>LED_RED&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daa0ad916c7f80666dc88f6b5b22a72e742" name="a2e6f2b264229590debe98b5c71abe9daa0ad916c7f80666dc88f6b5b22a72e742"></a>LED_GREEN&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daaa67c57c0ff22a2772cb6a5751a3327bf" name="a2e6f2b264229590debe98b5c71abe9daaa67c57c0ff22a2772cb6a5751a3327bf"></a>LED_BLUE&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daaf942b8844d07bcf04804008bb1421ae1" name="a2e6f2b264229590debe98b5c71abe9daaf942b8844d07bcf04804008bb1421ae1"></a>LED_MAGENTA&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daaf0939e8f07680b1a6d2ba02a70b819d2" name="a2e6f2b264229590debe98b5c71abe9daaf0939e8f07680b1a6d2ba02a70b819d2"></a>LED_CYAN&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daa81b537bb7607998bab91c7f08c5883de" name="a2e6f2b264229590debe98b5c71abe9daa81b537bb7607998bab91c7f08c5883de"></a>LED_YELLOW&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daace843b172a923d4eea99189d6764dfe4" name="a2e6f2b264229590debe98b5c71abe9daace843b172a923d4eea99189d6764dfe4"></a>LED_WHITE&#160;</td><td class="fielddoc"></td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daa831544cfcc81f1e2d0492f2246529af1" name="a2e6f2b264229590debe98b5c71abe9daa831544cfcc81f1e2d0492f2246529af1"></a>RED_off&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daad3c27e3e5ca74edbe47f6b9fd722f1d5" name="a2e6f2b264229590debe98b5c71abe9daad3c27e3e5ca74edbe47f6b9fd722f1d5"></a>RED_on&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daae00e64337ce221981253ea75c8a0a1b9" name="a2e6f2b264229590debe98b5c71abe9daae00e64337ce221981253ea75c8a0a1b9"></a>GREEN_on&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daab98bd10255fd8f515cdeac80aa5c67da" name="a2e6f2b264229590debe98b5c71abe9daab98bd10255fd8f515cdeac80aa5c67da"></a>BLUE_off&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daa74a000c7d831100dd845b9aa010fd4ad" name="a2e6f2b264229590debe98b5c71abe9daa74a000c7d831100dd845b9aa010fd4ad"></a>BLUE_on&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daac215b327b9f6fa77d09dbab22df63810" name="a2e6f2b264229590debe98b5c71abe9daac215b327b9f6fa77d09dbab22df63810"></a>GREEN_off&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daaf77fb67151d0c18d397069ad8c271ba3" name="a2e6f2b264229590debe98b5c71abe9daaf77fb67151d0c18d397069ad8c271ba3"></a>BLACK&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daaf80f9a890089d211842d59625e561f88" name="a2e6f2b264229590debe98b5c71abe9daaf80f9a890089d211842d59625e561f88"></a>RED&#160;</td><td class="fielddoc"><p>LED is BLACK. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daaa60bd322f93178d68184e30e162571ca" name="a2e6f2b264229590debe98b5c71abe9daaa60bd322f93178d68184e30e162571ca"></a>GREEN&#160;</td><td class="fielddoc"><p>LED is RED. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daae735a848bf82163a19236ead1c3ef2d2" name="a2e6f2b264229590debe98b5c71abe9daae735a848bf82163a19236ead1c3ef2d2"></a>YELLOW&#160;</td><td class="fielddoc"><p>LED is GREEN. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daa35d6719cb4d7577c031b3d79057a1b79" name="a2e6f2b264229590debe98b5c71abe9daa35d6719cb4d7577c031b3d79057a1b79"></a>BLUE&#160;</td><td class="fielddoc"><p>LED is. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daa56926c820ad72d0977e7ee44d9916e62" name="a2e6f2b264229590debe98b5c71abe9daa56926c820ad72d0977e7ee44d9916e62"></a>MAGENTA&#160;</td><td class="fielddoc"><p>LED is BLUE. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daaafe71cad474c15ce63b300c470eef8cc" name="a2e6f2b264229590debe98b5c71abe9daaafe71cad474c15ce63b300c470eef8cc"></a>CYAN&#160;</td><td class="fielddoc"><p>LED is. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2e6f2b264229590debe98b5c71abe9daa283fc479650da98250635b9c3c0e7e50" name="a2e6f2b264229590debe98b5c71abe9daa283fc479650da98250635b9c3c0e7e50"></a>WHITE&#160;</td><td class="fielddoc"><p>LED is. </p>
+</td></tr>
 </table>
 
 </div>
@@ -413,6 +274,9 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>: Gets the rotary encoder position. Returns the current position as an integer. </p>
+<p>@function: getRotaryPosition </p>
+
 </div>
 </div>
 <a id="a6aebe12370ad0af823ed5c0feefd8b26" name="a6aebe12370ad0af823ed5c0feefd8b26"></a>
@@ -438,10 +302,38 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>: Returns the state of the Push Button. Returns true if the button is pressed, false otherwise. Additionally, it clears the internal flag if the button was pressed. </p>
+<p>@function: getRotaryPushButton </p>
+
 </div>
 </div>
-<a id="ab736a51fcfa09fc50ac41e09c3eaae0a" name="ab736a51fcfa09fc50ac41e09c3eaae0a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab736a51fcfa09fc50ac41e09c3eaae0a">&#9670;&#160;</a></span>initRotaryPushButton()</h2>
+<a id="ad8e604dfc3d1aebb48a5d2e2ce12fc86" name="ad8e604dfc3d1aebb48a5d2e2ce12fc86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8e604dfc3d1aebb48a5d2e2ce12fc86">&#9670;&#160;</a></span>initLED()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void initLED </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a> *</td>          <td class="paramname"><span class="paramname"><em>_pLED</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afc12f169b97fca27c4b8e3bc1852ace4" name="afc12f169b97fca27c4b8e3bc1852ace4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc12f169b97fca27c4b8e3bc1852ace4">&#9670;&#160;</a></span>initRotaryPushButton()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -452,7 +344,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void initRotaryPushButton </td>
           <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pPuBioset</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -465,8 +357,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a0d6a5dcd3b6f6ad2e02b234581dbe84f" name="a0d6a5dcd3b6f6ad2e02b234581dbe84f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d6a5dcd3b6f6ad2e02b234581dbe84f">&#9670;&#160;</a></span>initRotaryPushButtonLED()</h2>
+<a id="a562a32530eb04529817d1c6925d1ed5b" name="a562a32530eb04529817d1c6925d1ed5b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a562a32530eb04529817d1c6925d1ed5b">&#9670;&#160;</a></span>setLED()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -475,32 +367,7 @@ Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void initRotaryPushButtonLED </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a028fccda0f7226337105e3d02ae3c71e" name="a028fccda0f7226337105e3d02ae3c71e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a028fccda0f7226337105e3d02ae3c71e">&#9670;&#160;</a></span>setRotaryColor()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void setRotaryColor </td>
+          <td class="memname">void setLED </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="#a2e6f2b264229590debe98b5c71abe9da">LED_COLOR_t</a></td>          <td class="paramname"><span class="paramname"><em>color</em></span></td><td>)</td>
           <td></td>
@@ -512,6 +379,10 @@ Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Set only RED LED</p>
+<p>Set only LED GREEN</p>
+<p>Set only LED BLUE</p>
+<p>Set LEDs color RGB- matrix mix</p>
 
 </div>
 </div>
@@ -537,6 +408,82 @@ Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a9222623564fba0f2e9fc01d1b92771ba" name="a9222623564fba0f2e9fc01d1b92771ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9222623564fba0f2e9fc01d1b92771ba">&#9670;&#160;</a></span>LEDbala</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a> LEDbala</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0562d3d8794334f06870fc75ea1412c7" name="a0562d3d8794334f06870fc75ea1412c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0562d3d8794334f06870fc75ea1412c7">&#9670;&#160;</a></span>LEDpgb</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a> LEDpgb</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Define, LEDs IO-Pinning BALA2024 Piggyback LED_RED GPIOB, PIN15 GPIOB, PIN3 LED_GREEN GPIOB, PIN14 GPIOB, PIN4 LED_BLUE GPIOB, PIN13 GPIOB, PIN1 </p>
+
+</div>
+</div>
+<a id="adc65ecaa33b77fac7adc0b606045adff" name="adc65ecaa33b77fac7adc0b606045adff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc65ecaa33b77fac7adc0b606045adff">&#9670;&#160;</a></span>PuBio_bala</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a> PuBio_bala</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3f2370f926f4afa1c8c25f62840b3da1" name="a3f2370f926f4afa1c8c25f62840b3da1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f2370f926f4afa1c8c25f62840b3da1">&#9670;&#160;</a></span>PuBio_pgb</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a> PuBio_pgb</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>exsamples of IO-connected RotPushButtom </p>
 
 </div>
 </div>

@@ -11,6 +11,7 @@
  */
 
 // CMSIS includes
+#include <adcBAT.h>
 #include <stm32f4xx.h>
 #include <system_stm32f4xx.h>
 
@@ -31,7 +32,7 @@
 #include <mcalRCC.h>
 
 // Balancer includes
-#include <BALO.h>
+#include <i2cDevices.h>
 #include <RotaryPushButton.h>
 #include <ST7735.h>
 #include <i2cMPU.h>
@@ -120,6 +121,7 @@ int main(void)
 
 	// TOF-Instanz deklarieren
 	TOFSensor_t TOF_Sensor_1;
+	MODE_PAGES_t MODE;
 
 	// Initialisieren des TOF-Sensors
 	initTOFSensorData(&TOF_Sensor_1, I2C1, TOF_ADDR_VL53LOX, TOF_DEFAULT_MODE_D, TOF_DISTANCE_1);
@@ -210,8 +212,8 @@ int main(void)
 			// Ranging Mode Page page
 			case SCREEN_PAGE3:
 				position = getRotaryPosition();
-				uint16_t MODE = (uint16_t)position % 4 + 1;
-				visualisationRangingProfileTOF(MODE);
+				MODE = (uint16_t)position % 4 + 1;
+				visualisationRangingProfileTOF(&MODE);
 
 				if(buttonPushed)
 				{
@@ -232,7 +234,7 @@ int main(void)
 						timeTimerExec = 36;
 						break;
 					default:
-						timeTimerExec = 30;
+						timeTimerExec = 60;
 						break;
 					}
 					TimerExec = 0UL;
@@ -311,8 +313,6 @@ int main(void)
 		// if timer LED is expired
 		if (isSystickExpired(TimerLED))
 		{
-			// toggle LED to show current speed of system
-			gpioTogglePin(LED_BLUE_ADR);
 
 			systickSetTicktime(&TimerLED, timeTimerLED);
 		}
@@ -332,25 +332,24 @@ void initBala(void)
 {
 	// initialization bala-library
 	//BalaHWsetup();
-
-	 ledActivate();		// at BALO.c
-	 i2cActivate();		// at BALO.c
-	 LED_red_on;
+	// initialization LED
+	 initLED(&LEDpgb);		//
+	 activateI2C1();		//
+	 setLED(RED_on);
 	 //adcActivate();
 
 
 
 	// initialization rotary push button
-	initRotaryPushButton();
+	initRotaryPushButton(&PuBio_pgb);
 
-	// initialization LED
-	initRotaryPushButtonLED();
+
 
 	// Configure of SysTick-Timers
 	systickInit(SYSTICK_1MS);
 
 	//initialization needed for TFT Display
-	spiInit();
+	IOspiInit(&ST7735pgb);			//! SPI Init
 	tftInitR(INITR_REDTAB);
 	// start visualization
 	visualisationStart();

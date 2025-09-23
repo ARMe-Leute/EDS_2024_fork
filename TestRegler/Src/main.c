@@ -81,7 +81,8 @@ int main(void)
 	tftFillScreen(tft_BLACK);
 
 	// initialize the rotary push button module
-	initRotaryPushButton();
+	initLED(&LEDpgb);
+	initRotaryPushButton(&PuBio_pgb);
 	systickSetMillis(&Timer1, TaskTime);	// setting of the Task Timer
 
 	LED_red_off;
@@ -109,18 +110,19 @@ int main(void)
 			   PID.init(&PID_Demo, _KD, _KI, _KD, (float)0.0001*TaskTime);
 		   }
 		   AlphaBeta[0] = (float)getRotaryPosition()/Scope_Demo.AmpY;		// Scale Rot-Pos Value to
-		   LED_blue_on;							// Switch Blue LED ON/OFF for Time Measurement of PID.run
+		   //setLED(BLUE_on);							// Switch Blue LED ON/OFF for Time Measurement of PID.run
 		   AlphaBeta[1] = PID.run(&PID_Demo,AlphaBeta[0]);
-		   LED_blue_off;
-		   if ((AlphaBeta[1] < -1) || (AlphaBeta[1] > 1))
+		   //setLED(BLUE_off);
+		   setLED( (LED_COLOR_t)(fabs(AlphaBeta[1])*7+8));
+		   /*if ((AlphaBeta[1] <= -1) || (AlphaBeta[1] >= 1))
 		   {
-			   setRotaryColor(LED_RED);
+			   setLED(RED);
 		   }
 		   else
 		   {
-			   setRotaryColor(LED_YELLOW);
+			   setLED(GREEN_on);
 		   }
-
+*/
 		   Scope.run(&Scope_Demo, AlphaBeta);
 
 	   } // end if systickexp

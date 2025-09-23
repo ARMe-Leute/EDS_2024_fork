@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['stepper_5ft_0',['Stepper_t',['../i2c_a_m_i_s_8h.html#aab000490232d0b3238d330e09e440d5d',1,'i2cAMIS.h']]]
+  ['pidcontr_5ft_0',['PIDContr_t',['../regler_8h.html#ad41d9bf7b5f020d488acb5d14e0bb6fa',1,'regler.h']]],
+  ['pubio_5ft_1',['PuBio_t',['../_rotary_push_button_8h.html#a25ed0f4d4dc43dde22bc304261b7f700',1,'RotaryPushButton.h']]]
 ];

@@ -118,10 +118,10 @@ Examples</h1>
 <div class="line">    <span class="keyword">const</span> uint8_t iHold = 5;</div>
 <div class="line">    </div>
 <div class="line">    <span class="comment">// PI.init(...  KP, KI, KD)</span></div>
-<div class="line">    <a class="code hl_variable" href="regler_8c.html#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a>.init(&amp;PID_Pos, 0.5,    0, 0.2);  <span class="comment">// Postion  Controler</span></div>
-<div class="line">    <a class="code hl_variable" href="regler_8c.html#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a>.init(&amp;PID_Velo, 0.1, 0.2, 0.1);  <span class="comment">// VelocityControler</span></div>
+<div class="line">    <a class="code hl_variable" href="regler_8h.html#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a>.init(&amp;PID_Pos, 0.5,    0, 0.2);  <span class="comment">// Postion  Controler</span></div>
+<div class="line">    <a class="code hl_variable" href="regler_8h.html#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a>.init(&amp;PID_Velo, 0.1, 0.2, 0.1);  <span class="comment">// VelocityControler</span></div>
 <div class="line"> </div>
-<div class="line">    PID_PosOut= <a class="code hl_variable" href="regler_8c.html#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a>.run(&amp;PID_Pos, ePos);</div>
+<div class="line">    PID_PosOut= <a class="code hl_variable" href="regler_8h.html#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a>.run(&amp;PID_Pos, ePos);</div>
 <div class="line"> </div>
 <div class="line">   </div>
 <div class="line">    <a class="code hl_function" href="i2c_a_m_i_s_8h.html#a2a05caa76b99de4de47c9d4495138647">StepperSetPos</a>(StepL, PID_PosOut); <span class="comment">// function call with  argument PID_PosOut</span></div>
@@ -129,12 +129,12 @@ Examples</h1>
 <div class="line">    </div>
 <div class="line">    <span class="comment">//  copy ot Parameter KP,KI,KD from PID_Pos to PID_new</span></div>
 <div class="line">    <span class="keyword">struct </span>PIDRegler PID_new;</div>
-<div class="line">    <a class="code hl_variable" href="regler_8c.html#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a>.set(&amp;PID_Pos, &amp;PID_new);</div>
+<div class="line">    <a class="code hl_variable" href="regler_8h.html#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a>.set(&amp;PID_Pos, &amp;PID_new);</div>
 <div class="line"> </div>
 <div class="line">}</div>
 <div class="ttc" id="ai2c_a_m_i_s_8h_html_a2a05caa76b99de4de47c9d4495138647"><div class="ttname"><a href="i2c_a_m_i_s_8h.html#a2a05caa76b99de4de47c9d4495138647">StepperSetPos</a></div><div class="ttdeci">void StepperSetPos(Stepper_t *stepper, int16_t value)</div><div class="ttdef"><b>Definition</b> i2cAMIS.c:490</div></div>
-<div class="ttc" id="aregler_8c_html_a0e2c3173f832ea7c74c11f5952c51d8b"><div class="ttname"><a href="regler_8c.html#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a></div><div class="ttdeci">const PIDContr_t PID</div><div class="ttdoc">define prototype structure for the PIDContr</div><div class="ttdef"><b>Definition</b> regler.c:21</div></div>
-<div class="ttc" id="aregler_8h_html"><div class="ttname"><a href="regler_8h.html">regler.h</a></div><div class="ttdoc">Regler V2.0.</div></div>
+<div class="ttc" id="aregler_8h_html"><div class="ttname"><a href="regler_8h.html">regler.h</a></div><div class="ttdoc">Regler V2.1.</div></div>
+<div class="ttc" id="aregler_8h_html_a0e2c3173f832ea7c74c11f5952c51d8b"><div class="ttname"><a href="regler_8h.html#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a></div><div class="ttdeci">const PIDContr_t PID</div><div class="ttdoc">define prototype structure for the PIDContr</div><div class="ttdef"><b>Definition</b> regler.c:100</div></div>
 </div><!-- fragment --><p><a class="anchor" id="Author"></a> </p>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
 Authors</h1>

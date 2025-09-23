@@ -91,32 +91,24 @@ $(function(){initNavTree('_s_t7735_8h.html','',''); });
   <div class="headertitle"><div class="title">ST7735.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>ST7735 TFT Graphic Interface V1.2.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;stm32f4xx.h&gt;</code><br />
 <code>#include &lt;mcalGPIO.h&gt;</code><br />
 <code>#include &lt;mcalSPI.h&gt;</code><br />
 <code>#include &lt;mcalSysTick.h&gt;</code><br />
-<code>#include &lt;<a class="el" href="_b_a_l_o_8h_source.html">BALO.h</a>&gt;</code><br />
 </div>
 <p><a href="_s_t7735_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:ST7735io" id="r_ST7735io"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_s_t7735io.html">ST7735io</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">IO-Interface for ST7735 IC using SPI using C with a struct as OOP (object oriented program) style BALA2024 PiggyBack RST - Reset PB4 PA9 DC - Data/Command PB5 PC7 CS - ChipSelect PA15 PB6 MOSI - PA7 PA7 CLK PA5 PA5.  <a href="struct_s_t7735io.html#details">More...</a><br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:ac8e8732c511f6404ba9b13b109eca76e" id="r_ac8e8732c511f6404ba9b13b109eca76e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac8e8732c511f6404ba9b13b109eca76e">__VCP_HW_CONFIG__</a></td></tr>
-<tr class="memitem:a673d8974f91513579c0b700e86bf9d61" id="r_a673d8974f91513579c0b700e86bf9d61"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a673d8974f91513579c0b700e86bf9d61">ST7735_SPI_PORT</a>&#160;&#160;&#160;GPIOA</td></tr>
-<tr class="memitem:ad19f30ab618f6feb9f305978b7ea074f" id="r_ad19f30ab618f6feb9f305978b7ea074f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad19f30ab618f6feb9f305978b7ea074f">ST7735_CLK</a>&#160;&#160;&#160;PIN5</td></tr>
-<tr class="memitem:a43764adbe19be56fc8727f41fa0a8fde" id="r_a43764adbe19be56fc8727f41fa0a8fde"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a43764adbe19be56fc8727f41fa0a8fde">ST7735_MOSI</a>&#160;&#160;&#160;PIN7</td></tr>
-<tr class="memitem:a2316f0593af7540c013c98d0e31f1929" id="r_a2316f0593af7540c013c98d0e31f1929"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2316f0593af7540c013c98d0e31f1929">ST7735_RST_PORT</a>&#160;&#160;&#160;GPIOB</td></tr>
-<tr class="memitem:a69b47c281e4a4d34cc36e81bec19f6a2" id="r_a69b47c281e4a4d34cc36e81bec19f6a2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69b47c281e4a4d34cc36e81bec19f6a2">ST7735_RST</a>&#160;&#160;&#160;PIN4</td></tr>
-<tr class="memitem:a7ed14c02324c5de909d69db4a2d254cb" id="r_a7ed14c02324c5de909d69db4a2d254cb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7ed14c02324c5de909d69db4a2d254cb">ST7735_RST1</a>&#160;&#160;&#160;gpioSetPin(GPIOB, PIN4)</td></tr>
-<tr class="memitem:a44b45391abc7ec2a88dcb0b9af62ce33" id="r_a44b45391abc7ec2a88dcb0b9af62ce33"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a44b45391abc7ec2a88dcb0b9af62ce33">ST7735_RST0</a>&#160;&#160;&#160;gpioResetPin(GPIOB, PIN4)</td></tr>
-<tr class="memitem:ab0e21f6e035be4aadb4673c384e0f645" id="r_ab0e21f6e035be4aadb4673c384e0f645"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab0e21f6e035be4aadb4673c384e0f645">ST7735_DC_PORT</a>&#160;&#160;&#160;GPIOB</td></tr>
-<tr class="memitem:a7931feb70fd9a35c9cf29872a700487a" id="r_a7931feb70fd9a35c9cf29872a700487a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7931feb70fd9a35c9cf29872a700487a">ST7735_DC</a>&#160;&#160;&#160;PIN5</td></tr>
-<tr class="memitem:a53f6505e5dd67bf0f5804c090e007e3a" id="r_a53f6505e5dd67bf0f5804c090e007e3a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a53f6505e5dd67bf0f5804c090e007e3a">ST7735_DC1</a>&#160;&#160;&#160;gpioSetPin(GPIOB, PIN5)</td></tr>
-<tr class="memitem:a403e3039e32327cbc1a038c15dfd0f44" id="r_a403e3039e32327cbc1a038c15dfd0f44"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a403e3039e32327cbc1a038c15dfd0f44">ST7735_DC0</a>&#160;&#160;&#160;gpioResetPin(GPIOB, PIN5)</td></tr>
-<tr class="memitem:ae0f055da476dd25b90d1486f7f67bfa5" id="r_ae0f055da476dd25b90d1486f7f67bfa5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae0f055da476dd25b90d1486f7f67bfa5">ST7735_CS_PORT</a>&#160;&#160;&#160;GPIOA</td></tr>
-<tr class="memitem:aef4952218da4918e94f5369b3c901131" id="r_aef4952218da4918e94f5369b3c901131"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aef4952218da4918e94f5369b3c901131">ST7735_CS</a>&#160;&#160;&#160;PIN15</td></tr>
-<tr class="memitem:a364c3c06268315459281284b01accca9" id="r_a364c3c06268315459281284b01accca9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a364c3c06268315459281284b01accca9">ST7735_CS1</a>&#160;&#160;&#160;gpioSetPin(GPIOA, PIN15)</td></tr>
-<tr class="memitem:a5abc75dde893aaa9c600f7005cdd108d" id="r_a5abc75dde893aaa9c600f7005cdd108d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5abc75dde893aaa9c600f7005cdd108d">ST7735_CS0</a>&#160;&#160;&#160;gpioResetPin(GPIOA, PIN15)</td></tr>
 <tr class="memitem:a701f3cb789282aaac331057a5f661f1f" id="r_a701f3cb789282aaac331057a5f661f1f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a701f3cb789282aaac331057a5f661f1f">__DEFAULT_FONTS__</a></td></tr>
 <tr class="memitem:a8482c50b5e4da7ef9cc27ec7f16aa374" id="r_a8482c50b5e4da7ef9cc27ec7f16aa374"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8482c50b5e4da7ef9cc27ec7f16aa374">INITR_GREENTAB</a>&#160;&#160;&#160;0x0</td></tr>
 <tr class="memitem:ac861596d7089b7620395cdad635c9307" id="r_ac861596d7089b7620395cdad635c9307"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac861596d7089b7620395cdad635c9307">INITR_REDTAB</a>&#160;&#160;&#160;0x1</td></tr>
@@ -186,9 +178,13 @@ Macros</h2></td></tr>
 <tr class="memitem:a80fb826a684cf3f0d306b22aa100ddac" id="r_a80fb826a684cf3f0d306b22aa100ddac"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a80fb826a684cf3f0d306b22aa100ddac">RIGHT</a>&#160;&#160;&#160;-2</td></tr>
 <tr class="memitem:a33a9b58332eda4a35ee87dc257c1419a" id="r_a33a9b58332eda4a35ee87dc257c1419a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a33a9b58332eda4a35ee87dc257c1419a">bitmapdatatype</a>&#160;&#160;&#160;uint16_t *</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a05a2862e16ae483b6ab66b678c3eda43" id="r_a05a2862e16ae483b6ab66b678c3eda43"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="struct_s_t7735io.html">ST7735io</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a05a2862e16ae483b6ab66b678c3eda43">ST7735io_t</a></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a3c484a97cdec02c5dbf46a11245e3395" id="r_a3c484a97cdec02c5dbf46a11245e3395"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c484a97cdec02c5dbf46a11245e3395">spiInit</a> (void)</td></tr>
+<tr class="memitem:ab614241bc418e469c69e2c480423a84a" id="r_ab614241bc418e469c69e2c480423a84a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab614241bc418e469c69e2c480423a84a">IOspiInit</a> (<a class="el" href="#a05a2862e16ae483b6ab66b678c3eda43">ST7735io_t</a> *TFT1)</td></tr>
 <tr class="memitem:a6865f2353b14a36cb05f95506626efb0" id="r_a6865f2353b14a36cb05f95506626efb0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6865f2353b14a36cb05f95506626efb0">tftSPISenddata</a> (const uint8_t cmd)</td></tr>
 <tr class="memitem:af2e866570ac4ef015b0f82a71657cc0a" id="r_af2e866570ac4ef015b0f82a71657cc0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af2e866570ac4ef015b0f82a71657cc0a">tftSPISenddata16</a> (const uint16_t data)</td></tr>
 <tr class="memitem:a0d89a4b0fed9ef5f41187b45acd3ca53" id="r_a0d89a4b0fed9ef5f41187b45acd3ca53"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d89a4b0fed9ef5f41187b45acd3ca53">tftSendCmd</a> (const uint8_t cmd)</td></tr>
@@ -224,12 +220,27 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a63ba13b6c762d63c18b780fe3a99133d" id="r_a63ba13b6c762d63c18b780fe3a99133d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a05a2862e16ae483b6ab66b678c3eda43">ST7735io_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63ba13b6c762d63c18b780fe3a99133d">ST7735pgb</a></td></tr>
+<tr class="memdesc:a63ba13b6c762d63c18b780fe3a99133d"><td class="mdescLeft">&#160;</td><td class="mdescRight">IO-Interface for ST7735 IC using SPI using C with a struct as OOP (object oriented program) style BALA2024 PiggyBack RST - Reset PB4 PA9 DC - Data/Command PB5 PC7 CS - ChipSelect PA15 PB6 MOSI - PA7 PA7 CLK PA5 PA5.  <br /></td></tr>
+<tr class="memitem:aa7dc6e166e6ace727cf515c236b55391" id="r_aa7dc6e166e6ace727cf515c236b55391"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#a05a2862e16ae483b6ab66b678c3eda43">ST7735io_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa7dc6e166e6ace727cf515c236b55391">ST7735bala</a></td></tr>
 <tr class="memitem:a834c41af2f17933de1351e90d29b9c6c" id="r_a834c41af2f17933de1351e90d29b9c6c"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a834c41af2f17933de1351e90d29b9c6c">ST7735_Timer</a></td></tr>
 <tr class="memitem:a9bd757e32de8d945331c373df7d988b2" id="r_a9bd757e32de8d945331c373df7d988b2"><td class="memItemLeft" align="right" valign="top">const unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9bd757e32de8d945331c373df7d988b2">SmallFont</a> []</td></tr>
 <tr class="memitem:a606395c705e2200ffe98dfefbdcbc43e" id="r_a606395c705e2200ffe98dfefbdcbc43e"><td class="memItemLeft" align="right" valign="top">const unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a606395c705e2200ffe98dfefbdcbc43e">BigFont</a> []</td></tr>
 <tr class="memitem:ab693dd1428b4be349998ea2bd4bf0ab3" id="r_ab693dd1428b4be349998ea2bd4bf0ab3"><td class="memItemLeft" align="right" valign="top">const unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab693dd1428b4be349998ea2bd4bf0ab3">SevenSegNumFont</a> []</td></tr>
 </table>
-<a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>ST7735 TFT Graphic Interface V1.2. </p>
+<dl class="section author"><dt>Author</dt><dd>see file <a class="el" href="_s_t7735_8c.html" title="ST7735 TFT Graphic Interface V1.2.">ST7735.c</a></dd></dl>
+<p>sorry, until now, there no doxygen compatible comments included </p><dl class="section date"><dt>Date</dt><dd>Aug 2025</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>This software is licensed based on CC BY-NC-SA 4.0 </dd>
+<dd>
+Code has been ported from Arduino Adafruit library. Copyrigths below: This is a library for the Adafruit 1.8" SPI display.
+ This library works with the Adafruit 1.8" TFT Breakout w/SD card ----&gt; <a href="http://www.adafruit.com/products/358">http://www.adafruit.com/products/358</a> as well as Adafruit raw 1.8" TFT display ----&gt; <a href="http://www.adafruit.com/products/618">http://www.adafruit.com/products/618</a></dd>
+<dd>
+Written by Limor Fried/Ladyada for Adafruit Industries. </dd>
+<dd>
+MIT license, all text above must be included in any redistribution </dd></dl>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="a701f3cb789282aaac331057a5f661f1f" name="a701f3cb789282aaac331057a5f661f1f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a701f3cb789282aaac331057a5f661f1f">&#9670;&#160;</a></span>__DEFAULT_FONTS__</h2>
 
@@ -538,20 +549,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ad19f30ab618f6feb9f305978b7ea074f" name="ad19f30ab618f6feb9f305978b7ea074f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad19f30ab618f6feb9f305978b7ea074f">&#9670;&#160;</a></span>ST7735_CLK</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_CLK&#160;&#160;&#160;PIN5</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a9caf06c78cdaba66cea553668103b759" name="a9caf06c78cdaba66cea553668103b759"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9caf06c78cdaba66cea553668103b759">&#9670;&#160;</a></span>ST7735_COLMOD</h2>
 
@@ -560,118 +557,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define ST7735_COLMOD&#160;&#160;&#160;0x3A</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aef4952218da4918e94f5369b3c901131" name="aef4952218da4918e94f5369b3c901131"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aef4952218da4918e94f5369b3c901131">&#9670;&#160;</a></span>ST7735_CS</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_CS&#160;&#160;&#160;PIN15</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a5abc75dde893aaa9c600f7005cdd108d" name="a5abc75dde893aaa9c600f7005cdd108d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5abc75dde893aaa9c600f7005cdd108d">&#9670;&#160;</a></span>ST7735_CS0</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_CS0&#160;&#160;&#160;gpioResetPin(GPIOA, PIN15)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a364c3c06268315459281284b01accca9" name="a364c3c06268315459281284b01accca9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a364c3c06268315459281284b01accca9">&#9670;&#160;</a></span>ST7735_CS1</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_CS1&#160;&#160;&#160;gpioSetPin(GPIOA, PIN15)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ae0f055da476dd25b90d1486f7f67bfa5" name="ae0f055da476dd25b90d1486f7f67bfa5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0f055da476dd25b90d1486f7f67bfa5">&#9670;&#160;</a></span>ST7735_CS_PORT</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_CS_PORT&#160;&#160;&#160;GPIOA</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a7931feb70fd9a35c9cf29872a700487a" name="a7931feb70fd9a35c9cf29872a700487a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7931feb70fd9a35c9cf29872a700487a">&#9670;&#160;</a></span>ST7735_DC</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_DC&#160;&#160;&#160;PIN5</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a403e3039e32327cbc1a038c15dfd0f44" name="a403e3039e32327cbc1a038c15dfd0f44"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a403e3039e32327cbc1a038c15dfd0f44">&#9670;&#160;</a></span>ST7735_DC0</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_DC0&#160;&#160;&#160;gpioResetPin(GPIOB, PIN5)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a53f6505e5dd67bf0f5804c090e007e3a" name="a53f6505e5dd67bf0f5804c090e007e3a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53f6505e5dd67bf0f5804c090e007e3a">&#9670;&#160;</a></span>ST7735_DC1</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_DC1&#160;&#160;&#160;gpioSetPin(GPIOB, PIN5)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ab0e21f6e035be4aadb4673c384e0f645" name="ab0e21f6e035be4aadb4673c384e0f645"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab0e21f6e035be4aadb4673c384e0f645">&#9670;&#160;</a></span>ST7735_DC_PORT</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_DC_PORT&#160;&#160;&#160;GPIOB</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -840,20 +725,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define ST7735_MADCTL&#160;&#160;&#160;0x36</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a43764adbe19be56fc8727f41fa0a8fde" name="a43764adbe19be56fc8727f41fa0a8fde"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a43764adbe19be56fc8727f41fa0a8fde">&#9670;&#160;</a></span>ST7735_MOSI</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_MOSI&#160;&#160;&#160;PIN7</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1126,62 +997,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a69b47c281e4a4d34cc36e81bec19f6a2" name="a69b47c281e4a4d34cc36e81bec19f6a2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a69b47c281e4a4d34cc36e81bec19f6a2">&#9670;&#160;</a></span>ST7735_RST</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_RST&#160;&#160;&#160;PIN4</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a44b45391abc7ec2a88dcb0b9af62ce33" name="a44b45391abc7ec2a88dcb0b9af62ce33"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a44b45391abc7ec2a88dcb0b9af62ce33">&#9670;&#160;</a></span>ST7735_RST0</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_RST0&#160;&#160;&#160;gpioResetPin(GPIOB, PIN4)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a7ed14c02324c5de909d69db4a2d254cb" name="a7ed14c02324c5de909d69db4a2d254cb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ed14c02324c5de909d69db4a2d254cb">&#9670;&#160;</a></span>ST7735_RST1</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_RST1&#160;&#160;&#160;gpioSetPin(GPIOB, PIN4)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a2316f0593af7540c013c98d0e31f1929" name="a2316f0593af7540c013c98d0e31f1929"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2316f0593af7540c013c98d0e31f1929">&#9670;&#160;</a></span>ST7735_RST_PORT</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_RST_PORT&#160;&#160;&#160;GPIOB</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a5656049de5d79e5a77260b69042179af" name="a5656049de5d79e5a77260b69042179af"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5656049de5d79e5a77260b69042179af">&#9670;&#160;</a></span>ST7735_SLPIN</h2>
 
@@ -1204,20 +1019,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define ST7735_SLPOUT&#160;&#160;&#160;0x11</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a673d8974f91513579c0b700e86bf9d61" name="a673d8974f91513579c0b700e86bf9d61"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a673d8974f91513579c0b700e86bf9d61">&#9670;&#160;</a></span>ST7735_SPI_PORT</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ST7735_SPI_PORT&#160;&#160;&#160;GPIOA</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1406,6 +1207,21 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">Typedef Documentation</h2>
+<a id="a05a2862e16ae483b6ab66b678c3eda43" name="a05a2862e16ae483b6ab66b678c3eda43"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05a2862e16ae483b6ab66b678c3eda43">&#9670;&#160;</a></span>ST7735io_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="struct_s_t7735io.html">ST7735io</a> <a class="el" href="#a05a2862e16ae483b6ab66b678c3eda43">ST7735io_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a371f476a75d17a1bd2c1d102ca018be7" name="a371f476a75d17a1bd2c1d102ca018be7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a371f476a75d17a1bd2c1d102ca018be7">&#9670;&#160;</a></span>delayms()</h2>
@@ -1432,8 +1248,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a3c484a97cdec02c5dbf46a11245e3395" name="a3c484a97cdec02c5dbf46a11245e3395"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3c484a97cdec02c5dbf46a11245e3395">&#9670;&#160;</a></span>spiInit()</h2>
+<a id="ab614241bc418e469c69e2c480423a84a" name="ab614241bc418e469c69e2c480423a84a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab614241bc418e469c69e2c480423a84a">&#9670;&#160;</a></span>IOspiInit()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1442,9 +1258,9 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void spiInit </td>
+          <td class="memname">void IOspiInit </td>
           <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="#a05a2862e16ae483b6ab66b678c3eda43">ST7735io_t</a> *</td>          <td class="paramname"><span class="paramname"><em>TFT1</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -2609,6 +2425,52 @@ Variables</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa7dc6e166e6ace727cf515c236b55391" name="aa7dc6e166e6ace727cf515c236b55391"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7dc6e166e6ace727cf515c236b55391">&#9670;&#160;</a></span>ST7735bala</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a05a2862e16ae483b6ab66b678c3eda43">ST7735io_t</a> ST7735bala</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a63ba13b6c762d63c18b780fe3a99133d" name="a63ba13b6c762d63c18b780fe3a99133d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63ba13b6c762d63c18b780fe3a99133d">&#9670;&#160;</a></span>ST7735pgb</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#a05a2862e16ae483b6ab66b678c3eda43">ST7735io_t</a> ST7735pgb</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>IO-Interface for ST7735 IC using SPI using C with a struct as OOP (object oriented program) style BALA2024 PiggyBack RST - Reset PB4 PA9 DC - Data/Command PB5 PC7 CS - ChipSelect PA15 PB6 MOSI - PA7 PA7 CLK PA5 PA5. </p>
 
 </div>
 </div>

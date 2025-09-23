@@ -2,7 +2,7 @@ var searchData=
 [
   ['getaccel_0',['getAccel',['../i2c_a_m_i_s_8c.html#a1329c6e31712e7e1fb4eebc9f680930b',1,'i2cAMIS.c']]],
   ['getaccelshape_1',['getAccelShape',['../i2c_a_m_i_s_8c.html#ab7410d2afb30346832254a1d26d75b06',1,'i2cAMIS.c']]],
-  ['getbatvolt_2',['getBatVolt',['../_b_a_l_o_8h.html#a60741550a99d7425829c36a9317e0664',1,'getBatVolt(analogCh_t *pADChn):&#160;BALO.c'],['../_b_a_l_o_8c.html#a60741550a99d7425829c36a9317e0664',1,'getBatVolt(analogCh_t *pADChn):&#160;BALO.c']]],
+  ['getbatvolt_2',['getBatVolt',['../adc_b_a_t_8h.html#a60741550a99d7425829c36a9317e0664',1,'getBatVolt(analogCh_t *pADChn):&#160;adcBAT.c'],['../adc_b_a_t_8c.html#a60741550a99d7425829c36a9317e0664',1,'getBatVolt(analogCh_t *pADChn):&#160;adcBAT.c']]],
   ['getfullstatus1_3',['getFullStatus1',['../i2c_a_m_i_s_8c.html#a734649ad7f7db20e7ba38bf0fb7c7e5f',1,'i2cAMIS.c']]],
   ['getfullstatus2_4',['getFullStatus2',['../i2c_a_m_i_s_8c.html#a4563884d4288a5a03d5927affcd00705',1,'i2cAMIS.c']]],
   ['geti2caddress_5',['getI2CAddress',['../i2c_a_m_i_s_8c.html#a28c2a683a8e5bfd62cc13b1a6d493161',1,'i2cAMIS.c']]],

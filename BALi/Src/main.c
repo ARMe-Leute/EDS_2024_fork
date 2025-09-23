@@ -26,12 +26,12 @@
 
 #include <mcalSysTick.h>
 #include <mcalGPIO.h>
-#include <mcalSPI.h>
+//#include <mcalSPI.h>
 #include <mcalI2C.h>
-#include <mcalADC.h>
+//#include <mcalADC.h>
 #include <ST7735.h>
 #include <RotaryPushButton.h>
-#include <BALO.h>
+#include <adcBAT.h>
 #include <i2cMPU.h>
 #include <i2cAMIS.h>
 #include <i2cTOF.h>
@@ -151,11 +151,11 @@ void StepperIHold(bool OnSwitch)
 		{
 			stepper.iHold.set(&StepL, StepPaValue[2]);
 			stepper.iHold.set(&StepR, StepPaValue[2]);
-			setRotaryColor(LED_YELLOW);
+			setLED(YELLOW);
 		}
 		else
 		{
-			setRotaryColor(LED_RED);
+			setLED(RED);
 			stepper.iHold.set(&StepL, iOff);
 			stepper.iHold.set(&StepR, iOff);
 		}
@@ -474,31 +474,38 @@ int main(void)
        size_t    arraySize = sizeof(timerList)/sizeof(timerList[0]);
 
 
-    //BALOsetup();
 
-    ledActivate();		// at BALO.c
-    i2cActivate();		// at BALO.c
-    LED_red_on;
-    adcActivate();
 
-	// Inits needed for TFT Display
-    // Initialisiert den Systick-Timer
-	systickInit(SYSTICK_1MS);
-	IOspiInit(&ST7735bala);
+    initLED(&LEDbala);
+
+    activateI2C1();			//! I2C Channel 1 at i2cDevices.c
+    activateI2C2();			//! I2C Channel 2 at i2cDevices.c
+	setLED(RED_on);
+    activateADC(PIN1);		//! BALA2024 used PIN1 for Battery Voltage Measurment
+
+	/**
+	 *	@brief init is needed for TFT Display
+	 *	 and initialize of Systick-Timer
+	 */
+	systickInit(SYSTICK_1MS);		//! Systick Basis Time
+	IOspiInit(&ST7735bala);			//! SPI Init
+
+	/**
+	 * brief make the display clear and working
+	 */
 	tftInitR(INITR_REDTAB);
-
-	//display setup
     tftSetRotation(LANDSCAPE);
     tftSetFont((uint8_t *)&SmallFont[0]);
     tftFillScreen(tft_BLACK);
 
-    /* initialize the rotary push button module */
-    initRotaryPushButton();
+    /**
+     * brief  initialize the rotary push button module
+     */
+    initRotaryPushButton(&PuBio_bala);
 
     systickSetMillis(&StepTaskTimer, StepTaskTime[M_InitBat]);
 
-
-    LED_red_off;
+    setLED(RED_off);
 
     tftPrintColor((char *)"I2C Scanner running \0",0,0,tft_MAGENTA);
 
@@ -527,12 +534,12 @@ int main(void)
 				   BatStatus = getBatVolt(&adChn);
 				   if (okBat == BatStatus)
 				   {
-						setRotaryColor(LED_GREEN);
+						setLED(GREEN);
 					//   tft_color  = tft_GREEN;
 				   }
 				   else
 				   {
-						setRotaryColor(LED_RED);
+						setLED(RED);
 					  // tft_color  = tft_YELLOW;
 				   }
 				   //sprintf(strT, "Battery: %3.1f V", adChn.BatVolt);
@@ -542,7 +549,7 @@ int main(void)
 				break;
 				case M_CheckI2cSlaves:  //I2C Scan
 				{
-				   setRotaryColor(LED_MAGENTA);
+				   setLED(MAGENTA);
 				   I2cCheckResult =  CheckAndInitI2cSlaves(&DevPrMask, &StepL,&StepR,&MPU1,&TOF1);
 
 				   if ((I2cCheckResult == 0)&&(DevPrMask & DevMPU1) && (DevPrMask & DevStepL) && (DevPrMask & DevStepR))  //Motor and Sensor present
@@ -550,7 +557,7 @@ int main(void)
 						StepRenable = true;
 						StepLenable = true;
 						TaskMode = M_Bala;  // Motor and Sensor present
-						setRotaryColor(LED_GREEN);
+						setLED(GREEN);
 						//StepTaskTime = StepTaskTimeSet;								// Tasktime for Stepper Balancing ca 8ms
 						RunInit = true;
 						break;
@@ -559,14 +566,14 @@ int main(void)
 				   {
 						//StepTaskTime = 70;									// Tasktime for display 70ms
 						TaskMode = M_DispTofData;
-						setRotaryColor(LED_BLUE);
+						setLED(BLUE);
 						break;
 				   }
 				   if ((I2cCheckResult == 0)&&(DevPrMask & DevMPU1))  //only MPU-Sensor present
 				   {
 						//StepTaskTime = 70;									// Tasktime for display 70ms
 						TaskMode = M_DispMpuData;
-						setRotaryColor(LED_GREEN);
+						setLED(GREEN);
 						break;
 				   }
 				}
@@ -580,13 +587,13 @@ int main(void)
 		   		break;
 		 		case M_DispTofData:  // read TOF Data
 				{
-					setRotaryColor(LED_WHITE);
+					setLED(WHITE);
 					if (TOF_read_distance_task(&TOF1))
 					//if (TOF_start_up_task(&TOF1))
 					{
 						visualisationTOF(&TOF1);
 					}
-					setRotaryColor(LED_BLUE);
+					setLED(BLUE);
 				}
 				break;
 		   		case M_Bala:  // Stepper Closed loop Control (old 8)
@@ -615,9 +622,9 @@ int main(void)
 						PID.init(&PID_phi, ParamValue[a_piKP],ParamValue[a_piKI],ParamValue[a_piKD], 1);
 						RunInit = false;
 					}
-					gpioResetPin(LED_RED_ADR);
+					setLED(RED_off);
 					mpuGetPitch(&MPU1);
-					gpioSetPin(LED_RED_ADR);
+					setLED(RED_on);
 					AlphaBeta[1] = MPU1.pitch;
 					AlphaBeta[0] = MPU1.pitchAccel;
 
@@ -626,7 +633,7 @@ int main(void)
             AlBeOszi(AlphaBeta);
 #endif
 
-        			gpioResetPin(LED_RED_ADR);
+        			setLED(RED_off);
 					if (fabs(AlphaBeta[1]) > 0.35)  // tilt angle more than  0.2 pi/4 = 30deg  -shut off Stepper control and reduce the IHold current and power consumption -> save the planet ;-)
 					{
 						activeMove = false;
@@ -652,12 +659,12 @@ int main(void)
 					{
 						if (fabs((AlphaBeta[1])) < 0.05)
 						{
-							setRotaryColor(LED_GREEN);
+							setLED(GREEN);
 							activeMove = true;
 						}
 						else
 						{
-							setRotaryColor(LED_YELLOW);
+							setLED(YELLOW);
 							StepperIHold(true);
 						}
 						if (activeMove == true)
@@ -676,7 +683,7 @@ int main(void)
 							//setPitch = 0;
 							if (StepRenable)
 							{
-								gpioSetPin(LED_RED_ADR);									// RED LED OFF
+								setLED(RED_off);									// RED LED OFF
 								if (!resetStepR)
 								{
 									curMotR = (float)StepperGetPos(&StepR);					// 0.3 ms
@@ -692,7 +699,7 @@ int main(void)
 								StepperSetPos(&StepR, posMotR); 							//setPosition 0.4 ms
 								StepRenable = false;
 
-								gpioResetPin(LED_RED_ADR);									//RED LED ON
+								setLED(RED_on);									//RED LED ON
 							}
 							else
 							{
@@ -714,7 +721,7 @@ int main(void)
 						}
 					}
 					//ParamEdit();  // run routine if Push Buttom activated
-					gpioSetPin(LED_RED_ADR);
+					setLED(RED_off);
 				}
 				break;
 		   		case M_StepFollowPitch:  // Stepper Position follow the tilt angle
@@ -981,11 +988,11 @@ void StepperFollowsPitch(bool StepLenable, bool StepRenable)
 	{
 		if (fabs(AlphaBeta[1]) < 0.05)
 		{
-			setRotaryColor(LED_GREEN);
+			setLED(GREEN);
 		}
 		else
 		{
-			setRotaryColor(LED_YELLOW);
+			setLED(YELLOW);
 			StepperIHold(true);
 			pos_motL =(int16_t)(AlphaBeta[1]*rad2step);
 			pos_motR =(int16_t)(AlphaBeta[1]*rad2step);

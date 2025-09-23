@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['undervolt_0',['underVolt',['../_b_a_l_o_8h.html#a9a85a5e6c8862eb03938052b064e4ab5acb6018bd571395302c4c70d909174472',1,'BALO.h']]]
+  ['magenta_0',['MAGENTA',['../_rotary_push_button_8h.html#a2e6f2b264229590debe98b5c71abe9daa56926c820ad72d0977e7ee44d9916e62',1,'RotaryPushButton.h']]]
 ];

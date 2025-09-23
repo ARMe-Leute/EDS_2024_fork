@@ -4,8 +4,14 @@ var _s_t7735_8c =
     [ "DELAY", "_s_t7735_8c.html#a62249e384b997229a3e2ae74ade334e2", null ],
     [ "putpix", "_s_t7735_8c.html#afa95a4da5c6fd3719884f2efac961687", null ],
     [ "Font", "_s_t7735_8c.html#a9470757e038d206fb456aa4ea3c730b0", null ],
+    [ "_CS0", "_s_t7735_8c.html#a37bf2a896c4cc044c5adf3624f6a13b8", null ],
+    [ "_CS1", "_s_t7735_8c.html#a8d0ffa9006a473aefd76c56fcf5acab1", null ],
+    [ "_DC0", "_s_t7735_8c.html#a938b849f48dbf8a88ef86774c159a30d", null ],
+    [ "_DC1", "_s_t7735_8c.html#a9069a875310281979363ecd953c47726", null ],
+    [ "_RST0", "_s_t7735_8c.html#af6b585c2252f4274238ee7f5d8a47ec9", null ],
+    [ "_RST1", "_s_t7735_8c.html#afd751397a2b16cbf714322e91e2a3b33", null ],
     [ "delayms", "_s_t7735_8c.html#adb77cfff332a74d822a426310ca98692", null ],
-    [ "spiInit", "_s_t7735_8c.html#a3c484a97cdec02c5dbf46a11245e3395", null ],
+    [ "IOspiInit", "_s_t7735_8c.html#a2fb2c767f8c2a7d251ff48b104e5921b", null ],
     [ "tftColor565", "_s_t7735_8c.html#a3d37c0139ed6971eedd2fe31dc7f3cd5", null ],
     [ "tftDrawBitmap", "_s_t7735_8c.html#a335a77c0a3fa1687f4361e2778c159bb", null ],
     [ "tftDrawBitmapRotate", "_s_t7735_8c.html#ad1e266b83114f4cd4ac04652d1f89e2e", null ],
@@ -43,5 +49,7 @@ var _s_t7735_8c =
     [ "tftSPISenddata16", "_s_t7735_8c.html#af2e866570ac4ef015b0f82a71657cc0a", null ],
     [ "BigFont", "_s_t7735_8c.html#a606395c705e2200ffe98dfefbdcbc43e", null ],
     [ "SevenSegNumFont", "_s_t7735_8c.html#ab693dd1428b4be349998ea2bd4bf0ab3", null ],
-    [ "SmallFont", "_s_t7735_8c.html#a9bd757e32de8d945331c373df7d988b2", null ]
+    [ "SmallFont", "_s_t7735_8c.html#a9bd757e32de8d945331c373df7d988b2", null ],
+    [ "ST7735bala", "_s_t7735_8c.html#aa7dc6e166e6ace727cf515c236b55391", null ],
+    [ "ST7735pgb", "_s_t7735_8c.html#a63ba13b6c762d63c18b780fe3a99133d", null ]
 ];

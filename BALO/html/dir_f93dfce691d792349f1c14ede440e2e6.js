@@ -1,6 +1,6 @@
 var dir_f93dfce691d792349f1c14ede440e2e6 =
 [
-    [ "BALO.h", "_b_a_l_o_8h.html", "_b_a_l_o_8h" ],
+    [ "adcBAT.h", "adc_b_a_t_8h.html", "adc_b_a_t_8h" ],
     [ "i2cAMIS.h", "i2c_a_m_i_s_8h.html", "i2c_a_m_i_s_8h" ],
     [ "i2cMPU.h", "i2c_m_p_u_8h.html", "i2c_m_p_u_8h" ],
     [ "i2cRFID.h", "i2c_r_f_i_d_8h.html", "i2c_r_f_i_d_8h" ],

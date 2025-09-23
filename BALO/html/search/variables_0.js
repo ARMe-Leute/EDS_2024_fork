@@ -11,5 +11,5 @@ var searchData=
   ['accelerationshapedescription_8',['accelerationShapeDescription',['../i2c_a_m_i_s_8c.html#a6f769e68b198de5b1e91044e53c9ae87',1,'i2cAMIS.c']]],
   ['accelerationshapename_9',['accelerationShapeName',['../i2c_a_m_i_s_8c.html#acbb53ffb75ac2537268097e03b27d816',1,'i2cAMIS.c']]],
   ['adc_10',['adc',['../structanalog_ch__t.html#aadeae3fa80cffc59bade6da6929cc03b',1,'analogCh_t']]],
-  ['analogch_11',['analogCh',['../_b_a_l_o_8h.html#a7c2bc2b813339eab16892570dd875385',1,'analogCh:&#160;BALO.c'],['../_b_a_l_o_8c.html#a7c2bc2b813339eab16892570dd875385',1,'analogCh:&#160;BALO.c']]]
+  ['analogch_11',['analogCh',['../adc_b_a_t_8h.html#a7c2bc2b813339eab16892570dd875385',1,'analogCh:&#160;adcBAT.c'],['../adc_b_a_t_8c.html#a7c2bc2b813339eab16892570dd875385',1,'analogCh:&#160;adcBAT.c']]]
 ];

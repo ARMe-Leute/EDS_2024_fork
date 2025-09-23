@@ -11,5 +11,6 @@ var regler_8h =
     [ "PIDget", "regler_8h.html#aa82dc322a66c93bc226a8121d7c23831", null ],
     [ "PIDinit", "regler_8h.html#ae313a08010f5b2c13d0817dd8d5a2925", null ],
     [ "PIDrun", "regler_8h.html#abef23f0f26fc866829e02002d3378e13", null ],
-    [ "PIDset", "regler_8h.html#a12854449cfe9f277668b37eec5d3a20f", null ]
+    [ "PIDset", "regler_8h.html#a12854449cfe9f277668b37eec5d3a20f", null ],
+    [ "PID", "regler_8h.html#a0e2c3173f832ea7c74c11f5952c51d8b", null ]
 ];

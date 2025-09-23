@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['tofsensor_5ft_0',['TOFSensor_t',['../i2c_t_o_f_8h.html#a0c25fd40b41f38a58aa3072046c4bb1a',1,'i2cTOF.h']]]
+  ['st7735io_5ft_0',['ST7735io_t',['../_s_t7735_8h.html#a05a2862e16ae483b6ab66b678c3eda43',1,'ST7735.h']]],
+  ['stepper_5ft_1',['Stepper_t',['../i2c_a_m_i_s_8h.html#aab000490232d0b3238d330e09e440d5d',1,'i2cAMIS.h']]]
 ];

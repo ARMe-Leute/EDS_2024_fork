@@ -92,7 +92,7 @@ $(function(){initNavTree('regler_8h.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Regler V2.0.  
+<p>Regler V2.1.  
 <a href="#details">More...</a></p>
 
 <p><a href="regler_8h_source.html">Go to the source code of this file.</a></p>
@@ -113,16 +113,22 @@ Typedefs</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:af17ef1e0ca689debf74e72c2bf5cae72" id="r_af17ef1e0ca689debf74e72c2bf5cae72"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af17ef1e0ca689debf74e72c2bf5cae72">MeanValrun</a> (<a class="el" href="#abd449e39c0bd05f28b5915c2beb714d7">MeanVal_t</a> *mVal, float Inp)</td></tr>
 <tr class="memitem:a7d3eeaef47dac42ffa6ae4ed285bccff" id="r_a7d3eeaef47dac42ffa6ae4ed285bccff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7d3eeaef47dac42ffa6ae4ed285bccff">MeanVALclr</a> (<a class="el" href="#abd449e39c0bd05f28b5915c2beb714d7">MeanVal_t</a> *mVal, float wight)</td></tr>
-<tr class="memdesc:a7d3eeaef47dac42ffa6ae4ed285bccff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear.  <br /></td></tr>
+<tr class="memdesc:a7d3eeaef47dac42ffa6ae4ed285bccff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear MeanValue Filter and set the weight.  <br /></td></tr>
 <tr class="memitem:aa82dc322a66c93bc226a8121d7c23831" id="r_aa82dc322a66c93bc226a8121d7c23831"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa82dc322a66c93bc226a8121d7c23831">PIDget</a> (<a class="el" href="#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *<a class="el" href="struct_p_i_d_contr.html">PIDContr</a>)</td></tr>
 <tr class="memitem:a12854449cfe9f277668b37eec5d3a20f" id="r_a12854449cfe9f277668b37eec5d3a20f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a12854449cfe9f277668b37eec5d3a20f">PIDset</a> (<a class="el" href="#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *Source, <a class="el" href="#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *Desti)</td></tr>
 <tr class="memitem:ae313a08010f5b2c13d0817dd8d5a2925" id="r_ae313a08010f5b2c13d0817dd8d5a2925"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae313a08010f5b2c13d0817dd8d5a2925">PIDinit</a> (<a class="el" href="#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *PIDParam, float KP, float KI, float KD, float TA)</td></tr>
-<tr class="memitem:abef23f0f26fc866829e02002d3378e13" id="r_abef23f0f26fc866829e02002d3378e13"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abef23f0f26fc866829e02002d3378e13">PIDrun</a> (<a class="el" href="#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *<a class="el" href="regler_8c.html#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a>, float Diff)</td></tr>
+<tr class="memitem:abef23f0f26fc866829e02002d3378e13" id="r_abef23f0f26fc866829e02002d3378e13"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abef23f0f26fc866829e02002d3378e13">PIDrun</a> (<a class="el" href="#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *<a class="el" href="#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a>, float Diff)</td></tr>
 <tr class="memitem:a290bf431474ea3a64c0356d070596995" id="r_a290bf431474ea3a64c0356d070596995"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a290bf431474ea3a64c0356d070596995">PIDclear</a> (<a class="el" href="#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *PIDParam)</td></tr>
 <tr class="memitem:a77e6c640ffadfed47a54e151d0e2c3ee" id="r_a77e6c640ffadfed47a54e151d0e2c3ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a77e6c640ffadfed47a54e151d0e2c3ee">LowPassFilt</a> (int16_t raw_data[3], int16_t filt_data[3], int16_t _tp)</td></tr>
+<tr class="memdesc:a77e6c640ffadfed47a54e151d0e2c3ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">LowPass Filter for 3D Axis Sensordata.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a0e2c3173f832ea7c74c11f5952c51d8b" id="r_a0e2c3173f832ea7c74c11f5952c51d8b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a></td></tr>
+<tr class="memdesc:a0e2c3173f832ea7c74c11f5952c51d8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">define prototype structure for the <a class="el" href="struct_p_i_d_contr.html" title="PIDContr Structure of external and internal values for a common PID Controller based on the fixed cyc...">PIDContr</a>  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Regler V2.0. </p>
+<div class="textblock"><p>Regler V2.1. </p>
 <dl class="section author"><dt>Author</dt><dd>Prof Flaemig <a href="https://github.com/tflaemig68/">https://github.com/tflaemig68/</a> </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>Aug 2025</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>Functions for Closed Loop Control (PID) and Signal Filter using Recursive Lowpass Function </dd>
@@ -192,6 +198,8 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
 </table>
 </div><div class="memdoc">
 
+<p>LowPass Filter for 3D Axis Sensordata. </p>
+
 </div>
 </div>
 <a id="a7d3eeaef47dac42ffa6ae4ed285bccff" name="a7d3eeaef47dac42ffa6ae4ed285bccff"></a>
@@ -211,7 +219,7 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>wight</em></span>&#160;)</td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>weight</em></span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -221,7 +229,14 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>Clear. </p>
+<p>Clear MeanValue Filter and set the weight. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mVal</td><td>- pointer </td></tr>
+    <tr><td class="paramname">weight</td><td>- value 0 no influnce by input 0 = no weight of input only old values were kept 0.5 = half mean and half new value weights 1 = max. weight of new value input </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -315,7 +330,7 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>PIDCOntr - pointer </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="struct_p_i_d_contr.html" title="PIDContr Structure of external and internal values for a common PID Controller based on the fixed cyc...">PIDContr</a> - pointer </dd></dl>
 
 </div>
 </div>
@@ -399,6 +414,13 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>run the PID coefficents form source to destination PID </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">PID</td><td>- pointer to PID </td></tr>
+    <tr><td class="paramname">Diff</td><td>- input difference = target minus current value </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -435,6 +457,31 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a0e2c3173f832ea7c74c11f5952c51d8b" name="a0e2c3173f832ea7c74c11f5952c51d8b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e2c3173f832ea7c74c11f5952c51d8b">&#9670;&#160;</a></span>PID</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> PID</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>define prototype structure for the <a class="el" href="struct_p_i_d_contr.html" title="PIDContr Structure of external and internal values for a common PID Controller based on the fixed cyc...">PIDContr</a> </p>
 
 </div>
 </div>

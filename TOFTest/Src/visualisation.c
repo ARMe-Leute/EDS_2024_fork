@@ -62,10 +62,10 @@ void visualisationStart(void)
 	tftPrint("TimeOfFlight Sensor",0,30,0);
 	tftPrint("Philipp & Andreas",0,50,0);
 	tftPrint("----------------",0,70,0);
-
+	tftPrint("-> Push Buttom <-",0,90,0);
 
 	// wait, that it can be read
-	//delayms(20000);
+	//delayms(2000);
 
 	// start menu scan i2c
 	//visualisationMenu(SCREEN_PAGE3, false, false);

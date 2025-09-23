@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['gyro_5foff_0',['GYRO_OFF',['../i2c_m_p_u_8h.html#a6dc4f4e7aa93f45b030c7d985cd54d40a893f8d9ca5e579b4bdd1a9489114fb63',1,'i2cMPU.h']]]
+  ['emptybat_0',['emptyBat',['../adc_b_a_t_8h.html#a9a85a5e6c8862eb03938052b064e4ab5ab0f9e454be91f2dfec5a64bbf7433605',1,'adcBAT.h']]]
 ];

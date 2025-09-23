@@ -92,7 +92,7 @@ $(function(){initNavTree('_rotary_push_button_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>: This is the C source code for controlling the rotary encoder with a built-in push button. It includes the implementations of the functions defined in "RotaryPushButton.h." Additionally, this source code contains the implementation of the interrupt functions. This library is based on the CMSIS and MCAL library.  
+<p>This is the header file for controlling the rotary encoder with a built-in push button. It includes functions for initializing the rotary push button, reading the rotary position and button state, as well as controlling the module's LED-color.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
 <code>#include &lt;stdbool.h&gt;</code><br />
@@ -106,27 +106,88 @@ $(function(){initNavTree('_rotary_push_button_8c.html','',''); });
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a4a440b76dd3bbbd8e2e7d9ee4f0718b2" id="r_a4a440b76dd3bbbd8e2e7d9ee4f0718b2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4a440b76dd3bbbd8e2e7d9ee4f0718b2">initRotaryPushButton</a> ()</td></tr>
-<tr class="memitem:a0d6a5dcd3b6f6ad2e02b234581dbe84f" id="r_a0d6a5dcd3b6f6ad2e02b234581dbe84f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d6a5dcd3b6f6ad2e02b234581dbe84f">initRotaryPushButtonLED</a> (void)</td></tr>
-<tr class="memitem:a028fccda0f7226337105e3d02ae3c71e" id="r_a028fccda0f7226337105e3d02ae3c71e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a028fccda0f7226337105e3d02ae3c71e">setRotaryColor</a> (<a class="el" href="_rotary_push_button_8h.html#a2e6f2b264229590debe98b5c71abe9da">LED_COLOR_t</a> color)</td></tr>
+<tr class="memitem:afc12f169b97fca27c4b8e3bc1852ace4" id="r_afc12f169b97fca27c4b8e3bc1852ace4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afc12f169b97fca27c4b8e3bc1852ace4">initRotaryPushButton</a> (const <a class="el" href="_rotary_push_button_8h.html#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a> *pPuBioset)</td></tr>
+<tr class="memitem:af8c333cd4a6c4a1f0d84341dcd7670e9" id="r_af8c333cd4a6c4a1f0d84341dcd7670e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af8c333cd4a6c4a1f0d84341dcd7670e9">initLED</a> (const <a class="el" href="_rotary_push_button_8h.html#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a> *pLEDset)</td></tr>
+<tr class="memitem:a562a32530eb04529817d1c6925d1ed5b" id="r_a562a32530eb04529817d1c6925d1ed5b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a562a32530eb04529817d1c6925d1ed5b">setLED</a> (<a class="el" href="_rotary_push_button_8h.html#a2e6f2b264229590debe98b5c71abe9da">LED_COLOR_t</a> color)</td></tr>
 <tr class="memitem:ad47da02fd9e793a2c462f2d2f6bfa387" id="r_ad47da02fd9e793a2c462f2d2f6bfa387"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad47da02fd9e793a2c462f2d2f6bfa387">getRotaryPushButton</a> ()</td></tr>
+<tr class="memdesc:ad47da02fd9e793a2c462f2d2f6bfa387"><td class="mdescLeft">&#160;</td><td class="mdescRight">: Returns the state of the Push Button. Returns true if the button is pressed, false otherwise. Additionally, it clears the internal flag if the button was pressed.  <br /></td></tr>
 <tr class="memitem:a86f4b7b7939a8c7b32cf45e8c70cf0b2" id="r_a86f4b7b7939a8c7b32cf45e8c70cf0b2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a86f4b7b7939a8c7b32cf45e8c70cf0b2">getRotaryPosition</a> ()</td></tr>
+<tr class="memdesc:a86f4b7b7939a8c7b32cf45e8c70cf0b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">: Gets the rotary encoder position. Returns the current position as an integer.  <br /></td></tr>
 <tr class="memitem:aa3efce68ff77452bb7bdec0b0ef0db7c" id="r_aa3efce68ff77452bb7bdec0b0ef0db7c"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa3efce68ff77452bb7bdec0b0ef0db7c">setRotaryPosition</a> (int32_t position)</td></tr>
-<tr class="memitem:a73845940c3b1e0d4338cf0cf975a7dac" id="r_a73845940c3b1e0d4338cf0cf975a7dac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a73845940c3b1e0d4338cf0cf975a7dac">ROTARY_A_HANDLER</a> (void)</td></tr>
-<tr class="memitem:a20172432dee9e3517f280a6e8355b750" id="r_a20172432dee9e3517f280a6e8355b750"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a20172432dee9e3517f280a6e8355b750">ROTARY_SW_HANDLER</a> (void)</td></tr>
+<tr class="memitem:a20e40b04f46a3e5a49cf6d516071aa41" id="r_a20e40b04f46a3e5a49cf6d516071aa41"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a20e40b04f46a3e5a49cf6d516071aa41">modifPositionCount</a> (void)</td></tr>
+<tr class="memdesc:a20e40b04f46a3e5a49cf6d516071aa41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks ROT B and updates the position accordingly.  <br /></td></tr>
+<tr class="memitem:a17e9789a29a87d2df54f12b94dd1a0b6" id="r_a17e9789a29a87d2df54f12b94dd1a0b6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a17e9789a29a87d2df54f12b94dd1a0b6">EXTI0_IRQHandler</a> (void)</td></tr>
+<tr class="memdesc:a17e9789a29a87d2df54f12b94dd1a0b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">EXTI Interrupt Handler for Pin0.  <br /></td></tr>
+<tr class="memitem:a738473a5b43f6c92b80ce1d3d6f77ed9" id="r_a738473a5b43f6c92b80ce1d3d6f77ed9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a738473a5b43f6c92b80ce1d3d6f77ed9">EXTI15_10_IRQHandler</a> (void)</td></tr>
+<tr class="memdesc:a738473a5b43f6c92b80ce1d3d6f77ed9"><td class="mdescLeft">&#160;</td><td class="mdescRight">: EXTI Interrupt Handler for PUSH BUTTON. Sets the PUSH BUTTON flag.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a0562d3d8794334f06870fc75ea1412c7" id="r_a0562d3d8794334f06870fc75ea1412c7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_rotary_push_button_8h.html#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0562d3d8794334f06870fc75ea1412c7">LEDpgb</a></td></tr>
+<tr class="memitem:a9222623564fba0f2e9fc01d1b92771ba" id="r_a9222623564fba0f2e9fc01d1b92771ba"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_rotary_push_button_8h.html#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9222623564fba0f2e9fc01d1b92771ba">LEDbala</a></td></tr>
+<tr class="memitem:a3f2370f926f4afa1c8c25f62840b3da1" id="r_a3f2370f926f4afa1c8c25f62840b3da1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_rotary_push_button_8h.html#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3f2370f926f4afa1c8c25f62840b3da1">PuBio_pgb</a></td></tr>
+<tr class="memdesc:a3f2370f926f4afa1c8c25f62840b3da1"><td class="mdescLeft">&#160;</td><td class="mdescRight">exsamples of IO-connected RotPushButtom  <br /></td></tr>
+<tr class="memitem:adc65ecaa33b77fac7adc0b606045adff" id="r_adc65ecaa33b77fac7adc0b606045adff"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_rotary_push_button_8h.html#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc65ecaa33b77fac7adc0b606045adff">PuBio_bala</a></td></tr>
 <tr class="memitem:af2f3170e386b49aec6d9cc216710cc0a" id="r_af2f3170e386b49aec6d9cc216710cc0a"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af2f3170e386b49aec6d9cc216710cc0a">rotoryPosition</a> = 0</td></tr>
 <tr class="memitem:a3807151c27347c227b96c794841ec8e5" id="r_a3807151c27347c227b96c794841ec8e5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3807151c27347c227b96c794841ec8e5">pushButtonFlag</a> = false</td></tr>
+<tr class="memdesc:a3807151c27347c227b96c794841ec8e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global variable to store the current position of the rotary encoder.  <br /></td></tr>
 <tr class="memitem:a19b47d1621a4e1e079c389d88c9179fa" id="r_a19b47d1621a4e1e079c389d88c9179fa"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a19b47d1621a4e1e079c389d88c9179fa">initRotaryPushButtonDone</a> = false</td></tr>
+<tr class="memdesc:a19b47d1621a4e1e079c389d88c9179fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global flag to indicate the state of the push button.  <br /></td></tr>
 <tr class="memitem:a2e8cc8d351ad8f0b0729c15f4432fbe9" id="r_a2e8cc8d351ad8f0b0729c15f4432fbe9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2e8cc8d351ad8f0b0729c15f4432fbe9">initRotaryPushButtonLEDDone</a> = false</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>: This is the C source code for controlling the rotary encoder with a built-in push button. It includes the implementations of the functions defined in "RotaryPushButton.h." Additionally, this source code contains the implementation of the interrupt functions. This library is based on the CMSIS and MCAL library. </p>
-<dl class="section author"><dt>Author</dt><dd>: Linus Blanke &amp; Christoph Lederbogen </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>: December 27, 2023 </dd></dl>
+<div class="textblock"><p>This is the header file for controlling the rotary encoder with a built-in push button. It includes functions for initializing the rotary push button, reading the rotary position and button state, as well as controlling the module's LED-color. </p>
+<dl class="section author"><dt>Author</dt><dd>Linus Blanke &amp; Christoph Lederbogen </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>December 27, 2023 </dd></dl>
+<dl class="section author"><dt>Author</dt><dd>V1.1ff Prof Flaemig <a href="https://github.com/tflaemig68/">https://github.com/tflaemig68/</a></dd></dl>
+<p>sorry, until now, there are partial doxygen compatible comments </p><dl class="section date"><dt>Date</dt><dd>V1.1 Sept. 2025</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a17e9789a29a87d2df54f12b94dd1a0b6" name="a17e9789a29a87d2df54f12b94dd1a0b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17e9789a29a87d2df54f12b94dd1a0b6">&#9670;&#160;</a></span>EXTI0_IRQHandler()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void EXTI0_IRQHandler </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>EXTI Interrupt Handler for Pin0. </p>
+<p>@function EXTI0_IRQHandler</p><ul>
+<li></li>
+</ul>
+<p>Check ROT B and update position</p>
+
+</div>
+</div>
+<a id="a738473a5b43f6c92b80ce1d3d6f77ed9" name="a738473a5b43f6c92b80ce1d3d6f77ed9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a738473a5b43f6c92b80ce1d3d6f77ed9">&#9670;&#160;</a></span>EXTI15_10_IRQHandler()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void EXTI15_10_IRQHandler </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>: EXTI Interrupt Handler for PUSH BUTTON. Sets the PUSH BUTTON flag. </p>
+<p>@function: EXTI15_10_IRQHandler</p><ul>
+<li></li>
+</ul>
+
+</div>
+</div>
 <a id="a86f4b7b7939a8c7b32cf45e8c70cf0b2" name="a86f4b7b7939a8c7b32cf45e8c70cf0b2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a86f4b7b7939a8c7b32cf45e8c70cf0b2">&#9670;&#160;</a></span>getRotaryPosition()</h2>
 
@@ -141,6 +202,9 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>: Gets the rotary encoder position. Returns the current position as an integer. </p>
+<p>@function: getRotaryPosition </p>
 
 </div>
 </div>
@@ -159,10 +223,30 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>: Returns the state of the Push Button. Returns true if the button is pressed, false otherwise. Additionally, it clears the internal flag if the button was pressed. </p>
+<p>@function: getRotaryPushButton </p>
+
 </div>
 </div>
-<a id="a4a440b76dd3bbbd8e2e7d9ee4f0718b2" name="a4a440b76dd3bbbd8e2e7d9ee4f0718b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4a440b76dd3bbbd8e2e7d9ee4f0718b2">&#9670;&#160;</a></span>initRotaryPushButton()</h2>
+<a id="af8c333cd4a6c4a1f0d84341dcd7670e9" name="af8c333cd4a6c4a1f0d84341dcd7670e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8c333cd4a6c4a1f0d84341dcd7670e9">&#9670;&#160;</a></span>initLED()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void initLED </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="_rotary_push_button_8h.html#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pLEDset</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afc12f169b97fca27c4b8e3bc1852ace4" name="afc12f169b97fca27c4b8e3bc1852ace4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc12f169b97fca27c4b8e3bc1852ace4">&#9670;&#160;</a></span>initRotaryPushButton()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -170,7 +254,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void initRotaryPushButton </td>
           <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="_rotary_push_button_8h.html#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a> *</td>          <td class="paramname"><span class="paramname"><em>pPuBioset</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -178,14 +262,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a0d6a5dcd3b6f6ad2e02b234581dbe84f" name="a0d6a5dcd3b6f6ad2e02b234581dbe84f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d6a5dcd3b6f6ad2e02b234581dbe84f">&#9670;&#160;</a></span>initRotaryPushButtonLED()</h2>
+<a id="a20e40b04f46a3e5a49cf6d516071aa41" name="a20e40b04f46a3e5a49cf6d516071aa41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20e40b04f46a3e5a49cf6d516071aa41">&#9670;&#160;</a></span>modifPositionCount()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void initRotaryPushButtonLED </td>
+          <td class="memname">void modifPositionCount </td>
           <td>(</td>
           <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
@@ -193,56 +277,29 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Checks ROT B and updates the position accordingly. </p>
+<p>@function helper for ROTARY_A_HANDLER interrupt </p>
+
 </div>
 </div>
-<a id="a73845940c3b1e0d4338cf0cf975a7dac" name="a73845940c3b1e0d4338cf0cf975a7dac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a73845940c3b1e0d4338cf0cf975a7dac">&#9670;&#160;</a></span>ROTARY_A_HANDLER()</h2>
+<a id="a562a32530eb04529817d1c6925d1ed5b" name="a562a32530eb04529817d1c6925d1ed5b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a562a32530eb04529817d1c6925d1ed5b">&#9670;&#160;</a></span>setLED()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void ROTARY_A_HANDLER </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a20172432dee9e3517f280a6e8355b750" name="a20172432dee9e3517f280a6e8355b750"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a20172432dee9e3517f280a6e8355b750">&#9670;&#160;</a></span>ROTARY_SW_HANDLER()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ROTARY_SW_HANDLER </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a028fccda0f7226337105e3d02ae3c71e" name="a028fccda0f7226337105e3d02ae3c71e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a028fccda0f7226337105e3d02ae3c71e">&#9670;&#160;</a></span>setRotaryColor()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void setRotaryColor </td>
+          <td class="memname">void setLED </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="_rotary_push_button_8h.html#a2e6f2b264229590debe98b5c71abe9da">LED_COLOR_t</a></td>          <td class="paramname"><span class="paramname"><em>color</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Set only RED LED</p>
+<p>Set only LED GREEN</p>
+<p>Set only LED BLUE</p>
+<p>Set LEDs color RGB- matrix mix</p>
 
 </div>
 </div>
@@ -276,6 +333,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Global flag to indicate the state of the push button. </p>
+<p>init bool variables </p>
+
 </div>
 </div>
 <a id="a2e8cc8d351ad8f0b0729c15f4432fbe9" name="a2e8cc8d351ad8f0b0729c15f4432fbe9"></a>
@@ -292,6 +352,101 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a9222623564fba0f2e9fc01d1b92771ba" name="a9222623564fba0f2e9fc01d1b92771ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9222623564fba0f2e9fc01d1b92771ba">&#9670;&#160;</a></span>LEDbala</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="_rotary_push_button_8h.html#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a> LEDbala</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">    .PORT = GPIOB,      </div>
+<div class="line">    .red = PIN15,       </div>
+<div class="line">    .green = PIN14,     </div>
+<div class="line">    .blue = PIN13,      </div>
+<div class="line">}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a0562d3d8794334f06870fc75ea1412c7" name="a0562d3d8794334f06870fc75ea1412c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0562d3d8794334f06870fc75ea1412c7">&#9670;&#160;</a></span>LEDpgb</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="_rotary_push_button_8h.html#aa8142e0463b546bc4513cc7c344f1d9f">LEDio_t</a> LEDpgb</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">    .PORT = GPIOB,      </div>
+<div class="line">    .red = PIN3,        </div>
+<div class="line">    .green = PIN4,      </div>
+<div class="line">    .blue = PIN10,      </div>
+<div class="line">}</div>
+</div><!-- fragment --><p>Define, LEDs IO-Pinning BALA2024 Piggyback LED_RED GPIOB, PIN15 GPIOB, PIN3 LED_GREEN GPIOB, PIN14 GPIOB, PIN4 LED_BLUE GPIOB, PIN13 GPIOB, PIN1 </p>
+
+</div>
+</div>
+<a id="adc65ecaa33b77fac7adc0b606045adff" name="adc65ecaa33b77fac7adc0b606045adff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc65ecaa33b77fac7adc0b606045adff">&#9670;&#160;</a></span>PuBio_bala</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="_rotary_push_button_8h.html#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a> PuBio_bala</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">     .PORT_AB = GPIOB,          </div>
+<div class="line">     .PinA = PIN0,              </div>
+<div class="line">     .RotA_IRQ = EXTI_PIN0,</div>
+<div class="line">     .RotA_IRQn = EXTI0_IRQn,</div>
+<div class="line">     .PinB = PIN1,              </div>
+<div class="line">     .PORT_SW = GPIOA,</div>
+<div class="line">     .PinSW = PIN10,                </div>
+<div class="line">     .RotSW_IRQ = EXTI_PIN10,</div>
+<div class="line">     .RotSW_IRQn = EXTI15_10_IRQn,</div>
+<div class="line">     .ccw = 1,</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a3f2370f926f4afa1c8c25f62840b3da1" name="a3f2370f926f4afa1c8c25f62840b3da1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f2370f926f4afa1c8c25f62840b3da1">&#9670;&#160;</a></span>PuBio_pgb</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="_rotary_push_button_8h.html#a25ed0f4d4dc43dde22bc304261b7f700">PuBio_t</a> PuBio_pgb</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">     .PORT_AB = GPIOC,          </div>
+<div class="line">     .PinA = PIN0,              </div>
+<div class="line">     .RotA_IRQ = EXTI_PIN0,</div>
+<div class="line">     .RotA_IRQn = EXTI0_IRQn,</div>
+<div class="line">     .PinB = PIN1,              </div>
+<div class="line">     .PORT_SW = GPIOA,</div>
+<div class="line">     .PinSW = PIN10,                </div>
+<div class="line">     .RotSW_IRQ = EXTI_PIN10,</div>
+<div class="line">     .RotSW_IRQn = EXTI15_10_IRQn,</div>
+<div class="line">     .ccw = 1,                      </div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>exsamples of IO-connected RotPushButtom </p>
+
+</div>
+</div>
 <a id="a3807151c27347c227b96c794841ec8e5" name="a3807151c27347c227b96c794841ec8e5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3807151c27347c227b96c794841ec8e5">&#9670;&#160;</a></span>pushButtonFlag</h2>
 
@@ -303,6 +458,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Global variable to store the current position of the rotary encoder. </p>
 
 </div>
 </div>

@@ -5,24 +5,61 @@
  *      Author: tobia
  */
 
+//#include <adcBAT.h>
 #include <mcalGPIO.h>
 #include <mcalI2C.h>
-#include <mcalSysTick.h>
-#include <BALO.h>
-#include <i2cTOF.h>
+//#include <mcalSysTick.h>
+//#include <i2cTOF.h>
 #include "i2cDevices.h"
 
 
-    //RFID SL018
 
-	uint8_t 	*strFirmware = (uint8_t *) " ....        \0";
-	uint8_t  RFIDcmd_LEDon[3] = {0x02, 0x40, 0xFF};
-	uint8_t  RFIDcmd_LEDoff[3] = {0x02, 0x40, 0x00};
-	uint8_t  RFIDcmd_getFirmwareVersion[2] = {0x01, 0xF0};
-	uint8_t  RFIDcmd_getMifareUID[2] = {0x01, 0x01};
+void activateI2C1()
+{
+	I2C_TypeDef   *i2c  = I2C1;
 
+	GPIO_TypeDef  *portB = GPIOB;
+    // GPIOB-Bustakt aktivieren wegen der Verwendung von PB8/PB9 (I2C).
+    i2cSelectI2C(i2c);                           // I2C1: Bustakt aktivieren
+    //i2cDisableDevice(i2c);
+    gpioInitPort(portB);
+    gpioSelectPinMode(portB, PIN8, ALTFUNC);
+    gpioSelectAltFunc(portB, PIN8, AF4);         // PB8 : I2C1 SCL
+    gpioSelectPinMode(portB, PIN9, ALTFUNC);
+    gpioSelectAltFunc(portB, PIN9, AF4);         // PB9 : I2C1 SDA
 
+    /**
+     * Verwenden Sie auf keinen Fall die MCU-internen Pull-up-Widerstaende!
+     * Widerstandswerte: jeweils 4k7 fuer SDA und SCL!
+     */
+    gpioSetOutputType(portB, PIN8, OPENDRAIN);   // Immer externe Pull-up-
+    gpioSetOutputType(portB, PIN9, OPENDRAIN);   // Widerstaende verwenden!!!
+    // Initialisierung des I2C-Controllers
+    i2cInitI2C(i2c, IC2_DUTY_CYCLE_16_9, 15, I2C_CLOCK_200);
+    i2cEnableDevice(i2c);                        // MCAL I2C1 activ
+}
 
+void activateI2C2()
+{
+	I2C_TypeDef   *i2c2  = I2C2;
+	GPIO_TypeDef  *portB = GPIOB;
+    // GPIOB-Bustakt aktivieren wegen der Verwendung von PB10/PB3 (I2C).
+    i2cSelectI2C(i2c2);                           // I2C2: Bustakt aktivieren
+    gpioSelectPinMode(portB, PIN10, ALTFUNC);
+    gpioSelectAltFunc(portB, PIN10, AF4);         // PB10 : I2C2 SCL
+    gpioSelectPinMode(portB, PIN3, ALTFUNC);
+    gpioSelectAltFunc(portB, PIN3, AF9);         // PB3 : 	I2C2 SDA
+
+    /**
+     * Verwenden Sie auf keinen Fall die MCU-internen Pull-up-Widerstaende!
+     * Widerstandswerte: jeweils 4k7 fuer SDA und SCL!
+     */
+    gpioSetOutputType(portB, PIN10, OPENDRAIN);   // Immer externe Pull-up-
+    gpioSetOutputType(portB, PIN3, OPENDRAIN);   // Widerstaende verwenden!!!
+    // Initialisierung des I2C-Controllers
+    i2cInitI2C(i2c2, IC2_DUTY_CYCLE_16_9, 15, I2C_CLOCK_200);
+    i2cEnableDevice(i2c2);                        // MCAL I2C2 activ
+}
 /*
 void setBMA020_Shadow(I2C_TypeDef *i2c, uint8_t ShadowDis)										// Ändern des Shadowbits (Genauigkeit)
 {
@@ -131,126 +168,8 @@ int8_t LIS3DHINIT(I2C_TypeDef *i2c, int8_t restart)
 	return step;
 
 }
+
+
 */
-
-
-
-
-
-
-void RFID_LED(I2C_TypeDef *i2c, bool LEDon)
-{
-	if (LEDon == 1)
-	{
-		i2cBurstWrite(i2c, i2cAddr_RFID, RFIDcmd_LEDon, 3);
-	}
-	else
-	{
-		i2cBurstWrite(i2c, i2cAddr_RFID, RFIDcmd_LEDoff, 3);
-	}
-}
-
-int8_t RFID_readCard(I2C_TypeDef *i2c, char *CardID)
-{
-	static  uint8_t step = 1;
-	uint8_t readBuffer[14];
-	uint8_t len, i, j = 0;
-	int8_t typeCard = -1;
-	static int8_t RFID_Status;
-	char *p_out;
-
-	switch (step)
-	{
-		case 1:
-		{
-			i2cBurstWrite(i2c, i2cAddr_RFID, RFIDcmd_getMifareUID, 2);
-			step = 2;
-			break;
-		}
-		case 2:
-		{
-			i2cBurstRead(i2c, i2cAddr_RFID, readBuffer, 0xC);
-			len = readBuffer[0]-2;
-			step = 1;
-			if (RFID_Status != readBuffer[2])
-			{
-				typeCard = readBuffer[len];
-				j = 0;
-				for (i = 0; i< 8; i++ )
-				{
-					if (i < len)
-					{
-						if (i == len-1) { CardID[j++]='-'; }					// add the Type number after this  -
-						p_out =	(char *) convDecByteToHex(readBuffer[i+3]);
-						CardID[j++]  = (char)*(p_out++);
-						CardID[j++] =(char)*p_out;
-					}
-					else
-					{CardID[j++]='.'; CardID[j++]='.';}
-
-				}
-				CardID[j]='.';
-				RFID_Status = readBuffer[2];
-			}
-			break;
-		}
-		default:
-		{
-			step = 1;
-		}
-	}
-	return typeCard;
-}
-
-int8_t RFID_readFWVersion(I2C_TypeDef *i2c, char *strFirmware)
-{
-	static  uint8_t step = 1;
-		uint8_t readBuffer[16];
-		uint8_t i, len;
-		int8_t status = -1;
-
-		switch (step)
-		{
-			case 1:
-			{
-				RFID_LED(i2c,0);
-				step = 2;
-				break;
-			}
-			case 2:
-			{
-				i2cBurstWrite(i2c, i2cAddr_RFID, RFIDcmd_getFirmwareVersion, 2);
-				step = 3;
-				break;
-			}
-			case 3:
-			{
-				i2cBurstRead(i2c, i2cAddr_RFID, readBuffer, 0xF);
-				len = readBuffer[0];
-				status = readBuffer[2];
-				step = 4;
-				for (i = 0; i<= len; i++ )
-				{
-				 strFirmware[i] = readBuffer[i+3];
-				}
-
-				break;
-			}
-			case 4:
-			{
-				RFID_LED(i2c,0);
-				step = 1;
-				break;
-			}
-
-			default:
-			{
-				step = 1;
-			}
-		}
-		return status;
-}
-
-
 
 

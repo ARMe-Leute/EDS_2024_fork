@@ -1,6 +1,6 @@
 var dir_413f4e031a85da0d68269c6fd2f76e1c =
 [
-    [ "BALO.c", "_b_a_l_o_8c.html", "_b_a_l_o_8c" ],
+    [ "adcBAT.c", "adc_b_a_t_8c.html", "adc_b_a_t_8c" ],
     [ "i2cAMIS.c", "i2c_a_m_i_s_8c.html", "i2c_a_m_i_s_8c" ],
     [ "i2cMPU.c", "i2c_m_p_u_8c.html", "i2c_m_p_u_8c" ],
     [ "i2cRFID.c", "i2c_r_f_i_d_8c.html", "i2c_r_f_i_d_8c" ],

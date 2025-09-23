@@ -92,7 +92,7 @@ $(function(){initNavTree('regler_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Regler V2.0.  
+<p>Regler V2.1.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
 <code>#include &lt;stdbool.h&gt;</code><br />
@@ -104,11 +104,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a290bf431474ea3a64c0356d070596995" id="r_a290bf431474ea3a64c0356d070596995"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a290bf431474ea3a64c0356d070596995">PIDclear</a> (<a class="el" href="regler_8h.html#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *PIDParam)</td></tr>
 <tr class="memitem:a12854449cfe9f277668b37eec5d3a20f" id="r_a12854449cfe9f277668b37eec5d3a20f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a12854449cfe9f277668b37eec5d3a20f">PIDset</a> (<a class="el" href="regler_8h.html#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *Source, <a class="el" href="regler_8h.html#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *Desti)</td></tr>
 <tr class="memitem:ae313a08010f5b2c13d0817dd8d5a2925" id="r_ae313a08010f5b2c13d0817dd8d5a2925"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae313a08010f5b2c13d0817dd8d5a2925">PIDinit</a> (<a class="el" href="regler_8h.html#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *PIDParam, float KP, float KI, float KD, float TA)</td></tr>
-<tr class="memitem:abef23f0f26fc866829e02002d3378e13" id="r_abef23f0f26fc866829e02002d3378e13"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abef23f0f26fc866829e02002d3378e13">PIDrun</a> (<a class="el" href="regler_8h.html#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *<a class="el" href="#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a>, float Diff)</td></tr>
+<tr class="memitem:abef23f0f26fc866829e02002d3378e13" id="r_abef23f0f26fc866829e02002d3378e13"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abef23f0f26fc866829e02002d3378e13">PIDrun</a> (<a class="el" href="regler_8h.html#ad41d9bf7b5f020d488acb5d14e0bb6fa">PIDContr_t</a> *<a class="el" href="regler_8h.html#a0e2c3173f832ea7c74c11f5952c51d8b">PID</a>, float Diff)</td></tr>
 <tr class="memitem:a674ef70eb4eb61b0acd9a8fa2b6fb795" id="r_a674ef70eb4eb61b0acd9a8fa2b6fb795"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a674ef70eb4eb61b0acd9a8fa2b6fb795">MeanVALrun</a> (<a class="el" href="regler_8h.html#abd449e39c0bd05f28b5915c2beb714d7">MeanVal_t</a> *mVal, float Inp)</td></tr>
 <tr class="memitem:ac343b20a79b6e1283f117950b9269cc1" id="r_ac343b20a79b6e1283f117950b9269cc1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac343b20a79b6e1283f117950b9269cc1">MeanVALclr</a> (<a class="el" href="regler_8h.html#abd449e39c0bd05f28b5915c2beb714d7">MeanVal_t</a> *mVal, float weight)</td></tr>
-<tr class="memdesc:ac343b20a79b6e1283f117950b9269cc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear.  <br /></td></tr>
+<tr class="memdesc:ac343b20a79b6e1283f117950b9269cc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear MeanValue Filter and set the weight.  <br /></td></tr>
 <tr class="memitem:a77e6c640ffadfed47a54e151d0e2c3ee" id="r_a77e6c640ffadfed47a54e151d0e2c3ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a77e6c640ffadfed47a54e151d0e2c3ee">LowPassFilt</a> (int16_t raw_data[3], int16_t filt_data[3], int16_t _tp)</td></tr>
+<tr class="memdesc:a77e6c640ffadfed47a54e151d0e2c3ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">LowPass Filter for 3D Axis Sensordata.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -117,7 +118,7 @@ Variables</h2></td></tr>
 <tr class="memitem:a97b864f719c9e0031b5a4918f05082e0" id="r_a97b864f719c9e0031b5a4918f05082e0"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="regler_8h.html#abd449e39c0bd05f28b5915c2beb714d7">MeanVal_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a97b864f719c9e0031b5a4918f05082e0">MV</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Regler V2.0. </p>
+<div class="textblock"><p>Regler V2.1. </p>
 <dl class="section author"><dt>Author</dt><dd>Prof Flaemig <a href="https://github.com/tflaemig68/">https://github.com/tflaemig68/</a> </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>Aug 2025</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>Functions for Closed Loop Control (PID) and Signal Filter using Recursive Lowpass Function </dd>
@@ -148,6 +149,8 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
       </table>
 </div><div class="memdoc">
 
+<p>LowPass Filter for 3D Axis Sensordata. </p>
+
 </div>
 </div>
 <a id="ac343b20a79b6e1283f117950b9269cc1" name="ac343b20a79b6e1283f117950b9269cc1"></a>
@@ -169,7 +172,14 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Clear. </p>
+<p>Clear MeanValue Filter and set the weight. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mVal</td><td>- pointer </td></tr>
+    <tr><td class="paramname">weight</td><td>- value 0 no influnce by input 0 = no weight of input only old values were kept 0.5 = half mean and half new value weights 1 = max. weight of new value input </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -239,7 +249,7 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>PIDCOntr - pointer </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="struct_p_i_d_contr.html" title="PIDContr Structure of external and internal values for a common PID Controller based on the fixed cyc...">PIDContr</a> - pointer </dd></dl>
 
 </div>
 </div>
@@ -307,6 +317,13 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>run the PID coefficents form source to destination PID </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">PID</td><td>- pointer to PID </td></tr>
+    <tr><td class="paramname">Diff</td><td>- input difference = target minus current value </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -380,10 +397,10 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
 <div class="line">    .init = <a class="code hl_function" href="regler_8h.html#ae313a08010f5b2c13d0817dd8d5a2925">PIDinit</a>,</div>
 <div class="line">    .run = <a class="code hl_function" href="regler_8h.html#abef23f0f26fc866829e02002d3378e13">PIDrun</a>,</div>
 <div class="line">}</div>
-<div class="ttc" id="aregler_8h_html_a12854449cfe9f277668b37eec5d3a20f"><div class="ttname"><a href="regler_8h.html#a12854449cfe9f277668b37eec5d3a20f">PIDset</a></div><div class="ttdeci">void PIDset(PIDContr_t *Source, PIDContr_t *Desti)</div><div class="ttdef"><b>Definition</b> regler.c:63</div></div>
-<div class="ttc" id="aregler_8h_html_aa82dc322a66c93bc226a8121d7c23831"><div class="ttname"><a href="regler_8h.html#aa82dc322a66c93bc226a8121d7c23831">PIDget</a></div><div class="ttdeci">PIDContr_t * PIDget(PIDContr_t *PIDContr)</div><div class="ttdef"><b>Definition</b> regler.c:41</div></div>
-<div class="ttc" id="aregler_8h_html_abef23f0f26fc866829e02002d3378e13"><div class="ttname"><a href="regler_8h.html#abef23f0f26fc866829e02002d3378e13">PIDrun</a></div><div class="ttdeci">float PIDrun(PIDContr_t *PID, float Diff)</div><div class="ttdef"><b>Definition</b> regler.c:93</div></div>
-<div class="ttc" id="aregler_8h_html_ae313a08010f5b2c13d0817dd8d5a2925"><div class="ttname"><a href="regler_8h.html#ae313a08010f5b2c13d0817dd8d5a2925">PIDinit</a></div><div class="ttdeci">void PIDinit(PIDContr_t *PIDParam, float KP, float KI, float KD, float TA)</div><div class="ttdef"><b>Definition</b> regler.c:80</div></div>
+<div class="ttc" id="aregler_8h_html_a12854449cfe9f277668b37eec5d3a20f"><div class="ttname"><a href="regler_8h.html#a12854449cfe9f277668b37eec5d3a20f">PIDset</a></div><div class="ttdeci">void PIDset(PIDContr_t *Source, PIDContr_t *Desti)</div><div class="ttdef"><b>Definition</b> regler.c:50</div></div>
+<div class="ttc" id="aregler_8h_html_aa82dc322a66c93bc226a8121d7c23831"><div class="ttname"><a href="regler_8h.html#aa82dc322a66c93bc226a8121d7c23831">PIDget</a></div><div class="ttdeci">PIDContr_t * PIDget(PIDContr_t *PIDContr)</div><div class="ttdef"><b>Definition</b> regler.c:28</div></div>
+<div class="ttc" id="aregler_8h_html_abef23f0f26fc866829e02002d3378e13"><div class="ttname"><a href="regler_8h.html#abef23f0f26fc866829e02002d3378e13">PIDrun</a></div><div class="ttdeci">float PIDrun(PIDContr_t *PID, float Diff)</div><div class="ttdef"><b>Definition</b> regler.c:82</div></div>
+<div class="ttc" id="aregler_8h_html_ae313a08010f5b2c13d0817dd8d5a2925"><div class="ttname"><a href="regler_8h.html#ae313a08010f5b2c13d0817dd8d5a2925">PIDinit</a></div><div class="ttdeci">void PIDinit(PIDContr_t *PIDParam, float KP, float KI, float KD, float TA)</div><div class="ttdef"><b>Definition</b> regler.c:67</div></div>
 </div><!-- fragment -->
 <p>define prototype structure for the <a class="el" href="struct_p_i_d_contr.html" title="PIDContr Structure of external and internal values for a common PID Controller based on the fixed cyc...">PIDContr</a> </p>
 

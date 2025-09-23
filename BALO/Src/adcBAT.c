@@ -5,6 +5,7 @@
 *
 ****************************************************************************************/
 
+#include <adcBAT.h>
 #include <stdio.h>
 #include <mcalSysTick.h>
 #include <mcalGPIO.h>
@@ -12,7 +13,6 @@
 #include <mcalI2C.h>
 #include <mcalADC.h>
 #include <ST7735.h>
-#include <BALO.h>
 
 
 
@@ -43,61 +43,13 @@ void ADCInit(GPIO_TypeDef *port, PIN_NUM_t pin, ADC_TypeDef *adc, ADC_CHANNEL_t 
 
 
 
-void i2cActivate()
-{
-	I2C_TypeDef   *i2c  = I2C1;
-#ifdef BALA2024
-	I2C_TypeDef   *i2c2  = I2C2;
-#endif /* BALA2024 */
-	GPIO_TypeDef  *portB = GPIOB;
-    // GPIOB-Bustakt aktivieren wegen der Verwendung von PB8/PB9 (I2C).
-    i2cSelectI2C(i2c);                           // I2C1: Bustakt aktivieren
-    //i2cDisableDevice(i2c);
-    gpioInitPort(portB);
-    gpioSelectPinMode(portB, PIN8, ALTFUNC);
-    gpioSelectAltFunc(portB, PIN8, AF4);         // PB8 : I2C1 SCL
-    gpioSelectPinMode(portB, PIN9, ALTFUNC);
-    gpioSelectAltFunc(portB, PIN9, AF4);         // PB9 : I2C1 SDA
-
-    /**
-     * Verwenden Sie auf keinen Fall die MCU-internen Pull-up-Widerstaende!
-     * Widerstandswerte: jeweils 4k7 fuer SDA und SCL!
-     */
-    gpioSetOutputType(portB, PIN8, OPENDRAIN);   // Immer externe Pull-up-
-    gpioSetOutputType(portB, PIN9, OPENDRAIN);   // Widerstaende verwenden!!!
-    // Initialisierung des I2C-Controllers
-    i2cInitI2C(i2c, IC2_DUTY_CYCLE_16_9, 15, I2C_CLOCK_200);
-    i2cEnableDevice(i2c);                        // MCAL I2C1 activ
-#ifdef BALA2024
-
-    // GPIOB-Bustakt aktivieren wegen der Verwendung von PB10/PB3 (I2C).
-    i2cSelectI2C(i2c2);                           // I2C2: Bustakt aktivieren
-    gpioSelectPinMode(portB, PIN10, ALTFUNC);
-    gpioSelectAltFunc(portB, PIN10, AF4);         // PB10 : I2C2 SCL
-    gpioSelectPinMode(portB, PIN3, ALTFUNC);
-    gpioSelectAltFunc(portB, PIN3, AF9);         // PB3 : 	I2C2 SDA
-
-    /**
-     * Verwenden Sie auf keinen Fall die MCU-internen Pull-up-Widerstaende!
-     * Widerstandswerte: jeweils 4k7 fuer SDA und SCL!
-     */
-    gpioSetOutputType(portB, PIN10, OPENDRAIN);   // Immer externe Pull-up-
-    gpioSetOutputType(portB, PIN3, OPENDRAIN);   // Widerstaende verwenden!!!
-    // Initialisierung des I2C-Controllers
-    i2cInitI2C(i2c2, IC2_DUTY_CYCLE_16_9, 15, I2C_CLOCK_200);
-    i2cEnableDevice(i2c2);                        // MCAL I2C2 activ
-#endif /* BALA2024 */
-}
-
-
-void adcActivate(void)
+void activateADC(PIN_NUM_t pinA1)
 {
     GPIO_TypeDef 			*port  = GPIOA;							// Port which is used for the analog signal
-#ifdef BALA2024
-    PIN_NUM_t				pinA1   = PIN1;							// Pin which is used for the analog signal
-#else
-    PIN_NUM_t				pinA1   = PIN0;							// Pin which is used for the analog signal
-#endif
+
+//    PIN_NUM_t				pinA1   = PIN1;	 //! Pin1 used for Balancer2024 BATTERY-Volatge
+//    PIN_NUM_t				pinA1   = PIN0;	 //! Pin which is used for the analog signal
+
 
     ADC_TypeDef				*adc   = ADC1;							// ADC which is used
     ADC_RESOLUTION_t 		resolution = ADC_RES_12BIT;				// Resolution of the ADC
@@ -154,40 +106,6 @@ BatStat_t getBatVolt(analogCh_t* pADChn)
     return pADChn->BatStatus;
 }
 /* end of BatteryVoltage.c */
-
-
-
-
-
-void ledActivate(void)
-{
-    gpioSelectPort(LED_GPIO);
-    gpioSelectPinMode(LED_GPIO, LED_red, OUTPUT);
-    gpioSetOutputType(LED_GPIO, LED_red	, PUSHPULL);
-    gpioSelectPushPullMode(LED_GPIO, LED_red, PULLUP);
-    LED_red_off;
-
-    gpioSelectPinMode(LED_GPIO, LED_green, OUTPUT);
-    gpioSetOutputType(LED_GPIO, LED_green, PUSHPULL);
-    gpioSelectPushPullMode(LED_GPIO, LED_green, PULLUP);
-    LED_green_off;
-
-    gpioSelectPinMode(LED_GPIO, LED_blue, OUTPUT);
-    gpioSetOutputType(LED_GPIO, LED_blue, PUSHPULL);
-    gpioSelectPushPullMode(LED_GPIO, LED_blue, PULLUP);
-    LED_blue_off;
-}
-
-void BALOsetup(void)
-{
-    // Configuration LED Pin
-
-   ledActivate();
-   i2cActivate();
-
-}
-
-
 
 uint16_t AlBeOszi(float *AlphaBeta)
 {

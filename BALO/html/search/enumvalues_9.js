@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['vcselperiodfinalrange_0',['VcselPeriodFinalRange',['../i2c_t_o_f_8h.html#a55c77cf8138cbaa748bf4559ca97896ca7a7a58361fb19efc6acb72a0316b3e8b',1,'i2cTOF.h']]],
-  ['vcselperiodprerange_1',['VcselPeriodPreRange',['../i2c_t_o_f_8h.html#a55c77cf8138cbaa748bf4559ca97896ca74620bf5eb7a53c38ba2cd9351c5b815',1,'i2cTOF.h']]]
+  ['okbat_0',['okBat',['../adc_b_a_t_8h.html#a9a85a5e6c8862eb03938052b064e4ab5a7eece130735e33f9281aa175cd36a618',1,'adcBAT.h']]],
+  ['overvolt_1',['overVolt',['../adc_b_a_t_8h.html#a9a85a5e6c8862eb03938052b064e4ab5a29eaaccb0a9a104ac85e6ab2eec7019d',1,'adcBAT.h']]]
 ];

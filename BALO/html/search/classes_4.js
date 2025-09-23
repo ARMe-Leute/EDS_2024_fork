@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['pidcontr_0',['PIDContr',['../struct_p_i_d_contr.html',1,'']]]
+  ['meanval_0',['MeanVal',['../struct_mean_val.html',1,'']]],
+  ['mpu6050_1',['MPU6050',['../struct_m_p_u6050.html',1,'']]]
 ];

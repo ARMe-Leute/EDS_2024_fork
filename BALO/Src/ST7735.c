@@ -4,7 +4,7 @@
  * @author 	Henning Karlsen (C)2010-2013
  * @author 	V1.1 Lea Hoß and Samuel Schieber (Students of DHBW Stuttgart)
  * 			Redesign and further development
- * @author	V1.2 Prof Flaemig <https://github.com/tflaemig68/>
+ * @author	V1.2ff Prof Flaemig <https://github.com/tflaemig68/>
  * @brief	ST7735 TFT Graphic Interface V1.2
  * @brief 	sorry, until now, there no doxygen compatible comments included
  * @date	V1.3 Aug. 2025

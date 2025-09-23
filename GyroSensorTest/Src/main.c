@@ -55,8 +55,9 @@
 #include <mcalGPIO.h>
 #include <mcalSPI.h>
 #include <mcalI2C.h>
+#include <i2cDevices.h>
 #include <RotaryPushButton.h>
-#include <BALO.h>
+#include <adcBAT.h>
 #include <ST7735.h>
 #include <i2cMPU.h>
 /*
@@ -64,17 +65,14 @@
   #warning "FPU is not initialized. Initialize the FPU before using floating-point operations."
 #endif
 */
+// uncomment BALA2024 for Piggyback Hardware
+#define BALA2024
+
 #ifdef BALA2024
-// MPU6050 I2C Bus
-	#define 	MPUi2c		I2C2
+#define MPUi2c I2C2
 #else
-	#define 	MPUi2c 		I2C1
+#define MPUi2c I2C1
 #endif
-// this is the Init run
-
-
-
-
 
 // Flags and timers for task scheduling
 bool timerTrigger = false;
@@ -105,22 +103,51 @@ int main(void)
 
     float temp;
 
-    // Initialize display and peripherals
-    BALOsetup();
+    initLED(&LEDbala);
 
-    LED_red_on;						//start mpu init
+#ifdef BALA2024
+activateI2C2();			//! I2C Channel 1 at i2cDevices.c
+#else
+activateI2C1();			//! I2C Channel 1 at i2cDevices.c
+#endif
+
+
+	setLED(RED_on);
+    // activateADC(PIN1);		//! BALA2024 used PIN1 for Battery Voltage Measurement
+
+	/**
+	 *	@brief init is needed for TFT Display
+	 *	 and initialize of Systick-Timer
+	 */
+
+
+
+    setLED(RED_on);						//start mpu init
 
     systickInit(SYSTICK_10MS);      // Initialize SysTick timer
-    spiInit();                     // Initialize SPI
+/**
+ * brief  initialize the rotary push button module
+ */
+#ifdef BALA2024
+    initRotaryPushButton(&PuBio_bala);// Initialize display and peripherals
+    IOspiInit(&ST7735bala);			//! SPI Init
+#else
+    initRotaryPushButton(&PuBio_pgb);// Initialize display and peripherals
+    IOspiInit(&ST7735pgb);			//! SPI Init
+#endif
+
     tftInitR(INITR_REDTAB);        // Initialize TFT display
 
-    // Set up display properties
-    tftSetRotation(LANDSCAPE_FLIP);
+/**
+ * brief make the display clear and working
+ */
+	tftInitR(INITR_REDTAB);
+    tftSetRotation(LANDSCAPE);
     tftSetFont((uint8_t *)&SmallFont[0]);
     tftFillScreen(tft_BLACK);
 
-    // Initialize rotary push button
-    initRotaryPushButton();
+
+
 
     // Set timer interval
     systickSetMillis(&Timer1, DispTaskTime);
@@ -176,7 +203,7 @@ int main(void)
 
 
 
-	LED_red_off;
+	setLED(RED_off);
 
 
 	// Reset I2C timer
@@ -209,11 +236,11 @@ int main(void)
             if ((MPU1.pitch * _rad2deg < -10) || (MPU1.pitch * _rad2deg > 10) ||
                 (MPU1.roll * _rad2deg < -10) || (MPU1.roll * _rad2deg > 10))
             {
-                setRotaryColor(LED_CYAN); // Deviations greater than ±10° trigger cyan
+                setLED(CYAN); // Deviations greater than ±10° trigger cyan
             }
             else
             {
-                setRotaryColor(LED_GREEN); // Otherwise, set green
+                setLED(GREEN); // Otherwise, set green
             }
 
 #ifdef Oszi
