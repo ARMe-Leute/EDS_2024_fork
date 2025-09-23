@@ -1,0 +1,8 @@
+../Src/regler.c:28:13:PIDget	16	static
+../Src/regler.c:38:6:PIDclear	16	static
+../Src/regler.c:50:6:PIDset	16	static
+../Src/regler.c:67:6:PIDinit	32	static
+../Src/regler.c:82:7:PIDrun	24	static
+../Src/regler.c:123:7:MeanVALrun	24	static
+../Src/regler.c:139:6:MeanVALclr	16	static
+../Src/regler.c:148:6:LowPassFilt	32	static

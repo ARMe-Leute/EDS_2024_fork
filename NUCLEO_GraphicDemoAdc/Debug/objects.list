@@ -1,0 +1,6 @@
+"./Src/RotaryPushButton.o"
+"./Src/ST7735.o"
+"./Src/graphics.o"
+"./Src/main.o"
+"./Src/regler.o"
+"./Startup/startup_stm32f401retx.o"

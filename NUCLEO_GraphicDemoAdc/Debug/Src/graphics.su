@@ -1,0 +1,6 @@
+../Src/graphics.c:27:6:i2cActivate	16	static
+../Src/graphics.c:75:6:ledActivate	8	static
+../Src/graphics.c:97:6:HWsetup	8	static
+../Src/graphics.c:116:6:OSZIinit	24	static
+../Src/graphics.c:130:9:OSZIrun	40	static
+../Src/graphics.c:191:10:AlBeOszi	32	static
