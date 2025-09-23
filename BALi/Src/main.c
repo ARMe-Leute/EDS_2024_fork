@@ -484,7 +484,7 @@ int main(void)
 	// Inits needed for TFT Display
     // Initialisiert den Systick-Timer
 	systickInit(SYSTICK_1MS);
-	spiInit();
+	IOspiInit(&ST7735bala);
 	tftInitR(INITR_REDTAB);
 
 	//display setup

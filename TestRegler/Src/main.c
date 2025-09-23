@@ -61,7 +61,7 @@ int main(void)
 	// size of the array  are calculated
 	size_t    arraySize = sizeof(timerList)/sizeof(timerList[0]);
 
-	BALOsetup();		// using this function from BALO.c for the hardware setup
+	HWsetup();		// using this function from graphics.c for the hardware setup
 	LED_red_on;			// switch LED to RED
 
 	struct PIDContr PID_Demo;  	// instance for PID Controller
@@ -71,7 +71,8 @@ int main(void)
 	systickInit(SYSTICK_1MS);
 
 	// Inits needed for TFT Display
-	spiInit();
+
+	IOspiInit(&ST7735pgb);
 	tftInitR(INITR_REDTAB);
 
 	//display setup

@@ -94,7 +94,7 @@ void ledActivate(void)
 /**
  * @brief init the used IO-hardware
  */
-void BALOsetup(void)
+void HWsetup(void)
 {
     // Configuration LED Pin
    ledActivate();

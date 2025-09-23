@@ -1,19 +1,39 @@
-/*********************************************************************************
-Some parts of code have been ported from Arduino Adafruit & UTFT libraries.
-Copyrights below:
+/**
+ ******************************************************************************
+ * @file	ST7735.c
+ * @author 	Henning Karlsen (C)2010-2013
+ * @author 	V1.1 Lea Hoß and Samuel Schieber (Students of DHBW Stuttgart)
+ * 			Redesign and further development
+ * @author	V1.2 Prof Flaemig <https://github.com/tflaemig68/>
+ * @brief	ST7735 TFT Graphic Interface V1.2
+ * @brief 	sorry, until now, there no doxygen compatible comments included
+ * @date	V1.3 Aug. 2025
+ ******************************************************************************
+ * @attention This software is licensed based on CC BY-NC-SA 4.0
+ * @attention Code has been ported from Arduino Adafruit library.
+ * @attention Copyrigths below:
+ *  This is a library for the Adafruit 1.8" SPI display.
+ *  This library works with the Adafruit 1.8" TFT Breakout w/SD card
+ *  ----> http://www.adafruit.com/products/358
+ *  as well as Adafruit raw 1.8" TFT display
+ *  ----> http://www.adafruit.com/products/618
+ *
+ * Written by Limor Fried/Ladyada for Adafruit Industries.
+ * MIT license, all text above must be included in any redistribution
+ *
+ * Some parts of code have been ported from Arduino Adafruit & UTFT libraries.
+ * Copyrights below:
+ * Written by Limor Fried/Ladyada for Adafruit Industries.
+ * MIT license, all text above must be included in any redistribution
+ * UTFT.cpp - Arduino/chipKit library support for Color TFT tft Boards
+ * Copyright (C)2010-2013 Henning Karlsen. All right reserved
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the CC BY-NC-SA 3.0 license.
+ * Please see the included documents for further information.
+ *********************************************************************************
+ */
 
-Written by Limor Fried/Ladyada for Adafruit Industries.
-MIT license, all text above must be included in any redistribution
 
-UTFT.cpp - Arduino/chipKit library support for Color TFT tft Boards
-Copyright (C)2010-2013 Henning Karlsen. All right reserved
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the CC BY-NC-SA 3.0 license.
-Please see the included documents for further information.
-**********************************************************************************/
-/*Redesign and further development have been done by Students of DHBW Stuttgart
-*/
 
 
 #include <math.h>
@@ -24,7 +44,6 @@ Please see the included documents for further information.
 #include <mcalSysTick.h>
 #include <mcalGPIO.h>
 #include <mcalSPI.h>
-#include <BALO.h>
 
 static uint16_t width = ST7735_TFTWIDTH;
 static uint16_t height = ST7735_TFTHEIGHT;
@@ -32,6 +51,82 @@ static uint16_t height = ST7735_TFTHEIGHT;
 /*****************************************************************************************
 Hardware Configuration
 ******************************************************************************************/
+/**
+ * @brief define prototype structure for the ST7735 Piggyback IO Interface
+ *
+ */
+static ST7735io_t *TFT ;
+static SPI_TypeDef  *spi ;
+
+void _DC1(void)
+{
+	gpioSetPin(TFT->DC_PORT, TFT->DC);
+}
+void _DC0(void)
+{
+	gpioResetPin(TFT->DC_PORT, TFT->DC);
+}
+
+void _RST1(void)
+{
+	gpioSetPin(TFT->RST_PORT, TFT->RST);
+}
+
+void _RST0(void)
+{
+	gpioResetPin(TFT->RST_PORT, TFT->RST);
+}
+
+void _CS1(void)
+{
+	gpioSetPin(TFT->CS_PORT, TFT->CS);
+}
+void _CS0(void)
+{
+	gpioResetPin(TFT->CS_PORT, TFT->CS);
+}
+
+
+/**
+* @brief IO-Interface for ST7735 IC using SPI
+* using C with a struct as OOP (object oriented program) style
+* 						BALA2024		PiggyBack
+* RST - Reset 			PB4				PA9
+* DC  - Data/Command	PB5				PC7
+* CS  - ChipSelect		PA15			PB6
+* MOSI -				PA7				PA7
+* CLK					PA5				PA5
+*
+*/
+
+ST7735io_t ST7735pgb = {
+	.CS_PORT = GPIOB,		//! Chip Select Port
+	.CS = PIN6,				//! Chip Select Pin
+	.DC_PORT = GPIOC,		//! DC - DATA/Command Select Port
+	.DC = PIN7,
+	.RST_PORT = GPIOA,		//! RST - Reset
+	.RST = PIN9,			//! Reset Pin
+	.SPI  =  SPI1,			// SPI only Output Data
+	.SPI_PORT = GPIOA,
+	.MOSI = PIN7,
+	.CLK = PIN5,
+
+};
+
+ST7735io_t ST7735bala = {
+	.CS_PORT = GPIOA,		//! Chip Select Port
+	.CS = PIN15,			//! Chip Select Pin
+	.DC_PORT = GPIOB,		//! DC - DATA/Command Select Port
+	.DC = PIN5,
+	.RST_PORT = GPIOB,		//! RST - Reset
+	.RST = PIN4,			//! Reset Pin
+	.SPI  =  SPI1,			// SPI only Output Data
+	.SPI_PORT = GPIOA,
+	.MOSI = PIN7,
+	.CLK = PIN5,
+};
+
+
 
 /****************************************************************************************
 *
@@ -40,10 +135,10 @@ Hardware Configuration
 * The idea of HW initialization and configuration have taken on from
 * http://vg.ucoz.ru/load/stm32_ickhodnye_teksty_programm_na_si/stm32_biblioteka_podkljuchenija_displeja_na_kontrollere_st7735_dlja_stm32f4/16-1-0-41
 ****************************************************************************************/
-//Redesign and further development have been done by Lea Hoß and Samuel Schieber (Students of DHBW Stuttgart)
 
 
-static SPI_TypeDef  *spi  = SPI1;
+
+
 
 
 /* Function creates delay
@@ -58,21 +153,21 @@ void delayms(uint32_t delayValue)
 // Function sends byte via SPI to controller
 void tftSPISenddata(const uint8_t data)
 {
-	spiWriteByte(spi, ST7735_CS_PORT, ST7735_CS, data);
+	spiWriteByte(spi, TFT->CS_PORT, TFT->CS, data);
 }
 
 
 // Function sends byte via SPI to controller
 void tftSPISenddata16(const uint16_t data)
 {
-	spiWriteWord(spi, ST7735_CS_PORT, ST7735_CS, data);
+	spiWriteWord(spi, TFT->CS_PORT, TFT->CS, data);
 }
 
 
 // Function sends control command to controller
 void tftSendCmd(const uint8_t cmd)
 {
-	ST7735_DC0;
+	_DC0();
     tftSPISenddata(cmd);
 }
 
@@ -80,29 +175,32 @@ void tftSendCmd(const uint8_t cmd)
 // Function that sends parameters or a command to controller
 void tftSendData(const uint8_t data)
 {
-    ST7735_DC1;
+	_DC1();
     tftSPISenddata(data);
 }
 
 // Function that initializes the hardware configuration
-void spiInit(void)
+void IOspiInit(ST7735io_t *TFTset)
 {
-
+	TFT = TFTset;
+	spi = TFT->SPI;
     // Declaration of SPI & IO Pins for ST7735-Port
-    gpioSelectPort(ST7735_RST_PORT);
-    gpioSelectPinMode(ST7735_RST_PORT, ST7735_RST, OUTPUT);		// RESET
-    gpioSelectPort(ST7735_DC_PORT);
-    gpioSelectPinMode(ST7735_DC_PORT, ST7735_DC, OUTPUT);		// DATA/Command
+    gpioSelectPort(TFT->RST_PORT);
+    gpioSelectPinMode(TFT->RST_PORT, TFT->RST, OUTPUT);		// RESET
+    gpioSelectPort(TFT->DC_PORT);
+    gpioSelectPinMode(TFT->DC_PORT, TFT->DC, OUTPUT);		// DATA/Command
 
-    gpioInitPort(ST7735_CS_PORT);
-    gpioSelectPinMode(ST7735_CS_PORT,ST7735_CS, OUTPUT);        // CS
-    gpioSelectPushPullMode(ST7735_CS_PORT, ST7735_CS, PULLUP);
 
-    gpioInitPort(ST7735_SPI_PORT);
-    gpioSelectPinMode(ST7735_SPI_PORT, ST7735_CLK, ALTFUNC);	// SPI1 Clock
-    gpioSelectAltFunc(ST7735_SPI_PORT, ST7735_CLK, AF5);
-    gpioSelectPinMode(ST7735_SPI_PORT, ST7735_MOSI, ALTFUNC);	// SPI1 MOSI
-    gpioSelectAltFunc(ST7735_SPI_PORT, ST7735_MOSI, AF5);
+
+    gpioInitPort(TFT->CS_PORT);
+    gpioSelectPinMode(TFT->CS_PORT,TFT->CS, OUTPUT);        // CS
+    gpioSelectPushPullMode(TFT->CS_PORT, TFT->CS, PULLUP);
+
+    gpioInitPort(TFT->SPI_PORT);
+    gpioSelectPinMode(TFT->SPI_PORT, TFT->CLK, ALTFUNC);	// SPI1 Clock
+    gpioSelectAltFunc(TFT->SPI_PORT, TFT->CLK, AF5);
+    gpioSelectPinMode(TFT->SPI_PORT, TFT->MOSI, ALTFUNC);	// SPI1 MOSI
+    gpioSelectAltFunc(TFT->SPI_PORT, TFT->MOSI, AF5);
 
     // initialization of  SPI1
     spiSelectSPI(spi);
@@ -481,6 +579,7 @@ static const uint8_t Rcmd3[] = {
 };
 
 #define putpix(c) { tftSPISenddata(c >> 8); tftSPISenddata(c & 0xFF); }
+//define putpix(c) { tftSPISenddata16(c);} //doesnt work
 
 //default values for start Position
 static int colstart = 0; // May be overwritten in init func
@@ -530,16 +629,16 @@ static void commandList(const uint8_t *addr)
 static void commonInit(const uint8_t *cmdList)
 {
 	// toggle RST low to reset; CS low so it'll listen to us
-	ST7735_CS0;
+	_CS0();
 #ifdef tft_SOFT_RESET
 	tftSendCmd(ST7735_SWRESET);
 	delayms(500);
 #else
 	//ST7735_RST1;
 	//delay_ms(500);
-	ST7735_RST0;
-	delayms(50);  //default value 500
-	ST7735_RST1;
+	_RST0();
+	delayms(50);  //default value 50
+	_RST1();
 	//delay_ms(500);
 #endif
 	if(cmdList) commandList(cmdList);
@@ -599,7 +698,7 @@ void tftSetAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
 //colors selected pixel in chosen color
 void tftPushColor(uint16_t color)
 {
-	ST7735_DC1;
+	_DC1();
 	putpix(color);
 }
 
@@ -641,7 +740,7 @@ void tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
 
 	tftSetAddrWindow(x, y, x+w-1, y+h-1);
 
-	ST7735_DC1;
+	_DC1();
 	for(y=h; y>0; y--)
 	{
 		for(x=w; x>0; x--)
@@ -662,7 +761,7 @@ void tftDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
 	if((y+h-1) >= height) h = height-y;
 	tftSetAddrWindow(x, y, x, y+h-1);
 
-	ST7735_DC1;
+	_DC1();
 	while (h--) {
 		putpix(color);
 	}
@@ -688,7 +787,7 @@ void tftDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 
 	tftSetAddrWindow(x, y, x+w-1, y);
 
-	ST7735_DC1;
+	_DC1();
 	while (w--)
 	{
 		putpix(color);
@@ -896,7 +995,7 @@ void tftDrawBitmap(int x, int y, int sx, int sy, bitmapdatatype data, int scale)
 		if (orientation == PORTRAIT || orientation == PORTRAIT_FLIP)
 		{
 			tftSetAddrWindow(x, y, x+sx-1, y+sy-1);
-			ST7735_DC1;
+			_DC1();
 
 			for (tc=0; tc<(sx*sy); tc++)
 			{
@@ -908,7 +1007,7 @@ void tftDrawBitmap(int x, int y, int sx, int sy, bitmapdatatype data, int scale)
 			for (ty=0; ty<sy; ty++)
 			{
 				tftSetAddrWindow(x, y+ty, x+sx-1, y+ty);
-				ST7735_DC1;
+				_DC1();
 				for (tx=sx-1; tx>=0; tx--)
 				{
 					putpix(data[(ty*sx)+tx]);
@@ -1370,6 +1469,3 @@ uint8_t tftGetHeight()
 {
 	return(height); // height depends on Rotation Mode
 }
-
-
-

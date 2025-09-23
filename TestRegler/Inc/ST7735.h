@@ -24,7 +24,7 @@
 
 
 //#include "stm32f30x.h"
-#include <graphics.h>
+
 #include <stm32f4xx.h>
 #include <mcalGPIO.h>
 #include <mcalSPI.h>
@@ -37,77 +37,40 @@ Hardware Configuration
 #ifndef __VCP_HW_CONFIG__
 #define __VCP_HW_CONFIG__
 
-/***********************************************************/
-#ifdef PIGGYBAG
-	//Define Display Piggyback
-
-	#define ST7735_SPI_PORT		GPIOA
-	#define ST7735_CLK			PIN5
-	#define ST7735_MOSI			PIN7
-
-	//RST  PA9	Piggyback
-
-	#define ST7735_RST_PORT		GPIOA
-	#define ST7735_RST			PIN9
-	#define ST7735_RST1  gpioSetPin(GPIOA, PIN9)
-	#define ST7735_RST0  gpioResetPin(GPIOA, PIN9)
 
 
-	//A0   PB7	Piggyback
-	#define ST7735_DC_PORT		GPIOC
-	#define ST7735_DC			PIN7
-	#define ST7735_DC1   gpioSetPin(GPIOC, PIN7)
-	#define ST7735_DC0	  gpioResetPin(GPIOC, PIN7)
+// ******************** Predeclare ST7735 IO-Interface ********************
+typedef struct ST7735io ST7735io_t;
 
+/**
+* @brief IO-Interface for ST7735 IC using SPI
+* using C with a struct as OOP (object oriented program) style
+* 						BALA2024		PiggyBack
+* RST - Reset 			PB4				PA9
+* DC  - Data/Command	PB5				PC7
+* CS  - ChipSelect		PA15			PB6
+* MOSI -				PA7				PA7
+* CLK					PA5				PA5
+*
+*/
+struct ST7735io
+{
+	 GPIO_TypeDef* CS_PORT;			//! CS - Chip Select Port
+	 PIN_NUM_t CS;					//! CS - Chip Select Pin
+	 GPIO_TypeDef* DC_PORT;			//! DC - DATA/Command Select Port
+	 PIN_NUM_t DC;					//! DC - Pin
+	 GPIO_TypeDef* RST_PORT;		//! RST - Reset Select Port
+	 PIN_NUM_t RST;					//! RST - Pin
+	 SPI_TypeDef  *SPI;				//! SPI Channel
+	 GPIO_TypeDef* SPI_PORT;		//! SPI - Port
+	 PIN_NUM_t MOSI;				//! SPI MOSI - Pin
+	 PIN_NUM_t CLK;					//! SPI CLK - Pin
+};
 
-	//CS   PB6	Piggyback
-	#define ST7735_CS_PORT		GPIOB
-	#define ST7735_CS			PIN6
-	#define ST7735_CS1   gpioSetPin(GPIOB, PIN6)
-	#define ST7735_CS0   gpioResetPin(GPIOB, PIN6)
+extern  ST7735io_t ST7735pgb;
+extern  ST7735io_t ST7735bala;
 
-#endif
-
-#ifdef BALA2024
-//Define Display BALA2042_V2.0
-
-/****
- * RST - Reset 			PB4
- * DC  - Data/Command	PB5
- * CS  - ChipSelect		PA15
- * MOSI -				PA7
- * CLK					PA5
- *
- */
-
-	#define ST7735_SPI_PORT		GPIOA
-	#define ST7735_CLK			PIN5
-	#define ST7735_MOSI			PIN7
-
-	//RST  PB4	BALA2042_V2.0
-
-	#define ST7735_RST_PORT		GPIOB
-	#define ST7735_RST			PIN4
-	#define ST7735_RST1  gpioSetPin(GPIOB, PIN4)
-	#define ST7735_RST0  gpioResetPin(GPIOB, PIN4)
-
-	//A0   PB5	BALA2042_V2.0
-	#define ST7735_DC_PORT		GPIOB
-	#define ST7735_DC			PIN5
-	#define ST7735_DC1   gpioSetPin(GPIOB, PIN5)
-	#define ST7735_DC0	  gpioResetPin(GPIOB, PIN5)
-
-	//CS   PA15	BALA2042_V2.0
-	#define ST7735_CS_PORT		GPIOA
-	#define ST7735_CS			PIN15
-	#define ST7735_CS1   gpioSetPin(GPIOA, PIN15)
-	#define ST7735_CS0   gpioResetPin(GPIOA, PIN15)
-
-#endif
- /***********************************************************/
-
-
-extern void spiInit(void);
+extern void IOspiInit(ST7735io_t *TFT1);
 extern void tftSPISenddata(const uint8_t cmd);
 extern void tftSPISenddata16(const uint16_t data);
 extern void tftSendCmd(const uint8_t cmd);

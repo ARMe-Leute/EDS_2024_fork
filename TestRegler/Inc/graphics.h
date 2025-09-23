@@ -56,7 +56,7 @@
 #define LED_blue_on		gpioResetPin(LED_GPIO, LED_blue)
 #define LED_blue_off	gpioSetPin(LED_GPIO, LED_blue)
 
-extern void BALOsetup(void);
+extern void HWsetup(void);
 extern void i2cActivate(void);
 
 
