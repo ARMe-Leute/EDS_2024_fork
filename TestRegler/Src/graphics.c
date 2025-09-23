@@ -2,7 +2,7 @@
  ******************************************************************************
  * @file	graphics.c
  * @author	Prof Flaemig <https://github.com/tflaemig68/>
- * @brief	Graphics for TFT Display V1.0
+ * @brief	Graphics for TFT Display V1.1
  * @date	Aug 2025
  ******************************************************************************
  * @attention Graphic function for TFT Display
@@ -104,6 +104,7 @@ void BALOsetup(void)
 /**
  * @brief initialize the Scope by setting the parameters
  * @param Scope - pointer to Oszi
+ * @param PosX - Oszi X-Position on TFT Display for Oszi
  * @param PosY - Oszi Y-Position on TFT Display for Oszi Y = Zero default: 73
  * @param AmpY - Oszi Y-Amplitude on TFT Display for Oszi Amplitude default: 47
  * @param TimeX - Oszi Time Length on TFT Display for Oszi  default: 159 (maximum)
@@ -112,8 +113,9 @@ void BALOsetup(void)
  * @param ColB	- Color of B Channel Line default: tft_MAGENTA;
  *
  */
-void OSZIinit(Scope_t* Scope, int16_t PosY,int16_t AmpY,int16_t TimeX, uint16_t ColBG, uint16_t ColA, uint16_t ColB)
+void OSZIinit(Scope_t* Scope, int16_t PosX, int16_t PosY, int16_t AmpY,int16_t TimeX, uint16_t ColBG, uint16_t ColA, uint16_t ColB)
 {
+	Scope->PosX = PosX;
 	Scope->PosY = PosY;
 	Scope->AmpY = AmpY;
 	Scope->TimeX = TimeX;
@@ -128,7 +130,7 @@ void OSZIinit(Scope_t* Scope, int16_t PosY,int16_t AmpY,int16_t TimeX, uint16_t 
 int16_t OSZIrun(Scope_t* Oszi, float *AlphaBeta)
 {
 	// Variables for Oszi Function
-	int16_t oszi[3] = {Oszi->PosY,Oszi->AmpY,Oszi->TimeX};			//oszi ypos-Zero Level, y-amplitude, t_lenght
+	int16_t oszi[4] = {Oszi->PosY,Oszi->AmpY,Oszi->TimeX,Oszi->PosX};			//oszi ypos-Zero Level, y-amplitude, t_lenght
 	uint16_t osziColor = Oszi->ColBG;
 	uint16_t aColor = Oszi->ColA;
 	uint16_t bColor = Oszi->ColB;
@@ -143,22 +145,22 @@ int16_t OSZIrun(Scope_t* Oszi, float *AlphaBeta)
 		int16_t Ya = oszi[0] - (int16_t)((oszi[1]-1) * AlphaBeta[0]);			// - ST7735 y = 0 upper line inverter direct to y Scale
 		int16_t Yb = oszi[0] - (int16_t)((oszi[1]-1) * AlphaBeta[1]);
 		int16_t osziHight = oszi[1]*2;
-		tftDrawFastVLine(timepos, (oszi[0]-oszi[1]), osziHight, osziColor);
+		tftDrawFastVLine(timepos+oszi[3], (oszi[0]-oszi[1]), osziHight, osziColor);
 		if (Ya == Yb)
 		{
-			tftDrawPixel(timepos,Ya,tft_WHITE);
+			tftDrawPixel(timepos+oszi[3],Ya,tft_WHITE);
 		}
 		else
 		{
-			tftDrawPixel(timepos,Ya,aColor);
-			tftDrawPixel(timepos,Yb,bColor);
+			tftDrawPixel(timepos+oszi[3],Ya,aColor);
+			tftDrawPixel(timepos+oszi[3],Yb,bColor);
 		}
 		if (++timepos > oszi[2] )
 		{
 			timepos = 0;
 			//lcd7735_fillRect(0, oszi[0]-oszi[1], oszi[2]+1, 2*oszi[1], osziColor);  // Clear all
 		}
-		tftDrawFastVLine(timepos, oszi[0], oszi[1]/2, tft_RED);
+		tftDrawFastVLine(timepos+oszi[3], oszi[0], oszi[1]/2, tft_RED);
 		Oszi->TimePos = timepos;
 		return timepos;
 }
@@ -169,8 +171,9 @@ int16_t OSZIrun(Scope_t* Oszi, float *AlphaBeta)
  * Display Size Height x Width 128 x 160
  */
 const Scope_t Scope = {
-	.PosY = 73,			//! Oszi Y-Position on TFT Display for Oszi Y = Zero default: 73
-	.AmpY = 47,			//! OSZI Y-AMPLITUDE ON TFT DISPLAY FOR OSZI AMPLITUDE DEFAULT: 47
+	.PosX = 0,			//! Oszi X-Position on TFT Display for Oszi  default: 0
+	.PosY = 63,			//! Oszi Y-Position on TFT Display for Oszi Y = Zero default: 63
+	.AmpY = 63,			//! OSZI Y-AMPLITUDE ON TFT DISPLAY FOR OSZI AMPLITUDE DEFAULT: 63 =128/2
 	.TimeX = 159,		//! Oszi Time Length on TFT Display for Oszi  default: 159 (maximum)
 	.TimePos = 0,		//! Current Time Pos
 	.ColBG = tft_GREY,		//! BackgroundColor default: tft_GREY;

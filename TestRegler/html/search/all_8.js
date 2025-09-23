@@ -1,7 +1,7 @@
 var searchData=
 [
   ['i2cactivate_0',['i2cActivate',['../graphics_8h.html#a50fe79f52e9390b57374a21525c912e8',1,'i2cActivate(void):&#160;graphics.c'],['../graphics_8c.html#ad726ed7ded22986d5f9e84be6b07f5fa',1,'i2cActivate():&#160;graphics.c']]],
-  ['init_1',['init',['../struct_scope_frame.html#ad0408ab0ad39334382a10014880d3118',1,'ScopeFrame::init'],['../struct_p_i_d_contr.html#a01afa6c96ebfd24e68582cea28ba9494',1,'PIDContr::init']]],
+  ['init_1',['init',['../struct_scope_frame.html#ad8a2bba4e304dd168dc08d6563ea4b12',1,'ScopeFrame::init'],['../struct_p_i_d_contr.html#a01afa6c96ebfd24e68582cea28ba9494',1,'PIDContr::init']]],
   ['initr_5fblacktab_2',['INITR_BLACKTAB',['../_s_t7735_8h.html#a385ddeae12a0bcd313507bbe58f66e9a',1,'ST7735.h']]],
   ['initr_5fgreentab_3',['INITR_GREENTAB',['../_s_t7735_8h.html#a8482c50b5e4da7ef9cc27ec7f16aa374',1,'ST7735.h']]],
   ['initr_5fredtab_4',['INITR_REDTAB',['../_s_t7735_8h.html#ac861596d7089b7620395cdad635c9307',1,'ST7735.h']]],

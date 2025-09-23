@@ -99,7 +99,9 @@ $(function(){initNavTree('struct_scope_frame.html','','struct_scope_frame-member
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:a8fa5c9139ca3c3dbfbff0f6403bf92a6" id="r_a8fa5c9139ca3c3dbfbff0f6403bf92a6"><td class="memItemLeft" align="right" valign="top">int16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8fa5c9139ca3c3dbfbff0f6403bf92a6">PosX</a></td></tr>
 <tr class="memitem:a607c16a2994c2d3c152b97feeae08256" id="r_a607c16a2994c2d3c152b97feeae08256"><td class="memItemLeft" align="right" valign="top">int16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a607c16a2994c2d3c152b97feeae08256">PosY</a></td></tr>
+<tr class="memdesc:a607c16a2994c2d3c152b97feeae08256"><td class="mdescLeft">&#160;</td><td class="mdescRight">Oszi X-Position on TFT Display for Oszi X = Zero default: 0.  <br /></td></tr>
 <tr class="memitem:a080abf40c8cebe5af7826468b6387638" id="r_a080abf40c8cebe5af7826468b6387638"><td class="memItemLeft" align="right" valign="top">int16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a080abf40c8cebe5af7826468b6387638">AmpY</a></td></tr>
 <tr class="memdesc:a080abf40c8cebe5af7826468b6387638"><td class="mdescLeft">&#160;</td><td class="mdescRight">Oszi Y-Position on TFT Display for Oszi Y = Zero default: 73.  <br /></td></tr>
 <tr class="memitem:ac1ce4a58a1e05801fc2848f2818e759b" id="r_ac1ce4a58a1e05801fc2848f2818e759b"><td class="memItemLeft" align="right" valign="top">int16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac1ce4a58a1e05801fc2848f2818e759b">TimeX</a></td></tr>
@@ -112,8 +114,8 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:a34898f474ed77156b32916a30e8b69bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">BackgroundColor default: tft_GREY;.  <br /></td></tr>
 <tr class="memitem:a2bdbaf4b9b8808b28ca0839487e90f35" id="r_a2bdbaf4b9b8808b28ca0839487e90f35"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2bdbaf4b9b8808b28ca0839487e90f35">ColB</a></td></tr>
 <tr class="memdesc:a2bdbaf4b9b8808b28ca0839487e90f35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Color of A Channel Line default: tft_YELLOW;.  <br /></td></tr>
-<tr class="memitem:ad0408ab0ad39334382a10014880d3118" id="r_ad0408ab0ad39334382a10014880d3118"><td class="memItemLeft" align="right" valign="top">void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad0408ab0ad39334382a10014880d3118">init</a> )(<a class="el" href="graphics_8h.html#af71a370b4452f7989ff2c84fdde179d1">Scope_t</a> *, int16_t, int16_t, int16_t, uint16_t, uint16_t, uint16_t)</td></tr>
-<tr class="memdesc:ad0408ab0ad39334382a10014880d3118"><td class="mdescLeft">&#160;</td><td class="mdescRight">Color of A Channel Line default: tft_MAGENTA;.  <br /></td></tr>
+<tr class="memitem:ad8a2bba4e304dd168dc08d6563ea4b12" id="r_ad8a2bba4e304dd168dc08d6563ea4b12"><td class="memItemLeft" align="right" valign="top">void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad8a2bba4e304dd168dc08d6563ea4b12">init</a> )(<a class="el" href="graphics_8h.html#af71a370b4452f7989ff2c84fdde179d1">Scope_t</a> *, int16_t, int16_t, int16_t, int16_t, uint16_t, uint16_t, uint16_t)</td></tr>
+<tr class="memdesc:ad8a2bba4e304dd168dc08d6563ea4b12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Color of A Channel Line default: tft_MAGENTA;.  <br /></td></tr>
 <tr class="memitem:afb3ed02e7aae099eb4eeafc29321af0b" id="r_afb3ed02e7aae099eb4eeafc29321af0b"><td class="memItemLeft" align="right" valign="top">int16_t(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb3ed02e7aae099eb4eeafc29321af0b">run</a> )(<a class="el" href="graphics_8h.html#af71a370b4452f7989ff2c84fdde179d1">Scope_t</a> *, float *)</td></tr>
 <tr class="memdesc:afb3ed02e7aae099eb4eeafc29321af0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">run Oszi with Input float AB[2]  <br /></td></tr>
 </table>
@@ -184,20 +186,34 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ad0408ab0ad39334382a10014880d3118" name="ad0408ab0ad39334382a10014880d3118"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad0408ab0ad39334382a10014880d3118">&#9670;&#160;</a></span>init</h2>
+<a id="ad8a2bba4e304dd168dc08d6563ea4b12" name="ad8a2bba4e304dd168dc08d6563ea4b12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8a2bba4e304dd168dc08d6563ea4b12">&#9670;&#160;</a></span>init</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void(* ScopeFrame::init) (<a class="el" href="graphics_8h.html#af71a370b4452f7989ff2c84fdde179d1">Scope_t</a> *, int16_t, int16_t, int16_t, uint16_t, uint16_t, uint16_t)</td>
+          <td class="memname">void(* ScopeFrame::init) (<a class="el" href="graphics_8h.html#af71a370b4452f7989ff2c84fdde179d1">Scope_t</a> *, int16_t, int16_t, int16_t, int16_t, uint16_t, uint16_t, uint16_t)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Color of A Channel Line default: tft_MAGENTA;. </p>
 <p>Initialize Oszi </p>
+
+</div>
+</div>
+<a id="a8fa5c9139ca3c3dbfbff0f6403bf92a6" name="a8fa5c9139ca3c3dbfbff0f6403bf92a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8fa5c9139ca3c3dbfbff0f6403bf92a6">&#9670;&#160;</a></span>PosX</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int16_t ScopeFrame::PosX</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -212,6 +228,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Oszi X-Position on TFT Display for Oszi X = Zero default: 0. </p>
 
 </div>
 </div>

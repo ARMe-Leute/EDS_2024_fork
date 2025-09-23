@@ -92,7 +92,7 @@ $(function(){initNavTree('graphics_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Graphics for TFT Display V1.0.  
+<p>Graphics for TFT Display V1.1.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;mcalSysTick.h&gt;</code><br />
@@ -110,8 +110,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:afab2fa5af9d43c8ecf418d855e0c1112"><td class="mdescLeft">&#160;</td><td class="mdescRight">Init LED pins for RGB.  <br /></td></tr>
 <tr class="memitem:a9ba8f151fc055a1fcf722f80a0260d33" id="r_a9ba8f151fc055a1fcf722f80a0260d33"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9ba8f151fc055a1fcf722f80a0260d33">BALOsetup</a> (void)</td></tr>
 <tr class="memdesc:a9ba8f151fc055a1fcf722f80a0260d33"><td class="mdescLeft">&#160;</td><td class="mdescRight">init the used IO-hardware  <br /></td></tr>
-<tr class="memitem:a61e00863ce5290fc7b61683246918a62" id="r_a61e00863ce5290fc7b61683246918a62"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a61e00863ce5290fc7b61683246918a62">OSZIinit</a> (<a class="el" href="graphics_8h.html#af71a370b4452f7989ff2c84fdde179d1">Scope_t</a> *<a class="el" href="graphics_8h.html#af970aaced0e54a5de0a7600b0cee7a91">Scope</a>, int16_t PosY, int16_t AmpY, int16_t TimeX, uint16_t ColBG, uint16_t ColA, uint16_t ColB)</td></tr>
-<tr class="memdesc:a61e00863ce5290fc7b61683246918a62"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the Scope by setting the parameters  <br /></td></tr>
+<tr class="memitem:a7843aa90516d9f370dfa33b36daf7a16" id="r_a7843aa90516d9f370dfa33b36daf7a16"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7843aa90516d9f370dfa33b36daf7a16">OSZIinit</a> (<a class="el" href="graphics_8h.html#af71a370b4452f7989ff2c84fdde179d1">Scope_t</a> *<a class="el" href="graphics_8h.html#af970aaced0e54a5de0a7600b0cee7a91">Scope</a>, int16_t PosX, int16_t PosY, int16_t AmpY, int16_t TimeX, uint16_t ColBG, uint16_t ColA, uint16_t ColB)</td></tr>
+<tr class="memdesc:a7843aa90516d9f370dfa33b36daf7a16"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the Scope by setting the parameters  <br /></td></tr>
 <tr class="memitem:ad00a362a05c5642829d175d5b08bb977" id="r_ad00a362a05c5642829d175d5b08bb977"><td class="memItemLeft" align="right" valign="top">int16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad00a362a05c5642829d175d5b08bb977">OSZIrun</a> (<a class="el" href="graphics_8h.html#af71a370b4452f7989ff2c84fdde179d1">Scope_t</a> *Oszi, float *AlphaBeta)</td></tr>
 <tr class="memdesc:ad00a362a05c5642829d175d5b08bb977"><td class="mdescLeft">&#160;</td><td class="mdescRight">run procedure for display A and B Line on this Scope  <br /></td></tr>
 <tr class="memitem:a3d44d87ca8749515d728160acfd57bc4" id="r_a3d44d87ca8749515d728160acfd57bc4"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3d44d87ca8749515d728160acfd57bc4">AlBeOszi</a> (float *AlphaBeta)</td></tr>
@@ -123,7 +123,7 @@ Variables</h2></td></tr>
 <tr class="memdesc:af970aaced0e54a5de0a7600b0cee7a91"><td class="mdescLeft">&#160;</td><td class="mdescRight">define prototype structure for the Scope the parameters are default values for a full screen Scope with enough space above for two text lines Display Size Height x Width 128 x 160  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Graphics for TFT Display V1.0. </p>
+<div class="textblock"><p>Graphics for TFT Display V1.1. </p>
 <dl class="section author"><dt>Author</dt><dd>Prof Flaemig <a href="https://github.com/tflaemig68/">https://github.com/tflaemig68/</a> </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>Aug 2025</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>Graphic function for TFT Display </dd>
@@ -213,8 +213,8 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
 
 </div>
 </div>
-<a id="a61e00863ce5290fc7b61683246918a62" name="a61e00863ce5290fc7b61683246918a62"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a61e00863ce5290fc7b61683246918a62">&#9670;&#160;</a></span>OSZIinit()</h2>
+<a id="a7843aa90516d9f370dfa33b36daf7a16" name="a7843aa90516d9f370dfa33b36daf7a16"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7843aa90516d9f370dfa33b36daf7a16">&#9670;&#160;</a></span>OSZIinit()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -223,6 +223,11 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
           <td class="memname">void OSZIinit </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="graphics_8h.html#af71a370b4452f7989ff2c84fdde179d1">Scope_t</a> *</td>          <td class="paramname"><span class="paramname"><em>Scope</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t</td>          <td class="paramname"><span class="paramname"><em>PosX</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -261,6 +266,7 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Scope</td><td>- pointer to Oszi </td></tr>
+    <tr><td class="paramname">PosX</td><td>- Oszi X-Position on TFT Display for Oszi </td></tr>
     <tr><td class="paramname">PosY</td><td>- Oszi Y-Position on TFT Display for Oszi Y = Zero default: 73 </td></tr>
     <tr><td class="paramname">AmpY</td><td>- Oszi Y-Amplitude on TFT Display for Oszi Amplitude default: 47 </td></tr>
     <tr><td class="paramname">TimeX</td><td>- Oszi Time Length on TFT Display for Oszi default: 159 (maximum) </td></tr>
@@ -310,21 +316,22 @@ This software is licensed based on CC BY-NC-SA 4.0 </dd></dl>
       </table>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">= {</div>
-<div class="line">    .PosY = 73,         </div>
-<div class="line">    .AmpY = 47,         </div>
+<div class="line">    .PosX = 0,          </div>
+<div class="line">    .PosY = 63,         </div>
+<div class="line">    .AmpY = 63,         </div>
 <div class="line">    .TimeX = 159,       </div>
 <div class="line">    .TimePos = 0,       </div>
 <div class="line">    .ColBG = <a class="code hl_define" href="_s_t7735_8h.html#a4615b073c7162ccf588745a7cfe28b83">tft_GREY</a>,      </div>
 <div class="line">    .ColA = <a class="code hl_define" href="_s_t7735_8h.html#aa5064f1ecfb8c7231717e1929bb1ec64">tft_YELLOW</a>,       </div>
 <div class="line">    .ColB = <a class="code hl_define" href="_s_t7735_8h.html#ad39732738e90d208a840936a1e0c54b5">tft_MAGENTA</a>, </div>
-<div class="line">    .init = <a class="code hl_function" href="#a61e00863ce5290fc7b61683246918a62">OSZIinit</a>,</div>
+<div class="line">    .init = <a class="code hl_function" href="#a7843aa90516d9f370dfa33b36daf7a16">OSZIinit</a>,</div>
 <div class="line">    .run = <a class="code hl_function" href="#ad00a362a05c5642829d175d5b08bb977">OSZIrun</a>,</div>
 <div class="line">}</div>
 <div class="ttc" id="a_s_t7735_8h_html_a4615b073c7162ccf588745a7cfe28b83"><div class="ttname"><a href="_s_t7735_8h.html#a4615b073c7162ccf588745a7cfe28b83">tft_GREY</a></div><div class="ttdeci">#define tft_GREY</div><div class="ttdef"><b>Definition</b> ST7735.h:233</div></div>
 <div class="ttc" id="a_s_t7735_8h_html_aa5064f1ecfb8c7231717e1929bb1ec64"><div class="ttname"><a href="_s_t7735_8h.html#aa5064f1ecfb8c7231717e1929bb1ec64">tft_YELLOW</a></div><div class="ttdeci">#define tft_YELLOW</div><div class="ttdef"><b>Definition</b> ST7735.h:232</div></div>
 <div class="ttc" id="a_s_t7735_8h_html_ad39732738e90d208a840936a1e0c54b5"><div class="ttname"><a href="_s_t7735_8h.html#ad39732738e90d208a840936a1e0c54b5">tft_MAGENTA</a></div><div class="ttdeci">#define tft_MAGENTA</div><div class="ttdef"><b>Definition</b> ST7735.h:231</div></div>
-<div class="ttc" id="agraphics_8c_html_a61e00863ce5290fc7b61683246918a62"><div class="ttname"><a href="#a61e00863ce5290fc7b61683246918a62">OSZIinit</a></div><div class="ttdeci">void OSZIinit(Scope_t *Scope, int16_t PosY, int16_t AmpY, int16_t TimeX, uint16_t ColBG, uint16_t ColA, uint16_t ColB)</div><div class="ttdoc">initialize the Scope by setting the parameters</div><div class="ttdef"><b>Definition</b> graphics.c:115</div></div>
-<div class="ttc" id="agraphics_8c_html_ad00a362a05c5642829d175d5b08bb977"><div class="ttname"><a href="#ad00a362a05c5642829d175d5b08bb977">OSZIrun</a></div><div class="ttdeci">int16_t OSZIrun(Scope_t *Oszi, float *AlphaBeta)</div><div class="ttdoc">run procedure for display A and B Line on this Scope</div><div class="ttdef"><b>Definition</b> graphics.c:128</div></div>
+<div class="ttc" id="agraphics_8c_html_a7843aa90516d9f370dfa33b36daf7a16"><div class="ttname"><a href="#a7843aa90516d9f370dfa33b36daf7a16">OSZIinit</a></div><div class="ttdeci">void OSZIinit(Scope_t *Scope, int16_t PosX, int16_t PosY, int16_t AmpY, int16_t TimeX, uint16_t ColBG, uint16_t ColA, uint16_t ColB)</div><div class="ttdoc">initialize the Scope by setting the parameters</div><div class="ttdef"><b>Definition</b> graphics.c:116</div></div>
+<div class="ttc" id="agraphics_8c_html_ad00a362a05c5642829d175d5b08bb977"><div class="ttname"><a href="#ad00a362a05c5642829d175d5b08bb977">OSZIrun</a></div><div class="ttdeci">int16_t OSZIrun(Scope_t *Oszi, float *AlphaBeta)</div><div class="ttdoc">run procedure for display A and B Line on this Scope</div><div class="ttdef"><b>Definition</b> graphics.c:130</div></div>
 </div><!-- fragment -->
 <p>define prototype structure for the Scope the parameters are default values for a full screen Scope with enough space above for two text lines Display Size Height x Width 128 x 160 </p>
 <p>reference to the prototype of <a class="el" href="graphics_8h.html#af71a370b4452f7989ff2c84fdde179d1">Scope_t</a> </p>

@@ -1,6 +1,8 @@
 var graphics_8h =
 [
     [ "ScopeFrame", "struct_scope_frame.html", "struct_scope_frame" ],
+    [ "_TFTX", "graphics_8h.html#a6c9e420871119e0689a1432034ef8729", null ],
+    [ "_TFTY", "graphics_8h.html#a79d14438222145047cab21f28d9af738", null ],
     [ "DELAY_blue", "graphics_8h.html#ad6e2f3b75678b7b3a3cf47081a52b010", null ],
     [ "DELAY_green", "graphics_8h.html#af9d0150944bea3877f25f0ea3789c524", null ],
     [ "DELAY_red", "graphics_8h.html#a07da22015852e53e6ca725920003d085", null ],

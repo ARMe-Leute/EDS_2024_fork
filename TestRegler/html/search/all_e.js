@@ -11,7 +11,8 @@ var searchData=
   ['piggybag_8',['PIGGYBAG',['../graphics_8h.html#a9f4c97e682a08e1eed6fd7679d77afdc',1,'graphics.h']]],
   ['portrait_9',['PORTRAIT',['../_s_t7735_8h.html#a20d6fe800ee77dff684c05b86d5ab3b7',1,'ST7735.h']]],
   ['portrait_5fflip_10',['PORTRAIT_FLIP',['../_s_t7735_8h.html#a910734d74e38658b021841c2848d0b8a',1,'ST7735.h']]],
-  ['posy_11',['PosY',['../struct_scope_frame.html#a607c16a2994c2d3c152b97feeae08256',1,'ScopeFrame']]],
-  ['pushbuttonflag_12',['pushButtonFlag',['../_rotary_push_button_8c.html#a3807151c27347c227b96c794841ec8e5',1,'RotaryPushButton.c']]],
-  ['putpix_13',['putpix',['../_s_t7735_8c.html#afa95a4da5c6fd3719884f2efac961687',1,'ST7735.c']]]
+  ['posx_11',['PosX',['../struct_scope_frame.html#a8fa5c9139ca3c3dbfbff0f6403bf92a6',1,'ScopeFrame']]],
+  ['posy_12',['PosY',['../struct_scope_frame.html#a607c16a2994c2d3c152b97feeae08256',1,'ScopeFrame']]],
+  ['pushbuttonflag_13',['pushButtonFlag',['../_rotary_push_button_8c.html#a3807151c27347c227b96c794841ec8e5',1,'RotaryPushButton.c']]],
+  ['putpix_14',['putpix',['../_s_t7735_8c.html#afa95a4da5c6fd3719884f2efac961687',1,'ST7735.c']]]
 ];

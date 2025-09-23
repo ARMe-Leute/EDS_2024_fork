@@ -5,7 +5,7 @@
  ******************************************************************************
  * @file	graphics.h
  * @author	Prof Flaemig <https://github.com/tflaemig68/>
- * @brief	TFT Graphics V1.0
+ * @brief	TFT Graphics V1.1
  * @date	Aug 2025
  ******************************************************************************
  * @attention Graphic function for TFT Display
@@ -15,7 +15,8 @@
  */
 
 #include <stdint.h>
-
+#define _TFTX 160
+#define _TFTY 128
 
 /**
  * @attention Selection of used Hardware Connectors
@@ -68,6 +69,7 @@ typedef struct ScopeFrame Scope_t;
 */
 struct ScopeFrame
 {
+	int16_t PosX;		//! Oszi X-Position on TFT Display for Oszi X = Zero default: 0
 	int16_t PosY;		//! Oszi Y-Position on TFT Display for Oszi Y = Zero default: 73
 	int16_t AmpY;		//! Oszi Y-Amplitude on TFT Display for Oszi Amplitude default: 47
 	int16_t TimeX;		//! Oszi Time Length on TFT Display for Oszi  default: 159 (maximum)
@@ -75,7 +77,7 @@ struct ScopeFrame
 	uint16_t ColBG; 	//! BackgroundColor default: tft_GREY;
 	uint16_t ColA; 		//! Color of A Channel Line default: tft_YELLOW;
 	uint16_t ColB;  	//! Color of A Channel Line default: tft_MAGENTA;
-	void (*init)(Scope_t*, int16_t, int16_t, int16_t, uint16_t, uint16_t, uint16_t);  //!< Initialize Oszi
+	void (*init)(Scope_t*, int16_t, int16_t, int16_t, int16_t, uint16_t, uint16_t, uint16_t);  //!< Initialize Oszi
 	int16_t (*run)(Scope_t*, float*);   				//!< run Oszi with Input float AB[2]
 };
 

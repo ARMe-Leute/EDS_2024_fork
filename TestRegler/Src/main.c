@@ -10,10 +10,12 @@
  *
  ******************************************************************************
  */
-#define SwVersion "PID Demo V2.0 (c)Fl"
+#define SwVersion "PID Demo V2.1 (c)Fl"
 #define _KP 0.5
 #define _KI 0.5
 #define _KD 0.1
+#define _OSZIScale 0.8  // Scale of Scope Size
+
 /*
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
@@ -88,7 +90,7 @@ int main(void)
 
 	sprintf(strT, "P:%2.1f I:%2.1f D:%2.1f", PID_Demo.KP,PID_Demo.KI,PID_Demo.KD);
 	tftPrintColor((char *)strT, 0 , 14, tft_GREEN);
-	Scope.init(&Scope_Demo, Scope.PosY, Scope.AmpY, Scope.TimeX, Scope.ColBG, Scope.ColA, Scope.ColB);
+	Scope.init(&Scope_Demo, _TFTX-Scope.TimeX*_OSZIScale ,_TFTY-Scope.AmpY*_OSZIScale, Scope.AmpY*_OSZIScale, Scope.TimeX*_OSZIScale, Scope.ColBG, Scope.ColA, Scope.ColB);
 
 	while (1)
 	{
